@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPMN Cyber Lab — Documentazione Simulation</title>
+  <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      padding-top: 56px;
+      font-family: sans-serif;
+    }
+    .doc-header {
+      background: linear-gradient(135deg, #198754 0%, #0d6efd 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .doc-section {
+      padding: 2rem 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .doc-section:last-child {
+      border-bottom: none;
+    }
+    .doc-section h2 {
+      color: #198754;
+      margin-bottom: 1.5rem;
+    }
+    .doc-section h3 {
+      color: #0d6efd;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .step-list {
+      list-style: none;
+      counter-reset: step-counter;
+      padding-left: 0;
+    }
+    .step-list li {
+      counter-increment: step-counter;
+      margin-bottom: 1.5rem;
+      padding-left: 3rem;
+      position: relative;
+    }
+    .step-list li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: #198754;
+      color: white;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    .feature-box {
+      background: #f8f9fa;
+      border-left: 4px solid #198754;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .back-link {
+      margin-bottom: 2rem;
+    }
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+    }
+    @media (min-width: 1200px) {
+      .container {
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">BPMN Cyber Lab</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="simulation.html">Simulation</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="documentation.html">Documentation</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-header">
+    <div class="container">
+      <h1 class="display-5 fw-bold mb-2">Documentazione Simulation</h1>
+      <p class="lead">Guida completa all'utilizzo del simulatore token</p>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <div class="back-link">
+      <a href="documentation.html" class="btn btn-outline-primary">
+        ← Torna all'indice della documentazione
+      </a>
+    </div>
+
+    <!-- Simulation -->
+    <div class="doc-section">
+      <h2>▶️ Simulation - Simulazione Token</h2>
+      <p>
+        Il Simulation permette di eseguire simulazioni del flusso di processo usando token che si muovono 
+        attraverso il diagramma BPMN, visualizzando l'esecuzione in tempo reale.
+      </p>
+
+      <h3>Come funziona la simulazione</h3>
+      <ol class="step-list">
+        <li>
+          <strong>Carica un diagramma BPMN</strong><br>
+          Usa <em>File → Apri BPMN</em> per caricare il diagramma che vuoi simulare.
+        </li>
+        <li>
+          <strong>Attiva la modalità simulazione</strong><br>
+          Clicca sul canvas per attivare la modalità simulazione. Il diagramma mostrerà overlay 
+          interattivi sugli elementi.
+        </li>
+        <li>
+          <strong>Avvia il processo</strong><br>
+          Clicca sull'<strong>Start Event</strong> (evento iniziale) per generare il primo token 
+          e avviare il processo.
+        </li>
+        <li>
+          <strong>Controlla l'esecuzione</strong><br>
+          Usa i pulsanti di controllo nella toolbar:
+          <ul>
+            <li><strong>▶️ Play</strong>: Avvia l'esecuzione automatica</li>
+            <li><strong>⏸️ Pause</strong>: Mette in pausa l'esecuzione</li>
+            <li><strong>⏭️ Step</strong>: Esegue un singolo passo</li>
+            <li><strong>🔄 Reset</strong>: Riavvia la simulazione</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Monitora il flusso</strong><br>
+          Il pannello <strong>Simulation Log</strong> a sinistra mostra in tempo reale:
+          <ul>
+            <li>Token aggiunti/rimossi dagli elementi</li>
+            <li>Stato della simulazione</li>
+            <li>Notifiche ed eventi</li>
+            <li>Timestamp di ogni operazione</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h3>Interazione durante la simulazione</h3>
+      <div class="feature-box">
+        <strong>🎯 Token sui Task</strong><br>
+        Quando un token arriva su un task (attività), clicca sull'overlay del task per:
+        <ul class="mb-0">
+          <li>▶️ Completare il task (token prosegue)</li>
+          <li>⏸️ Mettere in pausa</li>
+        </ul>
+      </div>
+      <div class="feature-box">
+        <strong>🔀 Gateway (Punti di decisione)</strong><br>
+        Nei gateway esclusivi (XOR), clicca sul percorso desiderato per scegliere quale ramo seguire.
+      </div>
+      <div class="feature-box">
+        <strong>📊 Visualizzazione token</strong><br>
+        I token appaiono come cerchi colorati sugli elementi. Il numero indica quanti token 
+        sono presenti sull'elemento.
+      </div>
+
+      <h3>Log della simulazione</h3>
+      <p>
+        Il pannello log sulla sinistra registra tutti gli eventi della simulazione:
+      </p>
+      <ul>
+        <li>🔵 <strong>Token aggiunti</strong>: Quando un token arriva su un elemento</li>
+        <li>➕ <strong>Token aumentati</strong>: Quando più token si accumulano</li>
+        <li>⚪ <strong>Token rimossi</strong>: Quando un token lascia un elemento</li>
+        <li>▶️ <strong>Simulazione avviata/in pausa</strong>: Cambio di stato</li>
+        <li>🏁 <strong>Processo completato</strong>: Quando tutti i token raggiungono gli end event</li>
+      </ul>
+      <p>
+        Usa il pulsante <strong>Pulisci Log</strong> per cancellare le voci precedenti.
+      </p>
+
+      <h3>Controlli di simulazione</h3>
+      <div class="feature-box">
+        <strong>▶️ Play</strong><br>
+        Avvia l'esecuzione automatica del processo. I token si muoveranno automaticamente attraverso 
+        il diagramma seguendo il flusso definito. Il sistema monitora in tempo reale il movimento 
+        dei token e aggiorna il log ogni 500ms.
+      </div>
+      <div class="feature-box">
+        <strong>⏸️ Pause</strong><br>
+        Mette in pausa l'esecuzione automatica. Utile per analizzare in dettaglio lo stato corrente 
+        del processo o per prendere decisioni manuali ai gateway.
+      </div>
+      <div class="feature-box">
+        <strong>⏭️ Step</strong><br>
+        Esegue un singolo passo della simulazione. Ideale per un controllo granulare del flusso 
+        e per comprendere esattamente cosa succede ad ogni transizione.
+      </div>
+      <div class="feature-box">
+        <strong>🔄 Reset</strong><br>
+        Riavvia completamente la simulazione, rimuovendo tutti i token e riportando il processo 
+        allo stato iniziale. Il log viene mantenuto per riferimento storico.
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="doc-section">
+      <h2>💡 Suggerimenti per la Simulation</h2>
+      <ul>
+        <li>
+          <strong>Attiva sempre la modalità simulazione</strong>: Clicca sul canvas prima di iniziare 
+          per vedere gli overlay interattivi.
+        </li>
+        <li>
+          <strong>Usa Step per debug</strong>: Il controllo passo-passo è ideale per capire 
+          esattamente come funziona il tuo processo.
+        </li>
+        <li>
+          <strong>Controlla il log</strong>: Il pannello log è essenziale per tracciare il flusso 
+          e identificare anomalie.
+        </li>
+        <li>
+          <strong>Monitora i token bloccati</strong>: Se un token rimane fermo su un elemento, 
+          potrebbe esserci un problema nel flusso del processo.
+        </li>
+        <li>
+          <strong>Simula più istanze</strong>: Clicca più volte sullo Start Event per vedere 
+          come si comporta il processo con più istanze parallele.
+        </li>
+        <li>
+          <strong>Usa Pause per analisi</strong>: Metti in pausa quando vuoi esaminare in dettaglio 
+          lo stato corrente della simulazione.
+        </li>
+      </ul>
+    </div>
+
+    <!-- FAQ Simulation -->
+    <div class="doc-section">
+      <h2>❓ FAQ - Simulation</h2>
+      
+      <h3>Non vedo i pulsanti di simulazione</h3>
+      <p>
+        Assicurati di aver caricato un diagramma BPMN valido. I controlli di simulazione 
+        appaiono solo dopo aver caricato un file.
+      </p>
+
+      <h3>La simulazione non avanza</h3>
+      <p>
+        Verifica che la modalità simulazione sia attiva (clicca sul canvas). Poi clicca 
+        sull'Start Event per generare il primo token.
+      </p>
+
+      <h3>Come gestire gateway complessi?</h3>
+      <p>
+        Nei gateway esclusivi (XOR), devi scegliere manualmente il percorso cliccando sul 
+        ramo desiderato. Nei gateway paralleli (AND), tutti i rami vengono eseguiti automaticamente.
+      </p>
+
+      <h3>Posso simulare più istanze di processo contemporaneamente?</h3>
+      <p>
+        Sì! Clicca più volte sullo Start Event per generare più token e simulare più istanze 
+        di processo che corrono in parallelo.
+      </p>
+
+      <h3>Il log è troppo lungo</h3>
+      <p>
+        Usa il pulsante <strong>Pulisci Log</strong> in alto nel pannello per cancellare 
+        le voci precedenti e iniziare da zero.
+      </p>
+
+      <h3>I token si muovono troppo velocemente</h3>
+      <p>
+        Usa il pulsante <strong>Pause</strong> per fermare l'esecuzione automatica, o usa 
+        <strong>Step</strong> per avanzare un passo alla volta.
+      </p>
+
+      <h3>Come faccio a sapere se il processo è completato?</h3>
+      <p>
+        Il log mostrerà il messaggio "🏁 Processo completato - nessun token attivo" quando tutti 
+        i token hanno raggiunto un End Event e non ci sono più token attivi nel sistema.
+      </p>
+
+      <h3>Posso salvare lo stato della simulazione?</h3>
+      <p>
+        Attualmente non è possibile salvare lo stato della simulazione. Ogni volta che carichi 
+        un diagramma, la simulazione parte da zero. Il log viene mantenuto fino a quando non 
+        lo cancelli manualmente o ricarichi la pagina.
+      </p>
+    </div>
+
+    <div class="back-link mt-5">
+      <a href="documentation-modeler.html" class="btn btn-primary me-2">
+        ← Documentazione Modeler
+      </a>
+      <a href="documentation.html" class="btn btn-outline-primary">
+        Torna all'indice della documentazione
+      </a>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white text-center py-3 mt-5">
+    <div class="container">
+      <p class="mb-0">&copy; 2026 BPMN Cyber Lab. Powered by bpmn.io</p>
+    </div>
+  </footer>
+
+  <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

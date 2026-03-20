@@ -7,11 +7,12 @@ Un tool per la modellazione di processi BPMN con annotazioni di cybersecurity pe
 
 ## 📋 Descrizione
 
-BPMN Cyber Lab è una piattaforma web integrata per la modellazione e simulazione di processi BPMN con focus sulla cybersecurity. Basato su [bpmn.io](https://bpmn.io), offre un'interfaccia intuitiva divisa in tre sezioni principali:
+BPMN Cyber Lab è una piattaforma web integrata per la modellazione e simulazione di processi BPMN con focus sulla cybersecurity. Basato su [bpmn.io](https://bpmn.io), offre un'interfaccia intuitiva divisa in quattro sezioni principali:
 
 - **Home**: Pagina di benvenuto con descrizione della piattaforma e accesso rapido alle funzionalità
 - **Modeler**: Editor BPMN avanzato con pannello proprietà personalizzato per annotazioni cyber
 - **Simulation**: Simulatore di processi con token flow per visualizzare l'esecuzione dei workflow
+- **Documentation**: Guida completa all'utilizzo del Modeler e della Simulation
 
 ### Caratteristiche principali
 
@@ -145,6 +146,7 @@ Seleziona un task nel diagramma per accedere al pannello **Cybersecurity** sulla
 │   ├── index.html                # Homepage con descrizione
 │   ├── modeler.html              # Pagina Modeler
 │   ├── simulation.html           # Pagina Simulation
+│   ├── documentation.html        # Documentazione utente
 │   ├── vendor/                   # Librerie esterne (Bootstrap)
 │   └── BPMNs/                    # Diagrammi di esempio
 │       ├── example.bpmn
@@ -223,7 +225,7 @@ Edita `src/riskColorBehavior.js` per personalizzare la logica di colorazione aut
 
 ### Modificare l'interfaccia
 
-- **Navbar**: Modifica direttamente `public/index.html`, `public/modeler.html`, `public/simulation.html`
+- **Navbar**: Modifica direttamente `public/index.html`, `public/modeler.html`, `public/simulation.html`, `public/documentation.html`
 - **Stili globali**: Edita `src/styles.css` o i file nella cartella `src/styles/`
 - **Layout e margini**: Modifica gli stili inline nelle sezioni `<style>` dei file HTML
 Seguire le stesse istruzioni della v1.

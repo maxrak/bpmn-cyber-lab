@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPMN Cyber Lab — Documentazione Modeler</title>
+  <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      padding-top: 56px;
+      font-family: sans-serif;
+    }
+    .doc-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .doc-section {
+      padding: 2rem 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .doc-section:last-child {
+      border-bottom: none;
+    }
+    .doc-section h2 {
+      color: #667eea;
+      margin-bottom: 1.5rem;
+    }
+    .doc-section h3 {
+      color: #764ba2;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .step-list {
+      list-style: none;
+      counter-reset: step-counter;
+      padding-left: 0;
+    }
+    .step-list li {
+      counter-increment: step-counter;
+      margin-bottom: 1.5rem;
+      padding-left: 3rem;
+      position: relative;
+    }
+    .step-list li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: #667eea;
+      color: white;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    .feature-box {
+      background: #f8f9fa;
+      border-left: 4px solid #667eea;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .keyboard-key {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      background: #e9ecef;
+      border: 1px solid #dee2e6;
+      border-radius: 0.25rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+    .back-link {
+      margin-bottom: 2rem;
+    }
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+    }
+    @media (min-width: 1200px) {
+      .container {
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">BPMN Cyber Lab</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="simulation.html">Simulation</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="documentation.html">Documentation</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-header">
+    <div class="container">
+      <h1 class="display-5 fw-bold mb-2">Documentazione Modeler</h1>
+      <p class="lead">Guida completa all'utilizzo dell'editor BPMN</p>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <div class="back-link">
+      <a href="documentation.html" class="btn btn-outline-primary">
+        ← Torna all'indice della documentazione
+      </a>
+    </div>
+
+    <!-- Modeler -->
+    <div class="doc-section">
+      <h2>🎨 Modeler - Editor BPMN</h2>
+      <p>
+        Il Modeler permette di creare e modificare diagrammi BPMN 2.0 con supporto per proprietà 
+        di sicurezza informatica personalizzate.
+      </p>
+
+      <h3>Iniziare</h3>
+      <ol class="step-list">
+        <li>
+          <strong>Carica un diagramma esistente</strong><br>
+          Usa il menu <em>File → Apri BPMN</em> nella navbar o il pulsante nella toolbar per caricare 
+          un file .bpmn esistente.
+        </li>
+        <li>
+          <strong>Crea un nuovo diagramma</strong><br>
+          Usa il pannello degli strumenti a sinistra per aggiungere elementi BPMN al canvas:
+          <ul>
+            <li><strong>Start Event</strong>: Evento di inizio processo</li>
+            <li><strong>Task</strong>: Attività/compito da eseguire</li>
+            <li><strong>Gateway</strong>: Punti di decisione (XOR, AND, OR)</li>
+            <li><strong>End Event</strong>: Evento di fine processo</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Collega gli elementi</strong><br>
+          Clicca su un elemento e trascina i connettori per creare Sequence Flow tra gli elementi.
+        </li>
+        <li>
+          <strong>Configura le proprietà</strong><br>
+          Seleziona un elemento e usa il pannello delle proprietà a destra per:
+          <ul>
+            <li>Modificare nome e documentazione</li>
+            <li>Configurare proprietà tecniche (ID, tipo)</li>
+            <li>Aggiungere proprietà cyber personalizzate</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Salva il diagramma</strong><br>
+          Usa <em>File → Salva BPMN</em> per esportare il diagramma in formato .bpmn
+        </li>
+      </ol>
+
+      <h3>Funzionalità avanzate</h3>
+      <div class="feature-box">
+        <strong>🔍 Zoom</strong><br>
+        Usa i pulsanti <span class="keyboard-key">+</span> e <span class="keyboard-key">-</span> 
+        nella toolbar o la rotella del mouse per zoomare il canvas.
+      </div>
+      <div class="feature-box">
+        <strong>↶ Undo/Redo</strong><br>
+        Annulla e ripristina modifiche usando i pulsanti nella toolbar o le scorciatoie 
+        <span class="keyboard-key">Ctrl+Z</span> / <span class="keyboard-key">Ctrl+Y</span>.
+      </div>
+      <div class="feature-box">
+        <strong>🔒 Proprietà Cyber</strong><br>
+        Il pannello proprietà permette di aggiungere attributi di sicurezza informatica personalizzati 
+        agli elementi del processo per analisi di rischio.
+      </div>
+
+      <h3>Scorciatoie da tastiera</h3>
+      <ul>
+        <li><span class="keyboard-key">Space</span> + drag: Sposta il canvas</li>
+        <li><span class="keyboard-key">Canc</span>: Elimina elemento selezionato</li>
+        <li><span class="keyboard-key">Ctrl+C</span> / <span class="keyboard-key">Ctrl+V</span>: Copia/Incolla</li>
+        <li><span class="keyboard-key">Ctrl+A</span>: Seleziona tutto</li>
+      </ul>
+    </div>
+
+    <!-- File Format -->
+    <div class="doc-section">
+      <h2>📄 Formato File BPMN</h2>
+      <p>
+        I diagrammi vengono salvati in formato <strong>BPMN 2.0 XML</strong>, lo standard 
+        internazionale per la modellazione di processi. I file hanno estensione <code>.bpmn</code> 
+        e sono compatibili con altri strumenti BPMN come Camunda Modeler.
+      </p>
+      <div class="feature-box">
+        <strong>💾 Compatibilità</strong><br>
+        Puoi importare diagrammi creati con altri editor BPMN 2.0 e esportare i tuoi 
+        diagrammi per usarli in altre piattaforme.
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="doc-section">
+      <h2>💡 Suggerimenti per il Modeler</h2>
+      <ul>
+        <li>
+          <strong>Salva frequentemente</strong>: Usa regolarmente la funzione di salvataggio 
+          per non perdere il lavoro.
+        </li>
+        <li>
+          <strong>Nomi significativi</strong>: Usa nomi descrittivi per gli elementi per 
+          rendere il processo più comprensibile.
+        </li>
+        <li>
+          <strong>Test con Simulation</strong>: Dopo aver creato un diagramma nel Modeler, 
+          testalo sempre con Simulation per verificare il flusso.
+        </li>
+        <li>
+          <strong>Start con esempi</strong>: Carica i diagrammi di esempio dalla cartella 
+          <code>/public/BPMNs/</code> per vedere come sono strutturati.
+        </li>
+        <li>
+          <strong>Organizza il layout</strong>: Mantieni il diagramma pulito e ordinato per 
+          facilitare la comprensione del processo.
+        </li>
+      </ul>
+    </div>
+
+    <!-- FAQ Modeler -->
+    <div class="doc-section">
+      <h2>❓ FAQ - Modeler</h2>
+      
+      <h3>Come aggiungo nuovi elementi al diagramma?</h3>
+      <p>
+        Usa la palette degli strumenti sul lato sinistro del canvas. Clicca sull'elemento desiderato 
+        e poi clicca sul canvas dove vuoi posizionarlo.
+      </p>
+
+      <h3>Non vedo il pannello delle proprietà</h3>
+      <p>
+        Assicurati di aver selezionato un elemento cliccandoci sopra. Il pannello delle proprietà 
+        appare sulla destra quando un elemento è selezionato.
+      </p>
+
+      <h3>Come collego due elementi?</h3>
+      <p>
+        Clicca sull'elemento di partenza, poi clicca e trascina uno dei cerchi blu che appaiono 
+        verso l'elemento di destinazione.
+      </p>
+
+      <h3>Posso annullare un'operazione?</h3>
+      <p>
+        Sì! Usa <span class="keyboard-key">Ctrl+Z</span> per annullare e 
+        <span class="keyboard-key">Ctrl+Y</span> per ripristinare, oppure i pulsanti 
+        nella toolbar.
+      </p>
+
+      <h3>Come esporto il diagramma in un'immagine?</h3>
+      <p>
+        Attualmente l'export è disponibile solo in formato BPMN XML. Per ottenere un'immagine, 
+        puoi usare lo strumento di cattura schermo del tuo sistema operativo.
+      </p>
+    </div>
+
+    <div class="back-link mt-5">
+      <a href="documentation.html" class="btn btn-outline-primary">
+        ← Torna all'indice della documentazione
+      </a>
+      <a href="documentation-simulation.html" class="btn btn-success ms-2">
+        Documentazione Simulation →
+      </a>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white text-center py-3 mt-5">
+    <div class="container">
+      <p class="mb-0">&copy; 2026 BPMN Cyber Lab. Powered by bpmn.io</p>
+    </div>
+  </footer>
+
+  <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>
