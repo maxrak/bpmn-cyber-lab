@@ -204,6 +204,149 @@
       </ul>
     </div>
 
+    <!-- Cyber Properties -->
+    <div class="doc-section">
+      <h2>🔒 Proprietà Cybersecurity</h2>
+      <p>
+        BPMN Cyber Lab estende lo standard BPMN 2.0 con proprietà personalizzate per l'analisi 
+        del rischio di sicurezza informatica. Queste proprietà permettono di annotare i task 
+        con informazioni critiche per la valutazione della sicurezza del processo.
+      </p>
+
+      <h3>Come accedere alle proprietà cyber</h3>
+      <ol class="step-list">
+        <li>
+          <strong>Seleziona un task</strong><br>
+          Clicca su un elemento di tipo Task, User Task o Service Task nel diagramma.
+        </li>
+        <li>
+          <strong>Apri il pannello proprietà</strong><br>
+          Il pannello apparirà automaticamente sulla destra. Scorri fino alla sezione 
+          <strong>"Cybersecurity"</strong>.
+        </li>
+        <li>
+          <strong>Compila i campi</strong><br>
+          Inserisci i valori appropriati per ciascuna proprietà cyber disponibile.
+        </li>
+      </ol>
+
+      <h3>Proprietà disponibili</h3>
+      
+      <div class="feature-box">
+        <strong>🎯 STRIDE</strong><br>
+        Categorie di minacce secondo il modello Microsoft STRIDE:<br>
+        <ul class="mb-2 mt-2">
+          <li><strong>S</strong> - Spoofing (falsificazione identità)</li>
+          <li><strong>T</strong> - Tampering (manomissione dati)</li>
+          <li><strong>R</strong> - Repudiation (ripudio azioni)</li>
+          <li><strong>I</strong> - Information Disclosure (divulgazione informazioni)</li>
+          <li><strong>D</strong> - Denial of Service (negazione del servizio)</li>
+          <li><strong>E</strong> - Elevation of Privilege (elevazione privilegi)</li>
+        </ul>
+        <strong>Esempio:</strong> <code>S,T,E</code> indica che il task è vulnerabile a 
+        Spoofing, Tampering ed Elevation of Privilege.
+      </div>
+
+      <div class="feature-box">
+        <strong>⚔️ MITRE ATT&CK</strong><br>
+        Identificatori delle tecniche di attacco dal framework MITRE ATT&CK. Specifica quali 
+        tecniche di attacco potrebbero essere applicate a questo task.<br>
+        <strong>Esempio:</strong> <code>T1078</code> (Valid Accounts) o <code>T1078,T1552</code> 
+        per tecniche multiple.<br>
+        <em>Consulta il catalogo MITRE: <a href="https://attack.mitre.org/" target="_blank">
+        attack.mitre.org</a></em>
+      </div>
+
+      <div class="feature-box">
+        <strong>📊 Risk Score</strong><br>
+        Punteggio numerico del rischio calcolato come <strong>Probabilità × Impatto</strong>.<br>
+        Convenzione suggerita:
+        <ul class="mb-2 mt-2">
+          <li>🟢 <strong>0-30</strong>: Rischio basso</li>
+          <li>🟡 <strong>31-60</strong>: Rischio medio</li>
+          <li>🟠 <strong>61-90</strong>: Rischio alto</li>
+          <li>🔴 <strong>91-100</strong>: Rischio critico</li>
+        </ul>
+        <strong>Esempio:</strong> <code>12</code> per rischio basso, <code>85</code> per rischio alto.<br>
+        <em>I task vengono colorati automaticamente in base al risk score!</em>
+      </div>
+
+      <div class="feature-box">
+        <strong>📝 Audit Level</strong><br>
+        Livello di dettaglio richiesto per l'audit e il logging delle operazioni:
+        <ul class="mb-2 mt-2">
+          <li><strong>None</strong>: Nessun requisito di audit</li>
+          <li><strong>Basic</strong>: Logging base delle operazioni principali</li>
+          <li><strong>Detailed</strong>: Logging dettagliato di tutte le operazioni e accessi</li>
+        </ul>
+        <strong>Esempio:</strong> Task critici come "Provisioning account" dovrebbero avere 
+        livello <code>Detailed</code>.
+      </div>
+
+      <div class="feature-box">
+        <strong>⚠️ Single Point of Failure (SPOF)</strong><br>
+        Indica se il task rappresenta un singolo punto di fallimento critico per il sistema:
+        <ul class="mb-2 mt-2">
+          <li><strong>No</strong>: Task non critico o con ridondanza</li>
+          <li><strong>Yes</strong>: Task critico senza alternative - il suo fallimento blocca 
+          l'intero processo</li>
+        </ul>
+        <strong>Esempio:</strong> Un servizio di provisioning centralizzato senza backup 
+        dovrebbe essere marcato come <code>Yes</code>.
+      </div>
+
+      <h3>Esempio pratico</h3>
+      <p>Consideriamo un task di "Provisioning Account" in un processo IAM:</p>
+      <div style="background: #fff; border: 1px solid #dee2e6; padding: 1rem; margin: 1rem 0; border-radius: 0.25rem;">
+        <strong>Provisioning account</strong> (Service Task)
+        <hr style="margin: 0.5rem 0;">
+        <table style="width: 100%; font-size: 0.9rem;">
+          <tr>
+            <td style="padding: 0.25rem; width: 40%;"><strong>STRIDE:</strong></td>
+            <td style="padding: 0.25rem;"><code>T,E</code></td>
+          </tr>
+          <tr>
+            <td style="padding: 0.25rem;"><strong>MITRE ATT&CK:</strong></td>
+            <td style="padding: 0.25rem;"><code>T1078,T1552</code></td>
+          </tr>
+          <tr>
+            <td style="padding: 0.25rem;"><strong>Risk Score:</strong></td>
+            <td style="padding: 0.25rem;"><code>20</code> 🟢</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.25rem;"><strong>Audit Level:</strong></td>
+            <td style="padding: 0.25rem;"><code>Detailed</code></td>
+          </tr>
+          <tr>
+            <td style="padding: 0.25rem;"><strong>SPOF:</strong></td>
+            <td style="padding: 0.25rem;"><code>Yes</code> ⚠️</td>
+          </tr>
+        </table>
+      </div>
+      <p>
+        <strong>Interpretazione:</strong> Questo task è vulnerabile a Tampering ed Elevation 
+        of Privilege, potrebbe subire attacchi di tipo Valid Accounts (T1078) o Unsecured 
+        Credentials (T1552), ha un rischio basso (20) ma richiede audit dettagliato ed è un 
+        singolo punto di fallimento critico.
+      </p>
+
+      <h3>Colorazione automatica</h3>
+      <p>
+        Il sistema applica automaticamente una colorazione ai task in base al <strong>Risk Score</strong> 
+        per facilitare l'identificazione visuale dei task più critici:
+      </p>
+      <ul>
+        <li>🟢 <strong>Verde</strong> (0-30): Rischio basso</li>
+        <li>🟡 <strong>Giallo</strong> (31-60): Rischio medio</li>
+        <li>🟠 <strong>Arancione</strong> (61-90): Rischio alto</li>
+        <li>🔴 <strong>Rosso</strong> (91-100): Rischio critico</li>
+      </ul>
+      <p>
+        La colorazione viene applicata automaticamente al caricamento del diagramma e 
+        quando si modifica il Risk Score nel pannello proprietà.
+      </p>
+    </div>
+
     <!-- File Format -->
     <div class="doc-section">
       <h2>📄 Formato File BPMN</h2>
@@ -232,12 +375,22 @@
           rendere il processo più comprensibile.
         </li>
         <li>
-          <strong>Test con Simulation</strong>: Dopo aver creato un diagramma nel Modeler, 
-          testalo sempre con Simulation per verificare il flusso.
+          <strong>Annota i task critici</strong>: Usa le proprietà cyber per documentare 
+          le vulnerabilità e i rischi di ogni task. Questo facilita l'analisi della sicurezza 
+          del processo.
         </li>
         <li>
-          <strong>Start con esempi</strong>: Carica i diagrammi di esempio dalla cartella 
-          <code>/public/BPMNs/</code> per vedere come sono strutturati.
+          <strong>Carica esempi annotati</strong>: Apri i file come 
+          <code>iam_lifecycle_risk_annotated.bpmn</code> per vedere esempi di annotazioni 
+          cyber complete.
+        </li>
+        <li>
+          <strong>Sfrutta la colorazione automatica</strong>: Il Risk Score colora automaticamente 
+          i task - usa questo per identificare rapidamente le aree critiche del processo.
+        </li>
+        <li>
+          <strong>Test con Simulation</strong>: Dopo aver creato un diagramma nel Modeler, 
+          testalo sempre con Simulation per verificare il flusso.
         </li>
         <li>
           <strong>Organizza il layout</strong>: Mantieni il diagramma pulito e ordinato per 
@@ -279,6 +432,45 @@
       <p>
         Attualmente l'export è disponibile solo in formato BPMN XML. Per ottenere un'immagine, 
         puoi usare lo strumento di cattura schermo del tuo sistema operativo.
+      </p>
+
+      <h3>Non vedo la sezione "Cybersecurity" nel pannello proprietà</h3>
+      <p>
+        La sezione Cybersecurity appare solo quando selezioni un <strong>Task</strong>, 
+        <strong>User Task</strong> o <strong>Service Task</strong>. Altri elementi come 
+        Start Event, End Event o Gateway non hanno proprietà cyber.
+      </p>
+
+      <h3>Cosa sono i codici MITRE ATT&CK?</h3>
+      <p>
+        MITRE ATT&CK è un framework che cataloga le tecniche di attacco informatico. 
+        I codici come <code>T1078</code> identificano tecniche specifiche. Puoi consultare 
+        il catalogo completo su 
+        <a href="https://attack.mitre.org/" target="_blank">attack.mitre.org</a> 
+        per trovare i codici più appropriati per il tuo caso.
+      </p>
+
+      <h3>Come calcolo il Risk Score?</h3>
+      <p>
+        Il Risk Score è tipicamente calcolato moltiplicando la <strong>Probabilità</strong> 
+        (quanto è probabile che la minaccia si verifichi) per l'<strong>Impatto</strong> 
+        (quanto danno causerebbe). Ad esempio: Probabilità 4 (su scala 1-10) × Impatto 5 
+        (su scala 1-10) = Risk Score 20. Puoi usare il tuo metodo di valutazione preferito.
+      </p>
+
+      <h3>Le proprietà cyber vengono salvate nel file BPMN?</h3>
+      <p>
+        Sì! Le proprietà cyber vengono salvate come estensioni Camunda nel file BPMN XML. 
+        Quando riapri il file, tutte le proprietà saranno preservate insieme alla colorazione 
+        automatica basata sul Risk Score.
+      </p>
+
+      <h3>Posso usare i file con proprietà cyber in altri strumenti?</h3>
+      <p>
+        I file BPMN con proprietà cyber sono compatibili con altri editor BPMN 2.0, ma le 
+        estensioni personalizzate (STRIDE, MITRE, Risk Score, ecc.) potrebbero non essere 
+        visualizzate in altri strumenti. Le proprietà rimangono comunque nel file XML e 
+        saranno visibili quando lo riapri in BPMN Cyber Lab.
       </p>
     </div>
 

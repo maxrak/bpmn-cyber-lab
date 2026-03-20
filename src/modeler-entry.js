@@ -14,6 +14,7 @@ import { setupFileHandlers, loadSampleDiagram } from './fileHandlers';
 
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
+import '@bpmn-io/properties-panel/dist/assets/properties-panel.css';
 import './styles.css';
 
 import './styles/properties-panel.css';
