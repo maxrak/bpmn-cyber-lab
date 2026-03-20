@@ -1,0 +1,75 @@
+Log server listening on http://localhost:4001
+[CLIENT-LOG] [ERROR] [webpack-dev-server] {"isTrusted":true}
+[CLIENT-LOG] [INFO] [webpack-dev-server] Trying to reconnect...
+[CLIENT-LOG] [ERROR] [webpack-dev-server] {"isTrusted":true}
+[CLIENT-LOG] [INFO] [webpack-dev-server] Trying to reconnect...
+[CLIENT-LOG] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled.
+[CLIENT-LOG] [LOG] Loaded simulation chunk
+[CLIENT-LOG] [LOG] [HMR] Waiting for update signal from WDS...
+[CLIENT-LOG] [LOG] Loaded simulation chunk
+[CLIENT-LOG] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled.
+[CLIENT-LOG] [LOG] [HMR] Waiting for update signal from WDS...
+[CLIENT-LOG] [LOG] Simulation bundle initialized
+[CLIENT-LOG] [LOG] Simulation bundle initialized
+[CLIENT-LOG] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled.
+[CLIENT-LOG] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled.
+[CLIENT-LOG] [LOG] [HMR] Waiting for update signal from WDS...
+[CLIENT-LOG] [LOG] [HMR] Waiting for update signal from WDS...
+[CLIENT-LOG] [WARN] Could not patch ModelUtil.getBusinessObject {}
+[CLIENT-LOG] [LOG] openBPMN called {"modelerProvided":true,"url":"/BPMNs/sample-empty.bpmn"}
+[CLIENT-LOG] [LOG] Modeler bundle initialized
+[CLIENT-LOG] [WARN] Could not patch ModelUtil.getBusinessObject {}
+[CLIENT-LOG] [LOG] openBPMN called {"modelerProvided":true,"url":"/BPMNs/sample-empty.bpmn"}
+[CLIENT-LOG] [LOG] Modeler bundle initialized
+[CLIENT-LOG] [LOG] Loaded modeler chunk
+[CLIENT-LOG] [LOG] Loaded modeler chunk
+[CLIENT-LOG] [ERROR] Error importing BPMN /BPMNs/sample-empty.bpmn type: object err: Network response not ok: 404
+[CLIENT-LOG] [ERROR] @
+[CLIENT-LOG] [ERROR] Error importing BPMN /BPMNs/sample-empty.bpmn type: object err: Network response not ok: 404
+[CLIENT-LOG] [ERROR] @
+[CLIENT-LOG] [ERROR] [webpack-dev-server] {"isTrusted":true}
+[CLIENT-LOG] [INFO] [webpack-dev-server] Disconnected!
+[CLIENT-LOG] [INFO] [webpack-dev-server] Trying to reconnect...
+[CLIENT-LOG] [ERROR] [webpack-dev-server] {"isTrusted":true}
+[CLIENT-LOG] [INFO] [webpack-dev-server] Disconnected!
+[CLIENT-LOG] [INFO] [webpack-dev-server] Trying to reconnect...
+[CLIENT-LOG] [ERROR] [webpack-dev-server] {"isTrusted":true}
+[CLIENT-LOG] [INFO] [webpack-dev-server] Trying to reconnect...
+[CLIENT-LOG] [ERROR] [webpack-dev-server] {"isTrusted":true}
+[CLIENT-LOG] [INFO] [webpack-dev-server] Trying to reconnect...
+[CLIENT-LOG] [ERROR] [webpack-dev-server] {"isTrusted":true}
+[CLIENT-LOG] [INFO] [webpack-dev-server] Trying to reconnect...
+[CLIENT-LOG] [ERROR] [webpack-dev-server] {"isTrusted":true}
+[CLIENT-LOG] [INFO] [webpack-dev-server] Trying to reconnect...
+[CLIENT-LOG] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled.
+[CLIENT-LOG] [LOG] [HMR] Waiting for update signal from WDS...
+[CLIENT-LOG] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled.
+[CLIENT-LOG] [LOG] [HMR] Waiting for update signal from WDS...
+[CLIENT-LOG] [WARN] Could not patch ModelUtil.getBusinessObject {}
+[CLIENT-LOG] [LOG] openBPMN called {"modelerProvided":true,"url":"/BPMNs/example.bpmn"}
+[CLIENT-LOG] [LOG] Modeler bundle initialized
+[CLIENT-LOG] [WARN] Could not patch ModelUtil.getBusinessObject {}
+[CLIENT-LOG] [LOG] openBPMN called {"modelerProvided":true,"url":"/BPMNs/example.bpmn"}
+[CLIENT-LOG] [LOG] Modeler bundle initialized
+[CLIENT-LOG] [LOG] Loaded modeler chunk
+[CLIENT-LOG] [LOG] Loaded modeler chunk
+[CLIENT-LOG] [LOG] Importing BPMN file /BPMNs/example.bpmn size: 852
+[CLIENT-LOG] [LOG] openBPMN: current appMode = modeler
+[CLIENT-LOG] [LOG] Import succeeded /BPMNs/example.bpmn
+[CLIENT-LOG] [LOG] Importing BPMN file /BPMNs/example.bpmn size: 852
+[CLIENT-LOG] [LOG] openBPMN: current appMode = modeler
+[CLIENT-LOG] [LOG] Import succeeded /BPMNs/example.bpmn
+[CLIENT-LOG] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled.
+[CLIENT-LOG] [LOG] [HMR] Waiting for update signal from WDS...
+[CLIENT-LOG] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled.
+[CLIENT-LOG] [LOG] [HMR] Waiting for update signal from WDS...
+[CLIENT-LOG] [LOG] Simulation bundle initialized
+[CLIENT-LOG] [LOG] Simulation bundle initialized
+[CLIENT-LOG] [LOG] Loaded simulation chunk
+[CLIENT-LOG] [LOG] Loaded simulation chunk
+[CLIENT-LOG] [ERROR] [webpack-dev-server] {"isTrusted":true}
+[CLIENT-LOG] [INFO] [webpack-dev-server] Disconnected!
+[CLIENT-LOG] [INFO] [webpack-dev-server] Trying to reconnect...
+[CLIENT-LOG] [ERROR] [webpack-dev-server] {"isTrusted":true}
+[CLIENT-LOG] [INFO] [webpack-dev-server] Disconnected!
+[CLIENT-LOG] [INFO] [webpack-dev-server] Trying to reconnect...

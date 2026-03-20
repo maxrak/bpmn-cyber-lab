@@ -1,0 +1,19 @@
+/* Minimal project-wide styles
+   This file exists so imports in src/index.js don't fail.
+   Add global overrides here as needed. */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: #ffffff;
+  color: #212529;
+}
+
+#canvas-modeler, #canvas-sim {
+  width: 100%;
+  height: 100%;
+}
+
+/* ensure properties panel uses box-sizing and spacing */
+#properties * { box-sizing: border-box; }

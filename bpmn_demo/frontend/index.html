@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BPMN.io + Mock Backend Demo</title>
+  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.11.1/dist/assets/diagram-js.css" />
+  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.11.1/dist/assets/bpmn-js.css" />
+  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.11.1/dist/assets/bpmn-font/css/bpmn.css" />
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f5f7fb; }
+    header { padding: 16px 24px; background: #102a43; color: white; }
+    main { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; padding: 16px; }
+    #canvas { height: 72vh; background: white; border-radius: 8px; border: 1px solid #d9e2ec; }
+    .panel { background: white; border: 1px solid #d9e2ec; border-radius: 8px; padding: 16px; }
+    button { margin: 0 8px 8px 0; padding: 10px 14px; border: 0; border-radius: 6px; cursor: pointer; }
+    .primary { background: #2f80ed; color: white; }
+    .secondary { background: #d9e2ec; }
+    pre { white-space: pre-wrap; background: #f0f4f8; padding: 12px; border-radius: 6px; min-height: 180px; }
+    input { width: 100%; padding: 8px; margin-bottom: 8px; box-sizing: border-box; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>BPMN.io + Backend Mock</h1>
+    <p>Demo didattica: modeler BPMN, mock di workflow engine e service task REST.</p>
+  </header>
+  <main>
+    <div>
+      <div class="panel" style="margin-bottom: 16px;">
+        <button class="primary" id="loadDiagram">Carica diagramma esempio</button>
+        <button class="secondary" id="exportXml">Esporta XML</button>
+        <button class="primary" id="runMock">Esegui scenario mock</button>
+      </div>
+      <div id="canvas"></div>
+    </div>
+    <div class="panel">
+      <h3>Input scenario</h3>
+      <label>Order ID</label>
+      <input id="orderId" value="ORD-2026-001" />
+      <label>Importo</label>
+      <input id="amount" type="number" value="149" />
+      <label>SKU</label>
+      <input id="sku" value="LAPTOP-15" />
+      <label>Quantita</label>
+      <input id="quantity" type="number" value="1" />
+      <label>Indirizzo</label>
+      <input id="address" value="Via Roma 1, Milano" />
+      <h3>Log</h3>
+      <pre id="log">Pronto.</pre>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/bpmn-js@17.11.1/dist/bpmn-modeler.development.js"></script>
+  <script>
+    const modeler = new BpmnJS({ container: '#canvas' });
+    const logEl = document.getElementById('log');
+    const apiBase = 'http://localhost:3001/api';
+
+    function log(message, data) {
+      const row = `[${new Date().toLocaleTimeString('it-IT')}] ${message}` + (data ? `\n${JSON.stringify(data, null, 2)}` : '');
+      logEl.textContent = row + '\n\n' + logEl.textContent;
+    }
+
+    async function loadSampleDiagram() {
+      const xml = await fetch('./sample.bpmn').then(r => r.text());
+      await modeler.importXML(xml);
+      const canvas = modeler.get('canvas');
+      canvas.zoom('fit-viewport');
+      log('Diagramma BPMN caricato.');
+    }
+
+    async function exportXml() {
+      const { xml } = await modeler.saveXML({ format: true });
+      log('XML esportato.', { preview: xml.slice(0, 400) + '...' });
+    }
+
+    async function post(path, body) {
+      const res = await fetch(`${apiBase}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    async function runMockScenario() {
+      try {
+        const variables = {
+          orderId: document.getElementById('orderId').value,
+          amount: Number(document.getElementById('amount').value),
+          sku: document.getElementById('sku').value,
+          quantity: Number(document.getElementById('quantity').value),
+          address: document.getElementById('address').value
+        };
+
+        const processInstance = await post('/process/start', {
+          definitionKey: 'order-fulfillment',
+          variables
+        });
+        log('Process instance avviata.', processInstance);
+
+        const payment = await post('/payment/check', {
+          orderId: variables.orderId,
+          amount: variables.amount
+        });
+        await post(`/process/${processInstance.id}/step/check-payment`, payment);
+        log('Service task: check payment', payment);
+
+        if (!payment.approved) {
+          log('Gateway: pagamento rifiutato, processo termina su Cancelled.');
+          return;
+        }
+
+        const reserve = await post('/warehouse/reserve', {
+          orderId: variables.orderId,
+          sku: variables.sku,
+          quantity: variables.quantity
+        });
+        await post(`/process/${processInstance.id}/step/prepare-order`, reserve);
+        log('User/Service task: prepare order', reserve);
+
+        const shipping = await post('/shipping/create', {
+          orderId: variables.orderId,
+          address: variables.address
+        });
+        await post(`/process/${processInstance.id}/step/create-shipment`, shipping);
+        log('Service task: create shipment', shipping);
+
+        const finalState = await fetch(`${apiBase}/process/${processInstance.id}`).then(r => r.json());
+        log('Stato finale processo.', finalState);
+      } catch (err) {
+        log('Errore durante lo scenario mock.', { message: err.message });
+      }
+    }
+
+    document.getElementById('loadDiagram').addEventListener('click', loadSampleDiagram);
+    document.getElementById('exportXml').addEventListener('click', exportXml);
+    document.getElementById('runMock').addEventListener('click', runMockScenario);
+
+    loadSampleDiagram();
+  </script>
+</body>
+</html>

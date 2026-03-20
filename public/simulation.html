@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPMN Cyber Lab — Simulation</title>
+  <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    .content {
+      display: flex;
+      height: calc(100% - 56px);
+      margin-top: 56px;
+    }
+    #canvas-sim {
+      flex: 3;
+      padding: 1rem;
+    }
+    #simulation-log {
+      flex: 1;
+      min-width: 350px;
+      max-width: 450px;
+      height: 100%;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+    /* Margini per toolbar */
+    #modeler-toolbar {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    /* Stili per i messaggi di log */
+    .log-entry {
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      border-left: 3px solid #6c757d;
+      background: #f8f9fa;
+      border-radius: 0.25rem;
+    }
+    .log-entry.log-info {
+      border-left-color: #0dcaf0;
+      background: #e7f6fd;
+    }
+    .log-entry.log-success {
+      border-left-color: #198754;
+      background: #d1e7dd;
+    }
+    .log-entry.log-warning {
+      border-left-color: #ffc107;
+      background: #fff3cd;
+    }
+    .log-entry.log-error {
+      border-left-color: #dc3545;
+      background: #f8d7da;
+    }
+    .log-timestamp {
+      font-size: 0.7rem;
+      color: #6c757d;
+      font-weight: 600;
+    }
+    .log-message {
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">BPMN Cyber Lab</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="simulation.html">Simulation</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="fileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              File
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="fileDropdown">
+              <li><button class="dropdown-item" id="nav-btn-open">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-open me-2" viewBox="0 0 16 16">
+                  <path d="M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m2-2A.5.5 0 0 1 5 9h4a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5"/>
+                </svg>
+                Apri BPMN
+              </button></li>
+              <li><button class="dropdown-item" id="nav-btn-save">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-save me-2" viewBox="0 0 16 16">
+                  <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1z"/>
+                </svg>
+                Salva BPMN
+              </button></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div id="modeler-toolbar" class="container-fluid px-3 py-2 bg-white border-bottom">
+    <div class="d-flex gap-2 align-items-center flex-wrap">
+      <button id="btn-open" class="btn btn-sm btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-open" viewBox="0 0 16 16">
+          <path d="M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m2-2A.5.5 0 0 1 5 9h4a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5"/>
+        </svg>
+        Carica BPMN
+      </button>
+      <button id="btn-save" class="btn btn-sm btn-success">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-save" viewBox="0 0 16 16">
+          <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1z"/>
+        </svg>
+        Salva BPMN
+      </button>
+      <div style="border-left: 1px solid #dee2e6; height: 30px; margin: 0 0.5rem;"></div>
+      <button id="btn-sim-play" class="btn btn-sm btn-success" style="display:none">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+          <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/>
+        </svg>
+        Play
+      </button>
+      <button id="btn-sim-pause" class="btn btn-sm btn-warning" style="display:none">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pause-fill" viewBox="0 0 16 16">
+          <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5m5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5"/>
+        </svg>
+        Pause
+      </button>
+      <button id="btn-sim-step" class="btn btn-sm btn-outline-info" style="display:none">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-skip-forward" viewBox="0 0 16 16">
+          <path d="M15.5 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5M0 4a.5.5 0 0 1 .5-.5h9.586a.5.5 0 0 1 .353.854L4.146 10.646a.5.5 0 0 1-.708-.708L9.086 4.5H.5A.5.5 0 0 1 0 4"/>
+        </svg>
+        Step
+      </button>
+      <button id="btn-sim-reset" class="btn btn-sm btn-outline-danger" style="display:none">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/>
+        </svg>
+        Reset
+      </button>
+      <div class="ms-auto">
+        <span id="app-mode-badge" class="badge bg-success">Simulation</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div id="canvas-sim" style="flex:3;"></div>
+    <aside id="simulation-log" class="bg-light border-start p-3">
+      <h5 class="mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-activity me-2" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2"/>
+        </svg>
+        Log Simulazione
+      </h5>
+      <div class="mb-3">
+        <button id="btn-clear-log" class="btn btn-sm btn-outline-secondary w-100">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash me-1" viewBox="0 0 16 16">
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+          </svg>
+          Pulisci Log
+        </button>
+      </div>
+      <div id="log-container" class="border rounded p-2 bg-white" style="height: calc(100vh - 250px); overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.85rem;">
+        <div class="text-muted small">In attesa di eventi di simulazione...</div>
+      </div>
+    </aside>
+  </div>
+
+  <input type="file" id="file-input" accept=".bpmn" style="display:none">
+  <script src="/simulation.bundle.js"></script>
+  <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

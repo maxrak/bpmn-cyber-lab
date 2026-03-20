@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head><title>BPMN Demo</title></head>
+<body>
+<h2>BPMN Demo v2</h2>
+
+<button onclick="login()">Login</button>
+<button onclick="start()">Start Process</button>
+<button onclick="pay()">Pay</button>
+<button onclick="fail()">Fail</button>
+<button onclick="audit()">Audit Log</button>
+
+<pre id="output"></pre>
+
+<script>
+let token = null;
+let currentId = null;
+
+async function login() {
+  const res = await fetch('http://localhost:3000/login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ user: 'admin' })
+  });
+  const data = await res.json();
+  token = data.token;
+  document.getElementById('output').innerText = "Logged in";
+}
+
+async function start() {
+  const res = await fetch('http://localhost:3000/start', { method: 'POST' });
+  const data = await res.json();
+  currentId = data.id;
+  document.getElementById('output').innerText = "Started: " + currentId;
+}
+
+async function pay() {
+  const res = await fetch(`http://localhost:3000/task/${currentId}/pay`, { method: 'POST' });
+  const data = await res.json();
+  document.getElementById('output').innerText = JSON.stringify(data);
+}
+
+async function fail() {
+  const res = await fetch(`http://localhost:3000/task/${currentId}/fail`, { method: 'POST' });
+  const data = await res.json();
+  document.getElementById('output').innerText = JSON.stringify(data);
+}
+
+async function audit() {
+  const res = await fetch('http://localhost:3000/audit');
+  const data = await res.json();
+  document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>

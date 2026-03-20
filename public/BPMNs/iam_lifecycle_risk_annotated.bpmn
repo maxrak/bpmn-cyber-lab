@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  id="Definitions_2"
+  targetNamespace="http://bpmn.io/schema/bpmn"
+  exporter="ChatGPT"
+  exporterVersion="1.0">
+
+  <bpmn:process id="Process_IAM_Risk" name="IAM Lifecycle - Annotato rischio" isExecutable="false">
+
+    <bpmn:startEvent id="StartEvent_1" name="Inizio">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:userTask id="Task_Request" name="Invia richiesta account">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="cyber.stride" value="R"/>
+          <camunda:property name="cyber.mitre" value=""/>
+          <camunda:property name="cyber.risk" value="4"/>
+          <camunda:property name="cyber.audit" value="BASIC"/>
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_Approve" name="Approva richiesta">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="cyber.stride" value="S,R,E"/>
+          <camunda:property name="cyber.mitre" value="T1078"/>
+          <camunda:property name="cyber.risk" value="12"/>
+          <camunda:property name="cyber.audit" value="DETAILED"/>
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_Approved" name="Approvata?">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_Approved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Rejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:serviceTask id="Task_Provision" name="Provisioning account">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="cyber.stride" value="T,E"/>
+          <camunda:property name="cyber.mitre" value="T1078,T1552"/>
+          <camunda:property name="cyber.risk" value="20"/>
+          <camunda:property name="cyber.audit" value="DETAILED"/>
+          <camunda:property name="cyber.is_spof" value="true"/>
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Approved</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:serviceTask id="Task_SendCred" name="Invia credenziali">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="cyber.stride" value="I"/>
+          <camunda:property name="cyber.mitre" value="T1552"/>
+          <camunda:property name="cyber.risk" value="16"/>
+          <camunda:property name="cyber.audit" value="DETAILED"/>
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="EndEvent_Approved" name="Account creato">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:endEvent id="EndEvent_Rejected" name="Richiesta respinta">
+      <bpmn:incoming>Flow_Rejected</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_Request"/>
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_Request" targetRef="Task_Approve"/>
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_Approve" targetRef="Gateway_Approved"/>
+    <bpmn:sequenceFlow id="Flow_Approved" sourceRef="Gateway_Approved" targetRef="Task_Provision"/>
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_Provision" targetRef="Task_SendCred"/>
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_SendCred" targetRef="EndEvent_Approved"/>
+    <bpmn:sequenceFlow id="Flow_Rejected" sourceRef="Gateway_Approved" targetRef="EndEvent_Rejected"/>
+
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_2">
+    <bpmndi:BPMNPlane id="BPMNPlane_2" bpmnElement="Process_IAM_Risk">
+
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="150" y="100" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Request_di" bpmnElement="Task_Request">
+        <dc:Bounds x="220" y="80" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Approve_di" bpmnElement="Task_Approve">
+        <dc:Bounds x="380" y="80" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_Approved_di" bpmnElement="Gateway_Approved" isMarkerVisible="true">
+        <dc:Bounds x="540" y="95" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Provision_di" bpmnElement="Task_Provision">
+        <dc:Bounds x="630" y="80" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_SendCred_di" bpmnElement="Task_SendCred">
+        <dc:Bounds x="810" y="80" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_Approved_di" bpmnElement="EndEvent_Approved">
+        <dc:Bounds x="980" y="100" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_Rejected_di" bpmnElement="EndEvent_Rejected">
+        <dc:Bounds x="630" y="200" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="186" y="118"/>
+        <di:waypoint x="220" y="118"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="340" y="118"/>
+        <di:waypoint x="380" y="118"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="500" y="118"/>
+        <di:waypoint x="540" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Approved_di" bpmnElement="Flow_Approved">
+        <di:waypoint x="590" y="120"/>
+        <di:waypoint x="630" y="118"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="770" y="118"/>
+        <di:waypoint x="810" y="118"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="950" y="118"/>
+        <di:waypoint x="980" y="118"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Rejected_di" bpmnElement="Flow_Rejected">
+        <di:waypoint x="565" y="145"/>
+        <di:waypoint x="648" y="218"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

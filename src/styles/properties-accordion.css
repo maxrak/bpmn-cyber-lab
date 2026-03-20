@@ -1,0 +1,26 @@
+.bpp-accordion {
+  border-top: 1px solid #ccc;
+}
+
+.bpp-accordion-header {
+  background: #eee;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  user-select: none;
+}
+
+.bpp-accordion-header:hover {
+  background: #e2e2e2;
+}
+
+.bpp-accordion-content {
+  padding: 8px 10px;
+  border-bottom: 1px solid #ccc;
+  display: none;
+}
+
+.bpp-accordion-content.open {
+  display: block;
+}

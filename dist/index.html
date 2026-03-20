@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPMN Cyber Lab</title>
+  <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: sans-serif;
+    }
+    .content {
+      display: flex;
+      height: calc(100% - 56px);
+      margin-top: 56px;
+    }
+    #canvas {
+      flex: 3;
+      border-right: 1px solid #dee2e6;
+    }
+    #properties {
+      flex: 1;
+      min-width: 320px;
+      max-width: 420px;
+      padding: 1rem;
+      height: 100%;
+      overflow-y: auto;
+      box-shadow: -4px 0 8px rgba(0,0,0,0.03);
+    }
+    /* Spaziatura e layout migliori per etichette e campi nel pannello proprietà */
+    #properties .form-group,
+    #properties .pp-row,
+    #properties .pp-property {
+      margin-bottom: 0.75rem !important;
+    }
+    #properties label,
+    #properties .pp-label,
+    #properties .form-label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+      font-size: .95rem;
+      color: #333;
+    }
+    #properties input[type="text"],
+    #properties input[type="number"],
+    #properties select,
+    #properties textarea,
+    #properties .form-control,
+    #properties .pp-input {
+      width: 100%;
+      padding: .375rem .5rem;
+      border: 1px solid #ced4da;
+      border-radius: .25rem;
+      background: #fff;
+    }
+    #properties .help-text,
+    #properties .pp-description {
+      margin-top: .25rem;
+      margin-bottom: .5rem;
+      color: #6c757d;
+      font-size: .875rem;
+    }
+  </style>
+<script defer src="modeler.bundle.js"></script><script defer src="simulation.bundle.js"></script></head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">BPMN Cyber Lab</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="fileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">FILE</a>
+            <ul class="dropdown-menu" aria-labelledby="fileDropdown">
+              <li><button class="dropdown-item" id="btn-open">Open BPMN</button></li>
+              <li><button class="dropdown-item" id="btn-save">Save BPMN</button></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="bpmnsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">BPMNs</a>
+            <ul class="dropdown-menu" aria-labelledby="bpmnsDropdown" id="bpmns-menu">
+              <li class="dropdown-item text-muted small px-3">Loading...</li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="modeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Mode</a>
+            <ul class="dropdown-menu p-2" aria-labelledby="modeDropdown" id="mode-menu">
+              <li class="dropdown-item">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="appMode" id="mode-modeler" value="modeler" checked>
+                  <label class="form-check-label ms-2" for="mode-modeler">Modeler</label>
+                </div>
+              </li>
+              <li class="dropdown-item">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="appMode" id="mode-simulation" value="simulation">
+                  <label class="form-check-label ms-2" for="mode-simulation">Simulation</label>
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div id="modeler-toolbar" class="container-fluid px-3 py-2 bg-white border-bottom">
+    <div class="d-flex gap-2 align-items-center">
+      <button id="btn-undo" class="btn btn-sm btn-outline-secondary">Undo</button>
+      <button id="btn-redo" class="btn btn-sm btn-outline-secondary">Redo</button>
+      <button id="btn-zoom-in" class="btn btn-sm btn-outline-secondary">Zoom +</button>
+      <button id="btn-zoom-out" class="btn btn-sm btn-outline-secondary">Zoom -</button>
+      <button id="btn-fit" class="btn btn-sm btn-outline-primary">Fit</button>
+      <div class="ms-auto">
+        <span id="app-mode-badge" class="badge bg-primary">Modeler</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div id="canvas-modeler" style="flex:3;"></div>
+    <div id="canvas-sim" style="flex:3; display:none;"></div>
+    <aside id="properties" class="bg-light border-start p-3">
+      <h5 class="mb-3">Proprietà</h5>
+      <!-- The BPMN properties panel will be injected inside this element -->
+    </aside>
+  </div>
+
+  <input type="file" id="file-input" accept=".bpmn" style="display:none">
+
+  <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

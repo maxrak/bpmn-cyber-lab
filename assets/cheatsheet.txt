@@ -1,0 +1,14 @@
+STRIDE: 
+S = Spoofing
+T = Tampering
+R = Repudiation
+I = Information Disclosure
+D = Denial of Service
+E = Elevation of Privilege
+
+MITRE ATT&CK (IAM subset):
+T1110  - Brute Force
+T1078  - Valid Accounts
+T1552  - Unsecured Credentials
+T1548  - Abuse Elevation Control Mechanism
+T1550  - Use of Stolen Tokens
