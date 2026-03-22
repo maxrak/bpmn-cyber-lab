@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .blue { stroke:#1f3a5f; fill:none; stroke-width:6; }
+    .green { stroke:#2ecc71; fill:none; stroke-width:6; }
+    .fill-blue { fill:#1f3a5f; }
+    .fill-green { fill:#2ecc71; }
+  </style>
+
+  <!-- Shield -->
+  <path d="M256 40 L440 120 L400 360 L256 460 L112 360 L72 120 Z" class="blue"/>
+
+  <!-- BPMN flow -->
+  <circle cx="140" cy="260" r="25" class="blue"/>
+  <rect x="200" y="235" width="60" height="50" rx="8" class="blue"/>
+  <polygon points="300,260 330,230 360,260 330,290" class="green"/>
+  <circle cx="410" cy="260" r="25" class="green"/>
+
+  <!-- Arrows -->
+  <line x1="165" y1="260" x2="200" y2="260" class="blue"/>
+  <line x1="260" y1="260" x2="300" y2="260" class="blue"/>
+  <line x1="360" y1="260" x2="385" y2="260" class="green"/>
+
+  <!-- Text -->
+  <text x="256" y="500" text-anchor="middle" font-size="36" class="fill-blue" font-family="Arial, Helvetica, sans-serif">
+    CYBER BPMN LAB
+  </text>
+</svg>

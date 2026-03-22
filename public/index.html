@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BPMN Cyber Lab - Home</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
   <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
   <style>
     .dropdown-header {
@@ -18,8 +19,11 @@
     .navbar .dropdown-divider {
       margin: 0.15rem 0;
     }
+    .navbar-nav {
+      align-items: center;
+    }
     body {
-      padding-top: 56px;
+      padding-top: 96px;
       font-family: sans-serif;
     }
     .hero-section {
@@ -57,14 +61,16 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
-      <a class="navbar-brand" href="index.html">BPMN Cyber Lab</a>
+
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+            <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+              <img src="/bpmn-cyber-lab.png" alt="BPMN Cyber Lab" height="64" style="width:auto;">
+            </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="modeler.html">Modeler</a>
@@ -84,11 +90,13 @@
               <li><a class="dropdown-item" href="documentation-simulation.html">▶️ Simulation</a></li>
               <li><hr class="dropdown-divider"></li>
               <div class="dropdown-header"> Esempi</div>
+              <!-- <li><h6 class="dropdown-header">Esempi</h6></li> -->
               <li><a class="dropdown-item" href="documentation-gateway-comparison.html">🔀 Gateway Comparison</a></li>
               <li><a class="dropdown-item" href="documentation-message-events.html">✉️ Message Events</a></li>
               <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
               <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
               <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+              <div class="dropdown-header"> Anti-Patterns</div>
               <li><a class="dropdown-item" href="documentation-anti-pattern-start-end.html">🚫 Anti-Pattern Start/End</a></li>
               <li><a class="dropdown-item" href="documentation-anti-pattern-gateway.html">❌ Anti-Pattern Gateway</a></li>
               <li><a class="dropdown-item" href="documentation-anti-pattern-message-events.html">📨 Anti-Pattern Message Events</a></li>
@@ -102,6 +110,7 @@
 
   <div class="hero-section">
     <div class="container">
+      <img src="/bpmn-cyber-lab.png" alt="BPMN Cyber Lab Logo" class="mb-4" style="max-height:120px; width:auto;">
       <h1 class="display-4 fw-bold mb-3">BPMN Cyber Lab</h1>
       <p class="lead mb-4">Piattaforma integrata per la modellazione e simulazione di processi BPMN con focus sulla sicurezza informatica</p>
     </div>
