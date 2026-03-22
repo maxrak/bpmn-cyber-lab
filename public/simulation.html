@@ -6,6 +6,18 @@
   <title>BPMN Cyber Lab — Simulation</title>
   <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
   <style>
+    .dropdown-header {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #adb5bd;
+      padding: 0.1rem 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .navbar .dropdown-divider {
+      margin: 0.15rem 0;
+    }
     html, body {
       height: 100%;
       margin: 0;
@@ -106,8 +118,25 @@
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="simulation.html">Simulation</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="documentation.html">Documentation</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Documentation
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="documentation.html">📚 Panoramica</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Guide</div>
+              <!-- <li><h6 class="dropdown-header">Guide</h6></li> -->
+              <li><a class="dropdown-item" href="documentation-modeler.html">✏️ Modeler</a></li>
+              <li><a class="dropdown-item" href="documentation-simulation.html">▶️ Simulation</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Esempi</div>
+              <li><a class="dropdown-item" href="documentation-gateway-comparison.html">🔀 Gateway Comparison</a></li>
+              <li><a class="dropdown-item" href="documentation-message-events.html">✉️ Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
+              <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
+              <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+            </ul>
           </li>
         </ul>
         <ul class="navbar-nav ms-auto">
@@ -116,18 +145,7 @@
               File
             </a>
             <ul class="dropdown-menu" aria-labelledby="fileDropdown">
-              <li><button class="dropdown-item" id="nav-btn-open">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-open me-2" viewBox="0 0 16 16">
-                  <path d="M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m2-2A.5.5 0 0 1 5 9h4a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5"/>
-                </svg>
-                Apri BPMN
-              </button></li>
-              <li><button class="dropdown-item" id="nav-btn-save">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-save me-2" viewBox="0 0 16 16">
-                  <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1z"/>
-                </svg>
-                Salva BPMN
-              </button></li>
+              <!-- File BPMN popolati dinamicamente da bpmnFileMenu.js -->
             </ul>
           </li>
         </ul>

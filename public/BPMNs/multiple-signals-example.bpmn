@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_MultipleSignals" targetNamespace="http://bpmn.io/schema/bpmn">
+  
+  <!-- Signal Definitions -->
+  <bpmn:signal id="Signal_Alert" name="Alert" />
+  <bpmn:signal id="Signal_Approve" name="Approve" />
+  <bpmn:signal id="Signal_Reject" name="Reject" />
+  <bpmn:signal id="Signal_Complete" name="Complete" />
+  <bpmn:signal id="Signal_Cancel" name="Cancel" />
+
+  <bpmn:process id="Process_MultipleSignals" isExecutable="false">
+    
+    <!-- MAIN COORDINATOR PROCESS -->
+    <bpmn:startEvent id="StartEvent_1" name="Start System">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:task id="Task_InitSystem" name="Initialize System">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Throw Alert Signal -->
+    <bpmn:intermediateThrowEvent id="Event_ThrowAlert" name="Send Alert Signal">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_Alert" />
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:task id="Task_WaitDecision" name="Wait for Decision">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Exclusive Gateway for Decision -->
+    <bpmn:eventBasedGateway id="Gateway_EventBased" name="Wait for Approve or Reject">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+
+    <!-- Catch Approve Signal -->
+    <bpmn:intermediateCatchEvent id="Event_CatchApprove" name="Approval Received">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_Approve" />
+    </bpmn:intermediateCatchEvent>
+
+    <!-- Catch Reject Signal -->
+    <bpmn:intermediateCatchEvent id="Event_CatchReject" name="Rejection Received">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_Reject" />
+    </bpmn:intermediateCatchEvent>
+
+    <!-- Approval Path -->
+    <bpmn:task id="Task_ProcessApproval" name="Process Approval">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Throw Complete Signal -->
+    <bpmn:intermediateThrowEvent id="Event_ThrowComplete" name="Send Complete Signal">
+      <bpmn:incoming>Flow_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_Complete" />
+    </bpmn:intermediateThrowEvent>
+
+    <!-- Rejection Path -->
+    <bpmn:task id="Task_ProcessRejection" name="Process Rejection">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Throw Cancel Signal -->
+    <bpmn:intermediateThrowEvent id="Event_ThrowCancel" name="Send Cancel Signal">
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_Cancel" />
+    </bpmn:intermediateThrowEvent>
+
+    <!-- Join paths -->
+    <bpmn:exclusiveGateway id="Gateway_Join">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="Task_Finalize" name="Finalize">
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="End_Main" name="End Main">
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- SUBPROCESS 1: Signal Start Event -->
+    <bpmn:subProcess id="SubProcess_1" name="Subprocess with Signal Start" triggeredByEvent="true">
+      <bpmn:startEvent id="Start_SignalAlert" name="Alert Received" isInterrupting="false">
+        <bpmn:outgoing>Flow_Sub1_1</bpmn:outgoing>
+        <bpmn:signalEventDefinition signalRef="Signal_Alert" />
+      </bpmn:startEvent>
+
+      <bpmn:task id="Task_LogAlert" name="Log Alert">
+        <bpmn:incoming>Flow_Sub1_1</bpmn:incoming>
+        <bpmn:outgoing>Flow_Sub1_2</bpmn:outgoing>
+      </bpmn:task>
+
+      <bpmn:task id="Task_NotifyTeam" name="Notify Team">
+        <bpmn:incoming>Flow_Sub1_2</bpmn:incoming>
+        <bpmn:outgoing>Flow_Sub1_3</bpmn:outgoing>
+      </bpmn:task>
+
+      <bpmn:endEvent id="End_Sub1" name="Alert Handled">
+        <bpmn:incoming>Flow_Sub1_3</bpmn:incoming>
+      </bpmn:endEvent>
+
+      <bpmn:sequenceFlow id="Flow_Sub1_1" sourceRef="Start_SignalAlert" targetRef="Task_LogAlert" />
+      <bpmn:sequenceFlow id="Flow_Sub1_2" sourceRef="Task_LogAlert" targetRef="Task_NotifyTeam" />
+      <bpmn:sequenceFlow id="Flow_Sub1_3" sourceRef="Task_NotifyTeam" targetRef="End_Sub1" />
+    </bpmn:subProcess>
+
+    <!-- SUBPROCESS 2: Multiple Signal Boundaries -->
+    <bpmn:subProcess id="SubProcess_2" name="Long Running Task with Multiple Interruptions" triggeredByEvent="true">
+      <bpmn:startEvent id="Start_SignalComplete" name="Complete Received">
+        <bpmn:outgoing>Flow_Sub2_1</bpmn:outgoing>
+        <bpmn:signalEventDefinition signalRef="Signal_Complete" />
+      </bpmn:startEvent>
+
+      <bpmn:task id="Task_LongRunning" name="Execute Long Task">
+        <bpmn:incoming>Flow_Sub2_1</bpmn:incoming>
+        <bpmn:outgoing>Flow_Sub2_2</bpmn:outgoing>
+      </bpmn:task>
+
+      <!-- Cancel Boundary (Interrupting) -->
+      <bpmn:boundaryEvent id="Boundary_Cancel" name="Cancel" attachedToRef="Task_LongRunning" cancelActivity="true">
+        <bpmn:outgoing>Flow_Sub2_3</bpmn:outgoing>
+        <bpmn:signalEventDefinition signalRef="Signal_Cancel" />
+      </bpmn:boundaryEvent>
+
+      <bpmn:task id="Task_Cleanup" name="Cleanup">
+        <bpmn:incoming>Flow_Sub2_3</bpmn:incoming>
+        <bpmn:outgoing>Flow_Sub2_4</bpmn:outgoing>
+      </bpmn:task>
+
+      <bpmn:endEvent id="End_Sub2_Cancelled" name="Cancelled">
+        <bpmn:incoming>Flow_Sub2_4</bpmn:incoming>
+      </bpmn:endEvent>
+
+      <bpmn:task id="Task_FinalizeTask" name="Finalize Task">
+        <bpmn:incoming>Flow_Sub2_2</bpmn:incoming>
+        <bpmn:outgoing>Flow_Sub2_5</bpmn:outgoing>
+      </bpmn:task>
+
+      <bpmn:endEvent id="End_Sub2_Complete" name="Completed">
+        <bpmn:incoming>Flow_Sub2_5</bpmn:incoming>
+      </bpmn:endEvent>
+
+      <bpmn:sequenceFlow id="Flow_Sub2_1" sourceRef="Start_SignalComplete" targetRef="Task_LongRunning" />
+      <bpmn:sequenceFlow id="Flow_Sub2_2" sourceRef="Task_LongRunning" targetRef="Task_FinalizeTask" />
+      <bpmn:sequenceFlow id="Flow_Sub2_3" sourceRef="Boundary_Cancel" targetRef="Task_Cleanup" />
+      <bpmn:sequenceFlow id="Flow_Sub2_4" sourceRef="Task_Cleanup" targetRef="End_Sub2_Cancelled" />
+      <bpmn:sequenceFlow id="Flow_Sub2_5" sourceRef="Task_FinalizeTask" targetRef="End_Sub2_Complete" />
+    </bpmn:subProcess>
+
+    <!-- SUBPROCESS 3: Cascading Signals -->
+    <bpmn:subProcess id="SubProcess_3" name="Cascading Signal Handler" triggeredByEvent="true">
+      <bpmn:startEvent id="Start_SignalReject" name="Reject Received" isInterrupting="false">
+        <bpmn:outgoing>Flow_Sub3_1</bpmn:outgoing>
+        <bpmn:signalEventDefinition signalRef="Signal_Reject" />
+      </bpmn:startEvent>
+
+      <bpmn:task id="Task_AnalyzeRejection" name="Analyze Rejection">
+        <bpmn:incoming>Flow_Sub3_1</bpmn:incoming>
+        <bpmn:outgoing>Flow_Sub3_2</bpmn:outgoing>
+      </bpmn:task>
+
+      <!-- Throw another signal (cascading) -->
+      <bpmn:intermediateThrowEvent id="Event_ThrowAlert2" name="Send Alert (Cascade)">
+        <bpmn:incoming>Flow_Sub3_2</bpmn:incoming>
+        <bpmn:outgoing>Flow_Sub3_3</bpmn:outgoing>
+        <bpmn:signalEventDefinition signalRef="Signal_Alert" />
+      </bpmn:intermediateThrowEvent>
+
+      <bpmn:task id="Task_CreateReport" name="Create Report">
+        <bpmn:incoming>Flow_Sub3_3</bpmn:incoming>
+        <bpmn:outgoing>Flow_Sub3_4</bpmn:outgoing>
+      </bpmn:task>
+
+      <bpmn:endEvent id="End_Sub3" name="Report Created">
+        <bpmn:incoming>Flow_Sub3_4</bpmn:incoming>
+      </bpmn:endEvent>
+
+      <bpmn:sequenceFlow id="Flow_Sub3_1" sourceRef="Start_SignalReject" targetRef="Task_AnalyzeRejection" />
+      <bpmn:sequenceFlow id="Flow_Sub3_2" sourceRef="Task_AnalyzeRejection" targetRef="Event_ThrowAlert2" />
+      <bpmn:sequenceFlow id="Flow_Sub3_3" sourceRef="Event_ThrowAlert2" targetRef="Task_CreateReport" />
+      <bpmn:sequenceFlow id="Flow_Sub3_4" sourceRef="Task_CreateReport" targetRef="End_Sub3" />
+    </bpmn:subProcess>
+
+    <!-- Main Process Sequence Flows -->
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_InitSystem" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_InitSystem" targetRef="Event_ThrowAlert" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Event_ThrowAlert" targetRef="Task_WaitDecision" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_WaitDecision" targetRef="Gateway_EventBased" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Gateway_EventBased" targetRef="Event_CatchApprove" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Gateway_EventBased" targetRef="Event_CatchReject" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Event_CatchApprove" targetRef="Task_ProcessApproval" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Event_CatchReject" targetRef="Task_ProcessRejection" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Task_ProcessApproval" targetRef="Event_ThrowComplete" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Event_ThrowComplete" targetRef="Gateway_Join" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_ProcessRejection" targetRef="Event_ThrowCancel" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Event_ThrowCancel" targetRef="Gateway_Join" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Gateway_Join" targetRef="Task_Finalize" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_Finalize" targetRef="End_Main" />
+
+  </bpmn:process>
+
+  <!-- Diagram -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_MultipleSignals">
+      
+      <!-- Main Process -->
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="138" y="235" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_InitSystem_di" bpmnElement="Task_InitSystem">
+        <dc:Bounds x="240" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_ThrowAlert_di" bpmnElement="Event_ThrowAlert">
+        <dc:Bounds x="392" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="377" y="235" width="66" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_WaitDecision_di" bpmnElement="Task_WaitDecision">
+        <dc:Bounds x="480" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_EventBased_di" bpmnElement="Gateway_EventBased">
+        <dc:Bounds x="635" y="185" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="620" y="147" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_CatchApprove_di" bpmnElement="Event_CatchApprove">
+        <dc:Bounds x="742" y="132" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="732" y="175" width="56" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_CatchReject_di" bpmnElement="Event_CatchReject">
+        <dc:Bounds x="742" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="735" y="295" width="50" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_ProcessApproval_di" bpmnElement="Task_ProcessApproval">
+        <dc:Bounds x="830" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_ThrowComplete_di" bpmnElement="Event_ThrowComplete">
+        <dc:Bounds x="982" y="132" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="960" y="175" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_ProcessRejection_di" bpmnElement="Task_ProcessRejection">
+        <dc:Bounds x="830" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_ThrowCancel_di" bpmnElement="Event_ThrowCancel">
+        <dc:Bounds x="982" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="960" y="295" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_Join_di" bpmnElement="Gateway_Join" isMarkerVisible="true">
+        <dc:Bounds x="1075" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Finalize_di" bpmnElement="Task_Finalize">
+        <dc:Bounds x="1180" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_Main_di" bpmnElement="End_Main">
+        <dc:Bounds x="1332" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1323" y="235" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Subprocess 1 -->
+      <bpmndi:BPMNShape id="SubProcess_1_di" bpmnElement="SubProcess_1" isExpanded="true">
+        <dc:Bounds x="180" y="380" width="420" height="180" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Start_SignalAlert_di" bpmnElement="Start_SignalAlert">
+        <dc:Bounds x="212" y="452" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="194" y="495" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_LogAlert_di" bpmnElement="Task_LogAlert">
+        <dc:Bounds x="290" y="430" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_NotifyTeam_di" bpmnElement="Task_NotifyTeam">
+        <dc:Bounds x="430" y="430" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_Sub1_di" bpmnElement="End_Sub1">
+        <dc:Bounds x="552" y="452" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="532" y="495" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_Sub1_1_di" bpmnElement="Flow_Sub1_1">
+        <di:waypoint x="248" y="470" />
+        <di:waypoint x="290" y="470" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Sub1_2_di" bpmnElement="Flow_Sub1_2">
+        <di:waypoint x="390" y="470" />
+        <di:waypoint x="430" y="470" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Sub1_3_di" bpmnElement="Flow_Sub1_3">
+        <di:waypoint x="530" y="470" />
+        <di:waypoint x="552" y="470" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Subprocess 2 -->
+      <bpmndi:BPMNShape id="SubProcess_2_di" bpmnElement="SubProcess_2" isExpanded="true">
+        <dc:Bounds x="650" y="380" width="500" height="220" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Start_SignalComplete_di" bpmnElement="Start_SignalComplete">
+        <dc:Bounds x="682" y="472" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="674" y="515" width="52" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_LongRunning_di" bpmnElement="Task_LongRunning">
+        <dc:Bounds x="760" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Boundary_Cancel_di" bpmnElement="Boundary_Cancel">
+        <dc:Bounds x="792" y="512" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="826" y="543" width="36" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Cleanup_di" bpmnElement="Task_Cleanup">
+        <dc:Bounds x="880" y="520" width="100" height="60" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_Sub2_Cancelled_di" bpmnElement="End_Sub2_Cancelled">
+        <dc:Bounds x="1012" y="532" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1003" y="575" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_FinalizeTask_di" bpmnElement="Task_FinalizeTask">
+        <dc:Bounds x="900" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_Sub2_Complete_di" bpmnElement="End_Sub2_Complete">
+        <dc:Bounds x="1042" y="442" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1032" y="485" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_Sub2_1_di" bpmnElement="Flow_Sub2_1">
+        <di:waypoint x="718" y="490" />
+        <di:waypoint x="760" y="490" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Sub2_2_di" bpmnElement="Flow_Sub2_2">
+        <di:waypoint x="860" y="490" />
+        <di:waypoint x="880" y="490" />
+        <di:waypoint x="880" y="460" />
+        <di:waypoint x="900" y="460" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Sub2_3_di" bpmnElement="Flow_Sub2_3">
+        <di:waypoint x="810" y="548" />
+        <di:waypoint x="810" y="550" />
+        <di:waypoint x="880" y="550" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Sub2_4_di" bpmnElement="Flow_Sub2_4">
+        <di:waypoint x="980" y="550" />
+        <di:waypoint x="1012" y="550" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Sub2_5_di" bpmnElement="Flow_Sub2_5">
+        <di:waypoint x="1000" y="460" />
+        <di:waypoint x="1042" y="460" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Subprocess 3 -->
+      <bpmndi:BPMNShape id="SubProcess_3_di" bpmnElement="SubProcess_3" isExpanded="true">
+        <dc:Bounds x="180" y="630" width="520" height="180" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Start_SignalReject_di" bpmnElement="Start_SignalReject">
+        <dc:Bounds x="212" y="702" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="207" y="745" width="46" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_AnalyzeRejection_di" bpmnElement="Task_AnalyzeRejection">
+        <dc:Bounds x="290" y="680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_ThrowAlert2_di" bpmnElement="Event_ThrowAlert2">
+        <dc:Bounds x="432" y="702" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="417" y="745" width="66" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_CreateReport_di" bpmnElement="Task_CreateReport">
+        <dc:Bounds x="510" y="680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_Sub3_di" bpmnElement="End_Sub3">
+        <dc:Bounds x="642" y="702" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="620" y="745" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_Sub3_1_di" bpmnElement="Flow_Sub3_1">
+        <di:waypoint x="248" y="720" />
+        <di:waypoint x="290" y="720" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Sub3_2_di" bpmnElement="Flow_Sub3_2">
+        <di:waypoint x="390" y="720" />
+        <di:waypoint x="432" y="720" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Sub3_3_di" bpmnElement="Flow_Sub3_3">
+        <di:waypoint x="468" y="720" />
+        <di:waypoint x="510" y="720" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Sub3_4_di" bpmnElement="Flow_Sub3_4">
+        <di:waypoint x="610" y="720" />
+        <di:waypoint x="642" y="720" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Main Sequence Flows -->
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="188" y="210" />
+        <di:waypoint x="240" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="340" y="210" />
+        <di:waypoint x="392" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="428" y="210" />
+        <di:waypoint x="480" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="580" y="210" />
+        <di:waypoint x="635" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="660" y="185" />
+        <di:waypoint x="660" y="150" />
+        <di:waypoint x="742" y="150" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="660" y="235" />
+        <di:waypoint x="660" y="270" />
+        <di:waypoint x="742" y="270" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="778" y="150" />
+        <di:waypoint x="830" y="150" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="778" y="270" />
+        <di:waypoint x="830" y="270" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9">
+        <di:waypoint x="930" y="150" />
+        <di:waypoint x="982" y="150" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="1018" y="150" />
+        <di:waypoint x="1100" y="150" />
+        <di:waypoint x="1100" y="185" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="930" y="270" />
+        <di:waypoint x="982" y="270" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="1018" y="270" />
+        <di:waypoint x="1100" y="270" />
+        <di:waypoint x="1100" y="235" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="1125" y="210" />
+        <di:waypoint x="1180" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="1280" y="210" />
+        <di:waypoint x="1332" y="210" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

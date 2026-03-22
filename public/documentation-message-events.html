@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPMN Cyber Lab — Esempio Message Events</title>
+  <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>    .dropdown-header {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #adb5bd;
+      padding: 0.1rem 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .navbar .dropdown-divider {
+      margin: 0.15rem 0;
+    }    body {
+      padding-top: 48px;
+      font-family: sans-serif;
+    }
+    .navbar {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      min-height: 48px;
+    }
+    .navbar-brand {
+      font-size: 1.1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .navbar-nav .nav-link {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .doc-header {
+      background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .doc-section {
+      padding: 2rem 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .doc-section:last-child {
+      border-bottom: none;
+    }
+    .doc-section h2 {
+      color: #20c997;
+      margin-bottom: 1.5rem;
+    }
+    .doc-section h3 {
+      color: #17a2b8;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .event-card {
+      background: #f8f9fa;
+      border-left: 4px solid #20c997;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .event-card h4 {
+      color: #20c997;
+      margin-bottom: 1rem;
+    }
+    .message-icon {
+      font-size: 2rem;
+      margin-right: 1rem;
+      color: #17a2b8;
+    }
+    .example-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .tip-box {
+      background: #d1ecf1;
+      border-left: 4px solid #0dcaf0;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .pool-box {
+      background: #e7f3ff;
+      border: 2px solid #0d6efd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .back-link {
+      margin-bottom: 2rem;
+    }
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+    }
+    @media (min-width: 1200px) {
+      .container {
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
+    }
+    .flow-diagram {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="navbar-brand me-3" href="index.html">BPMN Cyber Lab</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="simulation.html">Simulation</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-current="page">
+              Documentation
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="documentation.html">📚 Panoramica</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Guide</div>
+              <!-- <li><h6 class="dropdown-header">Guide</h6></li> -->
+              <li><a class="dropdown-item" href="documentation-modeler.html">✏️ Modeler</a></li>
+              <li><a class="dropdown-item" href="documentation-simulation.html">▶️ Simulation</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Esempi</div>
+              <li><a class="dropdown-item" href="documentation-gateway-comparison.html">🔀 Gateway Comparison</a></li>
+              <li><a class="dropdown-item" href="documentation-message-events.html">✉️ Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
+              <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
+              <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-header">
+    <div class="container">
+      <h1 class="display-5 fw-bold mb-2">Esempio: Message Events</h1>
+      <p class="lead">Comunicazione asincrona tra processi tramite eventi messaggio</p>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <div class="back-link">
+      <a href="documentation.html" class="btn btn-outline-primary">
+        ← Torna all'indice della documentazione
+      </a>
+    </div>
+
+    <!-- Introduzione -->
+    <div class="doc-section">
+      <h2>💬 Obiettivo dell'esempio</h2>
+      <p>
+        Il file <strong>message-events-example.bpmn</strong> dimostra come utilizzare i <strong>Message Events</strong> 
+        in BPMN per modellare la comunicazione asincrona tra processi indipendenti. Questo esempio mostra 
+        una collaborazione tra Cliente e Venditore in un tipico flusso di ordine e-commerce, illustrando 
+        tutti i principali tipi di message eventi.
+      </p>
+
+      <div class="tip-box">
+        <h5>💡 Perché usare Message Events?</h5>
+        <p>
+          I Message Events sono fondamentali quando modelli processi che coinvolgono <strong>più partecipanti</strong> 
+          (persone, sistemi, organizzazioni) che comunicano in modo <strong>asincrono</strong>. 
+          A differenza di una semplice chiamata di funzione, un messaggio:
+        </p>
+        <ul>
+          <li><strong>Non blocca</strong> il processo mittente (comunicazione asincrona)</li>
+          <li>Può attraversare <strong>confini di sistema</strong> (es: API, email, messaggi)</li>
+          <li>Rappresenta <strong>interazioni reali</strong> tra entità indipendenti</li>
+          <li>Può essere <strong>perso, ritardato o gestito con timeout</strong></li>
+        </ul>
+      </div>
+
+      <div class="example-box">
+        <h5>📖 Come utilizzare questo esempio</h5>
+        <ol>
+          <li>Carica <code>message-events-example.bpmn</code> dal menu <strong>File</strong></li>
+          <li>Osserva nel <strong>Modeler</strong> i due pool (Cliente e Venditore) e i message flow che li collegano</li>
+          <li>Passa alla <strong>Simulation</strong> per vedere come i messaggi sincronizzano i due processi</li>
+          <li>Nota come ogni messaggio ha un mittente (throw event) e un ricevente (catch event)</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Scenario -->
+    <div class="doc-section">
+      <h2>🛒 Scenario: Processo di ordine e-commerce</h2>
+      <p>
+        L'esempio modella un processo completo di acquisto online che coinvolge due partecipanti indipendenti:
+      </p>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="pool-box">
+            <h4>👤 Pool Cliente</h4>
+            <p><strong>Responsabilità:</strong></p>
+            <ul>
+              <li>Preparare e inviare la richiesta d'ordine</li>
+              <li>Attendere conferma dal venditore</li>
+              <li>Decidere se accettare o rifiutare</li>
+              <li>Inviare pagamento (se accetta)</li>
+              <li>Ricevere notifica di spedizione</li>
+              <li>Opzione: annullare in qualsiasi momento</li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="pool-box">
+            <h4>🏢 Pool Venditore</h4>
+            <p><strong>Responsabilità:</strong></p>
+            <ul>
+              <li>Ricevere richiesta d'ordine (avvia processo)</li>
+              <li>Validare ordine e verificare disponibilità</li>
+              <li>Inviare conferma al cliente</li>
+              <li>Elaborare ordine (interrompibile)</li>
+              <li>Ricevere e verificare pagamento</li>
+              <li>Preparare e spedire merce</li>
+              <li>Gestire eventuali annullamenti</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-diagram">
+        <strong>Flusso messaggi:</strong><br><br>
+        Cliente: Prepara ordine → [Msg 1: Richiesta Ordine] → Venditore: Riceve e valida<br>
+        Venditore: Conferma → [Msg 2: Conferma Ordine] → Cliente: Rivedi e decidi<br>
+        Cliente: Pagamento → [Msg 3: Info Pagamento] → Venditore: Verifica e prepara<br>
+        Venditore: Spedizione → [Msg 4: Notifica Spedizione] → Cliente: Ricevi merce<br>
+        (Opzionale) Cliente: Annulla → [Msg 5: Annulla Ordine] → Venditore: Interrompi (Boundary Event)
+      </div>
+    </div>
+
+    <!-- Message Event Types -->
+    <div class="doc-section">
+      <h2>📨 Tipi di Message Events</h2>
+
+      <div class="event-card">
+        <h4><span class="message-icon">📤</span>Message Intermediate Throw Event</h4>
+        <p><strong>Simbolo:</strong> Cerchio doppio con icona busta (vuoto)</p>
+        <p><strong>Funzione:</strong> <strong>Inviare</strong> un messaggio a un altro partecipante</p>
+        <p><strong>Comportamento:</strong> Il processo emette il messaggio e <strong>continua immediatamente</strong> 
+        senza aspettare risposta. È un'operazione non bloccante.</p>
+        
+        <div class="alert alert-info mt-3">
+          <strong>Nel diagramma di esempio:</strong>
+          <ul>
+            <li><code>Event_SendOrder</code> - Cliente invia richiesta d'ordine</li>
+            <li><code>Event_SendConfirmation</code> - Venditore invia conferma</li>
+            <li><code>Event_SendPayment</code> - Cliente invia dati pagamento</li>
+            <li><code>Event_SendShipment</code> - Venditore notifica spedizione</li>
+            <li><code>Event_SendCancel</code> - Cliente annulla ordine</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <h4><span class="message-icon">📥</span>Message Intermediate Catch Event</h4>
+        <p><strong>Simbolo:</strong> Cerchio doppio con icona busta (pieno)</p>
+        <p><strong>Funzione:</strong> <strong>Attendere</strong> la ricezione di un messaggio specifico</p>
+        <p><strong>Comportamento:</strong> Il processo si <strong>ferma</strong> in attesa del messaggio. 
+        Quando il messaggio arriva, il token prosegue.</p>
+        
+        <div class="alert alert-warning mt-3">
+          <strong>Nel diagramma di esempio:</strong>
+          <ul>
+            <li><code>Event_ReceiveConfirmation</code> - Cliente aspetta conferma dal venditore</li>
+            <li><code>Event_ReceivePayment</code> - Venditore aspetta pagamento dal cliente</li>
+            <li><code>Event_ReceiveShipment</code> - Cliente aspetta notifica di spedizione</li>
+          </ul>
+          <p class="mb-0 mt-2"><strong>Nota:</strong> Questi sono punti di <strong>sincronizzazione</strong> 
+          tra i due processi. Un processo non può proseguire finché non riceve il messaggio atteso.</p>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <h4><span class="message-icon">▶️</span>Message Start Event</h4>
+        <p><strong>Simbolo:</strong> Cerchio singolo con icona busta (pieno)</p>
+        <p><strong>Funzione:</strong> <strong>Avviare</strong> un processo quando arriva un messaggio specifico</p>
+        <p><strong>Comportamento:</strong> Il processo rimane <strong>inattivo</strong> finché non riceve 
+        il messaggio che lo attiva. Questo è tipico di processi "reattivi" o "event-driven".</p>
+        
+        <div class="alert alert-success mt-3">
+          <strong>Nel diagramma di esempio:</strong>
+          <ul>
+            <li><code>Event_ReceiveOrder</code> - Il processo del Venditore <strong>inizia solo</strong> 
+            quando riceve la richiesta d'ordine dal cliente</li>
+          </ul>
+          <p class="mb-0 mt-2"><strong>Caso d'uso:</strong> Perfetto per modellare sistemi che reagiscono 
+          a eventi esterni (API endpoint, email in arrivo, messaggi da code).</p>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <h4><span class="message-icon">⚠️</span>Message Boundary Event</h4>
+        <p><strong>Simbolo:</strong> Cerchio doppio con icona busta, attaccato al bordo di un'attività</p>
+        <p><strong>Funzione:</strong> <strong>Interrompere</strong> un'attività in corso quando arriva un messaggio</p>
+        <p><strong>Comportamento:</strong> Mentre l'attività è in esecuzione, se arriva il messaggio specificato, 
+        l'attività viene <strong>interrotta</strong> e il flusso segue il percorso del boundary event.</p>
+        
+        <div class="alert alert-danger mt-3">
+          <strong>Nel diagramma di esempio:</strong>
+          <ul>
+            <li><code>Boundary_CancelOrder</code> - Attaccato a <code>Task_ProcessOrder</code> nel processo Venditore</li>
+            <li>Se il cliente invia un messaggio di annullamento mentre il venditore sta elaborando l'ordine, 
+            l'elaborazione viene <strong>interrotta immediatamente</strong></li>
+            <li>Il flusso passa a <code>Task_CancelOrder</code> per gestire l'annullamento</li>
+          </ul>
+          <p class="mb-0 mt-2"><strong>Caso d'uso:</strong> Gestione eccezioni, timeout, richieste di cancellazione, 
+          escalation.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Flow -->
+    <div class="doc-section">
+      <h2>🔗 Message Flow vs Sequence Flow</h2>
+      <p>È fondamentale comprendere la differenza tra i due tipi di connettori in BPMN:</p>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">→ Sequence Flow (freccia solida)</h5>
+              <ul>
+                <li><strong>All'interno</strong> di un singolo processo/pool</li>
+                <li>Rappresenta il <strong>flusso di controllo</strong></li>
+                <li>Indica l'ordine di esecuzione delle attività</li>
+                <li><strong>Sincrono</strong> - passa il token direttamente</li>
+              </ul>
+              <div class="example-box mt-3">
+                <small><strong>Esempio:</strong> Task A → Task B significa "esegui B dopo A"</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">⤏ Message Flow (freccia tratteggiata)</h5>
+              <ul>
+                <li><strong>Tra</strong> due processi/pool diversi</li>
+                <li>Rappresenta lo <strong>scambio di messaggi</strong></li>
+                <li>Collega throw event a catch event</li>
+                <li><strong>Asincrono</strong> - comunicazione non bloccante</li>
+              </ul>
+              <div class="example-box mt-3">
+                <small><strong>Esempio:</strong> Pool A [invia] ⤏ Pool B [riceve] significa "A invia messaggio a B"</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box mt-4">
+        <h5>💡 Regola importante</h5>
+        <p class="mb-0">
+          <strong>Non puoi usare sequence flow tra pool diversi.</strong> La comunicazione tra partecipanti 
+          indipendenti deve sempre avvenire tramite <strong>message flow</strong>. Questo riflette la realtà: 
+          processi indipendenti non condividono il flusso di esecuzione, ma comunicano tramite messaggi.
+        </p>
+      </div>
+    </div>
+
+    <!-- Simulation Guide -->
+    <div class="doc-section">
+      <h2>🎮 Guida alla simulazione</h2>
+
+      <h3>Fase 1: Avvio del processo</h3>
+      <div class="flow-diagram">
+        1. Il processo Cliente inizia automaticamente con lo Start Event<br>
+        2. Esegue "Prepara Ordine"<br>
+        3. Raggiunge "Invia Richiesta" (Throw Event)<br>
+        4. <strong>→ Message Flow attivato →</strong><br>
+        5. Il processo Venditore si AVVIA con "Ricevi Richiesta" (Start Event)<br>
+        6. Venditore esegue "Valida Ordine" e "Verifica Disponibilità"
+      </div>
+
+      <p class="mt-3">
+        <strong>Osserva:</strong> Il processo Venditore non esisteva prima di ricevere il messaggio. 
+        Il <strong>Message Start Event</strong> lo ha attivato. Questo è chiamato pattern <strong>"Request-Response"</strong>.
+      </p>
+
+      <h3>Fase 2: Conferma e decisione</h3>
+      <div class="flow-diagram">
+        7. Venditore raggiunge "Invia Conferma" (Throw Event)<br>
+        8. <strong>→ Message Flow →</strong><br>
+        9. Cliente si SBLOCCA da "Attendi Conferma" (Catch Event)<br>
+        10. Cliente esegue "Rivedi Ordine"<br>
+        11. Cliente decide al gateway XOR: Accetta? (Sì/No)
+      </div>
+
+      <p class="mt-3">
+        <strong>Osserva:</strong> Il Cliente era <strong>bloccato</strong> in attesa della conferma. 
+        I Catch Event sono punti di <strong>sincronizzazione</strong>. Questo garantisce che il Cliente 
+        non proceda prima di avere la risposta del Venditore.
+      </p>
+
+      <h3>Fase 3a: Percorso di successo (Cliente accetta)</h3>
+      <div class="flow-diagram">
+        12a. Cliente → Gateway: Sì → "Invia Pagamento" (Throw Event)<br>
+        13a. <strong>→ Message Flow →</strong><br>
+        14a. Venditore si SBLOCCA da "Attendi Pagamento" (Catch Event)<br>
+        15a. Venditore: "Verifica Pagamento" → "Prepara Spedizione" → "Notifica Spedizione"<br>
+        16a. <strong>→ Message Flow →</strong><br>
+        17a. Cliente si SBLOCCA da "Attendi Spedizione" (Catch Event)<br>
+        18a. Cliente: "Ricevi Merce" → End Event ✅<br>
+        19a. Venditore: "Spedisci Merce" → End Event ✅
+      </div>
+
+      <h3>Fase 3b: Percorso di annullamento (Cliente rifiuta)</h3>
+      <div class="flow-diagram">
+        12b. Cliente → Gateway: No → "Annulla Ordine" (Throw Event)<br>
+        13b. <strong>→ Message Flow →</strong><br>
+        14b. Venditore: "Elabora Ordine" viene INTERROTTO dal Boundary Event<br>
+        15b. Venditore esegue "Annulla Ordine" → End Event ❌<br>
+        16b. Cliente → End Event (Annullato) ❌
+      </div>
+
+      <p class="mt-3">
+        <strong>Osserva:</strong> Il <strong>Boundary Event</strong> permette al messaggio di annullamento 
+        di interrompere un'attività in corso. Questo è essenziale per gestire <strong>eccezioni asincrone</strong>.
+      </p>
+
+      <div class="tip-box mt-4">
+        <h5>🎯 Suggerimenti per la simulazione</h5>
+        <ul>
+          <li><strong>Usa la vista Pools:</strong> Assicurati che entrambi i pool siano visibili per vedere la sincronizzazione</li>
+          <li><strong>Velocità lenta:</strong> Imposta velocità bassa per osservare i message flow</li>
+          <li><strong>Pausa strategica:</strong> Metti in pausa quando raggiungi i Catch Event per vedere il "waiting"</li>
+          <li><strong>Log eventi:</strong> Controlla il log per vedere l'ordine cronologico di invio/ricezione messaggi</li>
+          <li><strong>Testa entrambi i percorsi:</strong> Simula con "Accetta" e con "Rifiuta" per vedere i due scenari</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Message Types -->
+    <div class="doc-section">
+      <h2>📋 I 5 messaggi dell'esempio</h2>
+
+      <table class="table table-bordered">
+        <thead class="table-light">
+          <tr>
+            <th>Messaggio</th>
+            <th>Mittente</th>
+            <th>Destinatario</th>
+            <th>Scopo</th>
+            <th>Tipo Evento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Richiesta Ordine</strong></td>
+            <td>Cliente (Throw)</td>
+            <td>Venditore (Start)</td>
+            <td>Avviare il processo di vendita</td>
+            <td>Intermediate Throw → Start</td>
+          </tr>
+          <tr>
+            <td><strong>Conferma Ordine</strong></td>
+            <td>Venditore (Throw)</td>
+            <td>Cliente (Catch)</td>
+            <td>Confermare disponibilità e prezzo</td>
+            <td>Intermediate Throw → Catch</td>
+          </tr>
+          <tr>
+            <td><strong>Info Pagamento</strong></td>
+            <td>Cliente (Throw)</td>
+            <td>Venditore (Catch)</td>
+            <td>Inviare dati per il pagamento</td>
+            <td>Intermediate Throw → Catch</td>
+          </tr>
+          <tr>
+            <td><strong>Notifica Spedizione</strong></td>
+            <td>Venditore (Throw)</td>
+            <td>Cliente (Catch)</td>
+            <td>Informare che la merce è partita</td>
+            <td>Intermediate Throw → Catch</td>
+          </tr>
+          <tr>
+            <td><strong>Annulla Ordine</strong></td>
+            <td>Cliente (Throw)</td>
+            <td>Venditore (Boundary)</td>
+            <td>Interrompere l'elaborazione</td>
+            <td>Intermediate Throw → Boundary</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Real World Applications -->
+    <div class="doc-section">
+      <h2>🌍 Applicazioni nel mondo reale</h2>
+      
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">🏦 Sistemi finanziari</h5>
+              <ul>
+                <li>Richiesta → Approvazione → Pagamento</li>
+                <li>Message flow tra cliente, banca, merchant</li>
+                <li>Boundary events per timeout o cancellazioni</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">📧 Workflow email</h5>
+              <ul>
+                <li>Invio email = Throw Event</li>
+                <li>Attesa risposta = Catch Event</li>
+                <li>Reminder = Boundary Timer</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">🔧 Microservizi</h5>
+              <ul>
+                <li>API call = Message Flow</li>
+                <li>Service A → Message → Service B</li>
+                <li>Event-driven architecture</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="example-box mt-4">
+        <h5>💼 Esempio pratico: Sistema di ticketing</h5>
+        <div class="flow-diagram">
+          <strong>Pool Cliente:</strong><br>
+          Start → Apri Ticket (Throw: "Nuova Richiesta") → [Attendi Risposta] (Catch) → Valuta Soluzione<br>
+          → Gateway: Risolto? → Sì: Chiudi Ticket | No: Rilancia (Throw: "Aggiornamento")<br><br>
+          
+          <strong>Pool Support:</strong><br>
+          [Ricevi Richiesta] (Start) → Analizza → Throw: "Prima Risposta" → [Lavora Ticket]...<br>
+          Boundary: [Escalation] se passa troppo tempo → Passa al Manager
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="doc-section">
+      <h2>🎓 Conclusioni chiave</h2>
+
+      <div class="event-card">
+        <h4>Quando usare Message Events</h4>
+        <ul>
+          <li><strong>Collaborazione tra pool/partecipanti diversi:</strong> Mai usare sequence flow tra pool</li>
+          <li><strong>Comunicazione asincrona:</strong> Il mittente non aspetta risposta immediata</li>
+          <li><strong>Sincronizzazione inter-processo:</strong> Catch Events creano punti di attesa</li>
+          <li><strong>Eventi esterni che avviano processi:</strong> Message Start Event per sistemi event-driven</li>
+          <li><strong>Interruzioni asincrone:</strong> Boundary Events per eccezioni, timeout, cancellazioni</li>
+        </ul>
+      </div>
+
+      <div class="tip-box">
+        <h5>⚠️ Errori comuni da evitare</h5>
+        <ul>
+          <li>❌ Usare sequence flow tra pool diversi (usa message flow)</li>
+          <li>❌ Dimenticare di collegare throw e catch event con message flow</li>
+          <li>❌ Non associare correttamente i message definitions agli eventi</li>
+          <li>❌ Aspettarsi comportamento sincrono da message event (sono asincroni)</li>
+          <li>❌ Usare message event quando una semplice task sarebbe sufficiente (overhead inutile)</li>
+        </ul>
+      </div>
+
+      <div class="event-card mt-4">
+        <h4>Best Practices</h4>
+        <ul>
+          <li>✅ Nomina i messaggi in modo descrittivo (<em>"Conferma Ordine"</em> non <em>"Messaggio 1"</em>)</li>
+          <li>✅ Usa Message Start Events per processi che devono essere "triggerati" dall'esterno</li>
+          <li>✅ Considera sempre timeout e gestione eccezioni (Boundary Events)</li>
+          <li>✅ Documenta il payload del messaggio (cosa contiene il messaggio)</li>
+          <li>✅ Usa pools separati per entità realmente indipendenti</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="doc-section">
+      <h2>➡️ Prossimi passi</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Estendi l'esempio</h5>
+              <p class="card-text">
+                Prova ad aggiungere nel <strong>Modeler</strong>:
+              </p>
+              <ul>
+                <li>Un terzo pool (es: "Corriere" per la spedizione)</li>
+                <li>Timer Boundary Event per timeout pagamento</li>
+                <li>Signal Events per notifiche broadcast</li>
+                <li>Subprocess per gestione complessa errori</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Esplora altri concetti BPMN</h5>
+              <p class="card-text">Continua l'apprendimento:</p>
+              <ul>
+                <li><a href="documentation-gateway-comparison.html">Gateway Comparison Example</a></li>
+                <li><a href="documentation-modeler.html">Documentazione completa Modeler</a></li>
+                <li><a href="documentation-simulation.html">Documentazione completa Simulation</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white text-center py-3 mt-5">
+    <div class="container">
+      <p class="mb-0">&copy; 2026 BPMN Cyber Lab. Powered by bpmn.io</p>
+    </div>
+  </footer>
+
+  <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

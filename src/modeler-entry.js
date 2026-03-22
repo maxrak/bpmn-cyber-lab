@@ -14,6 +14,7 @@ import CustomPaletteProvider from './customPaletteProvider';
 import CustomContextPadProvider from './customContextPadProvider';
 import { setupFileHandlers, loadSampleDiagram } from './fileHandlers';
 import { getCurrentBpmn, updateFilenameUI } from './globalBpmnState';
+import { initializeBpmnFileMenu } from './bpmnFileMenu';
 
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
@@ -62,6 +63,22 @@ modeler.importXML(initialBpmn).then(() => {
     console.warn('zoom failed', e); 
   }
   console.log('✅ Modeler inizializzato con BPMN dallo stato globale');
+  
+  // Calcola l'altezza minima del container interno in base alla palette
+  setTimeout(() => {
+    const palette = document.querySelector('.djs-palette');
+    const canvasModeler = document.querySelector('#canvas-modeler');
+    
+    if (palette && canvasModeler) {
+      const paletteHeight = palette.offsetHeight;
+      const padding = 5000; // margine extra
+      const minHeight = paletteHeight + padding;
+      
+      // Imposta min-height sul #canvas-modeler per permettere lo scroll
+      canvasModeler.style.minHeight = `${minHeight}px`;
+      console.log(`✅ Canvas min-height impostata: ${minHeight}px (palette: ${paletteHeight}px)`);
+    }
+  }, 300); // Attende il rendering della palette
 }).catch(err => {
   console.error('❌ Errore caricamento BPMN iniziale', err);
 });
@@ -73,20 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Aggiorna l'indicatore del filename nella navbar
   updateFilenameUI();
-
-  const navOpenBtn = document.getElementById('nav-btn-open');
-  const navSaveBtn = document.getElementById('nav-btn-save');
-  const toolbarOpenBtn = document.getElementById('btn-open');
-  const toolbarSaveBtn = document.getElementById('btn-save');
-
-  // Wire navbar buttons to toolbar buttons
-  if (navOpenBtn && toolbarOpenBtn) {
-    navOpenBtn.addEventListener('click', () => toolbarOpenBtn.click());
-  }
-
-  if (navSaveBtn && toolbarSaveBtn) {
-    navSaveBtn.addEventListener('click', () => toolbarSaveBtn.click());
-  }
+  
+  // Inizializza il menu dinamico dei file BPMN
+  initializeBpmnFileMenu(modeler);
 });
 
 // Mini toolbar handlers (undo/redo/zoom/fit)

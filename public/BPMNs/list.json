@@ -1,5 +1,9 @@
 [
-  "example.bpmn",
+  "gateway-comparison.bpmn",
+  "message-events-example.bpmn",
+  "signal-events-example.bpmn",
+  "multiple-signals-example.bpmn",
+  "error-events-example.bpmn",
   "iam_lifecycle_as_is_modeled.bpmn",
   "iam_lifecycle_risk_annotated.bpmn",
   "sample-empty.bpmn",

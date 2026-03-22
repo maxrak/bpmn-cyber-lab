@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Signal Events Multipli - BPMN Cyber Lab</title>
+  <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>    .dropdown-header {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #adb5bd;
+      padding: 0.1rem 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .navbar .dropdown-divider {
+      margin: 0.15rem 0;
+    }    body {
+      padding-top: 48px;
+      font-family: sans-serif;
+    }
+    .navbar {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      min-height: 48px;
+    }
+    .navbar-brand {
+      font-size: 1.1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .navbar-nav .nav-link {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .doc-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    h1 {
+      color: #667eea;
+      border-bottom: 3px solid #764ba2;
+      padding-bottom: 15px;
+      margin-bottom: 30px;
+    }
+    h2 {
+      color: #764ba2;
+      margin-top: 40px;
+      margin-bottom: 20px;
+    }
+    h3 {
+      color: #667eea;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+    .signal-type {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+    .signal-type h4 {
+      margin: 0 0 10px 0;
+      font-weight: bold;
+    }
+    .signal-type p {
+      margin: 0;
+      opacity: 0.95;
+    }
+    .example-box {
+      background: #f8f9fa;
+      border-left: 4px solid #667eea;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+    .pattern-box {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+    .pattern-box h4 {
+      color: #856404;
+      margin-top: 0;
+    }
+    .code-block {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      margin: 15px 0;
+    }
+    .flow-diagram {
+      background: #e3f2fd;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border: 2px solid #2196f3;
+    }
+    .btn-back {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 30px;
+      transition: transform 0.3s ease;
+    }
+    .btn-back:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      color: white;
+    }
+    .key-concept {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 5px;
+    }
+    .signal-badge {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 14px;
+      font-weight: bold;
+      margin: 5px;
+    }
+    ul.checklist {
+      list-style: none;
+      padding-left: 0;
+    }
+    ul.checklist li:before {
+      content: "✓ ";
+      color: #4caf50;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+    }
+    @media (min-width: 1200px) {
+      .container {
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="navbar-brand me-3" href="index.html">BPMN Cyber Lab</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="simulation.html">Simulation</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-current="page">
+              Documentation
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="documentation.html">📚 Panoramica</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Guide</div>
+              <!-- <li><h6 class="dropdown-header">Guide</h6></li> -->
+              <li><a class="dropdown-item" href="documentation-modeler.html">✏️ Modeler</a></li>
+              <li><a class="dropdown-item" href="documentation-simulation.html">▶️ Simulation</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Esempi</div>
+              <li><a class="dropdown-item" href="documentation-gateway-comparison.html">🔀 Gateway Comparison</a></li>
+              <li><a class="dropdown-item" href="documentation-message-events.html">✉️ Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
+              <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
+              <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+    <div class="doc-header">
+    <div class="container">
+      <h1 class="display-5 fw-bold mb-2">Esempio: Signal Events Multipli in BPMN</h1>
+      <p class="lead">Gestione di Eventi Multipli </p>
+    </div>
+  </div>
+    <div class="container">
+        <h1>📡 Signal Events Multipli in BPMN</h1>
+        
+        <div class="key-concept">
+            <strong>Concetto Chiave:</strong> I Signal Events possono essere combinati e coordinati per creare pattern di comunicazione complessi tra diverse parti di un processo. Questo esempio dimostra come gestire segnali multipli simultanei, segnali in cascata, e pattern avanzati di sincronizzazione.
+        </div>
+
+        <h2>🎯 Scenario: Sistema di Coordinamento Multi-Segnale</h2>
+        <p>
+            L'esempio illustra un <strong>sistema di coordinamento complesso</strong> dove diversi segnali vengono emessi e ricevuti in modo orchestrato. Il processo principale gestisce la logica di business mentre tre subprocess separati reagiscono autonomamente ai segnali ricevuti.
+        </p>
+
+        <div class="flow-diagram">
+            <h4>📊 Flusso del Processo</h4>
+            <pre style="margin: 0; white-space: pre-wrap;">
+1. Sistema si inizializza
+2. Emette segnale <strong>Alert</strong> → Attiva Subprocess 1 (non-interrupting)
+3. Attende decisione tramite Event-Based Gateway
+4. Riceve <strong>Approve</strong> o <strong>Reject</strong>
+   
+   Path A (Approval):
+   → Process Approval → Emette <strong>Complete</strong> → Attiva Subprocess 2
+   
+   Path B (Rejection):
+   → Process Rejection → Emette <strong>Cancel</strong> → Attiva Subprocess 3
+   → Subprocess 3 emette <strong>Alert</strong> (cascading) → Ri-attiva Subprocess 1
+            </pre>
+        </div>
+
+        <h2>🔷 I Cinque Segnali del Sistema</h2>
+        
+        <div class="signal-type">
+            <h4><span class="signal-badge">Alert</span></h4>
+            <p>
+                <strong>Tipo:</strong> Broadcast non-interrupting<br>
+                <strong>Scopo:</strong> Notifica generale del sistema per logging e monitoraggio<br>
+                <strong>Gestito da:</strong> Subprocess 1 (Event Subprocess con Signal Start)<br>
+                <strong>Caratteristica:</strong> Può essere emesso multiplo volte, non interrompe il flusso principale
+            </p>
+        </div>
+
+        <div class="signal-type">
+            <h4><span class="signal-badge">Approve</span></h4>
+            <p>
+                <strong>Tipo:</strong> Decision signal<br>
+                <strong>Scopo:</strong> Segnala approvazione di una richiesta<br>
+                <strong>Gestito da:</strong> Event-Based Gateway nel processo principale<br>
+                <strong>Caratteristica:</strong> Alternativa mutualmente esclusiva con Reject
+            </p>
+        </div>
+
+        <div class="signal-type">
+            <h4><span class="signal-badge">Reject</span></h4>
+            <p>
+                <strong>Tipo:</strong> Decision signal<br>
+                <strong>Scopo:</strong> Segnala rigetto di una richiesta<br>
+                <strong>Gestito da:</strong> Event-Based Gateway nel processo principale<br>
+                <strong>Caratteristica:</strong> Triggera subprocess 3 che genera signal in cascata
+            </p>
+        </div>
+
+        <div class="signal-type">
+            <h4><span class="signal-badge">Complete</span></h4>
+            <p>
+                <strong>Tipo:</strong> Workflow trigger signal<br>
+                <strong>Scopo:</strong> Avvia task di lunga durata dopo approvazione<br>
+                <strong>Gestito da:</strong> Subprocess 2 (Event Subprocess con Signal Start)<br>
+                <strong>Caratteristica:</strong> Può essere interrotto da Cancel via boundary event
+            </p>
+        </div>
+
+        <div class="signal-type">
+            <h4><span class="signal-badge">Cancel</span></h4>
+            <p>
+                <strong>Tipo:</strong> Interrupting signal<br>
+                <strong>Scopo:</strong> Interrompe task in esecuzione e attiva cleanup<br>
+                <strong>Gestito da:</strong> Boundary Event su Task_LongRunning (interrupting)<br>
+                <strong>Caratteristica:</strong> Interrompe immediatamente il task e devia il flusso
+            </p>
+        </div>
+
+        <h2>🎨 Pattern Dimostrati</h2>
+
+        <div class="pattern-box">
+            <h4>📌 Pattern 1: Event-Based Gateway con Signal</h4>
+            <p>
+                Utilizzato per implementare <strong>decisioni basate su eventi esterni</strong>. Il gateway attende uno tra più signal catch events, permettendo al processo di procedere solo quando uno specifico segnale viene ricevuto.
+            </p>
+            <div class="code-block">
+&lt;eventBasedGateway id="Gateway_EventBased"&gt;
+  &lt;outgoing&gt;Flow_5&lt;/outgoing&gt;  &lt;!-- to Approve --&gt;
+  &lt;outgoing&gt;Flow_6&lt;/outgoing&gt;  &lt;!-- to Reject --&gt;
+&lt;/eventBasedGateway&gt;
+
+&lt;intermediateCatchEvent id="Event_CatchApprove"&gt;
+  &lt;signalEventDefinition signalRef="Signal_Approve" /&gt;
+&lt;/intermediateCatchEvent&gt;
+
+&lt;intermediateCatchEvent id="Event_CatchReject"&gt;
+  &lt;signalEventDefinition signalRef="Signal_Reject" /&gt;
+&lt;/intermediateCatchEvent&gt;
+            </div>
+            <strong>Uso pratico:</strong> Sistemi di approvazione, workflow di revisione, pattern di await multipli.
+        </div>
+
+        <div class="pattern-box">
+            <h4>📌 Pattern 2: Event Subprocess con Signal Start</h4>
+            <p>
+                <strong>Subprocess triggerati da eventi</strong> (triggeredByEvent="true") che si attivano automaticamente quando il segnale viene emesso. Possono essere <em>interrupting</em> o <em>non-interrupting</em>.
+            </p>
+            <div class="code-block">
+&lt;subProcess id="SubProcess_1" triggeredByEvent="true"&gt;
+  &lt;startEvent id="Start_SignalAlert" isInterrupting="false"&gt;
+    &lt;signalEventDefinition signalRef="Signal_Alert" /&gt;
+  &lt;/startEvent&gt;
+  &lt;!-- Tasks eseguite in parallelo al processo principale --&gt;
+&lt;/subProcess&gt;
+            </div>
+            <ul class="checklist">
+                <li><strong>isInterrupting="false":</strong> esegue in parallelo (Subprocess 1 e 3)</li>
+                <li><strong>isInterrupting="true":</strong> interrompe il processo padre (non usato qui)</li>
+            </ul>
+            <strong>Uso pratico:</strong> Logging parallelo, monitoring, notifiche non bloccanti.
+        </div>
+
+        <div class="pattern-box">
+            <h4>📌 Pattern 3: Signal Boundary Event (Interrupting)</h4>
+            <p>
+                I <strong>Boundary Events</strong> vengono attaccati a task o subprocess per gestire interruzioni. Quando il segnale viene ricevuto, il task viene interrotto e il flusso segue il boundary event.
+            </p>
+            <div class="code-block">
+&lt;task id="Task_LongRunning" name="Execute Long Task" /&gt;
+
+&lt;boundaryEvent id="Boundary_Cancel" 
+               attachedToRef="Task_LongRunning" 
+               cancelActivity="true"&gt;
+  &lt;signalEventDefinition signalRef="Signal_Cancel" /&gt;
+&lt;/boundaryEvent&gt;
+
+&lt;!-- Flow da Boundary_Cancel porta a Cleanup --&gt;
+            </div>
+            <strong>Uso pratico:</strong> Timeout management, cancellazione task, gestione errori asincroni.
+        </div>
+
+        <div class="pattern-box">
+            <h4>📌 Pattern 4: Cascading Signals</h4>
+            <p>
+                Un subprocess può <strong>emettere nuovi segnali</strong> come risultato della ricezione di un altro segnale, creando una catena di reazioni (event chain).
+            </p>
+            <div class="code-block">
+Subprocess 3 (triggeredByEvent="true"):
+  Riceve: Signal_Reject
+    ↓
+  Esegue: Analyze Rejection
+    ↓
+  Emette: Signal_Alert (cascading)
+    ↓
+  Attiva: Subprocess 1 di nuovo (non-interrupting)
+            </div>
+            <strong>Uso pratico:</strong> Event chains, notification cascades, pattern di propagazione.
+        </div>
+
+        <h2>🔍 Analisi dei Subprocess</h2>
+
+        <h3>Subprocess 1: Alert Handler (Non-Interrupting)</h3>
+        <div class="example-box">
+            <strong>Attivazione:</strong> Signal Start Event con Signal_Alert (isInterrupting="false")<br>
+            <strong>Comportamento:</strong> Esegue in parallelo senza interrompere il flusso principale<br>
+            <strong>Azioni:</strong>
+            <ul>
+                <li>Log Alert → registra l'evento</li>
+                <li>Notify Team → invia notifiche ai membri del team</li>
+            </ul>
+            <strong>Scenario:</strong> Può essere attivato più volte (prima dal processo principale, poi dal cascading signal in Subprocess 3)
+        </div>
+
+        <h3>Subprocess 2: Long Task con Cancellation</h3>
+        <div class="example-box">
+            <strong>Attivazione:</strong> Signal Start Event con Signal_Complete<br>
+            <strong>Comportamento:</strong> Task di lunga durata con possibilità di interruzione<br>
+            <strong>Azioni:</strong>
+            <ul>
+                <li>Execute Long Task → operazione time-consuming</li>
+                <li><strong>Cancellation Path:</strong> Boundary Event (Cancel) → Cleanup → End (Cancelled)</li>
+                <li><strong>Success Path:</strong> Finalize Task → End (Completed)</li>
+            </ul>
+            <strong>Scenario:</strong> Se arriva Cancel mentre il task è in esecuzione, viene interrotto e viene eseguito cleanup
+        </div>
+
+        <h3>Subprocess 3: Rejection Handler con Cascading</h3>
+        <div class="example-box">
+            <strong>Attivazione:</strong> Signal Start Event con Signal_Reject (isInterrupting="false")<br>
+            <strong>Comportamento:</strong> Analizza il rigetto ed emette un segnale secondario<br>
+            <strong>Azioni:</strong>
+            <ul>
+                <li>Analyze Rejection → analisi del motivo del rigetto</li>
+                <li><strong>Throw Alert (Cascade)</strong> → emette nuovo Signal_Alert</li>
+                <li>Create Report → genera documentazione</li>
+            </ul>
+            <strong>Scenario:</strong> Dimostra come un signal può triggeerare l'emissione di un altro signal (cascading effect)
+        </div>
+
+        <h2>💡 Concetti Chiave</h2>
+
+        <div class="key-concept">
+            <h4>🔄 Broadcast vs Point-to-Point</h4>
+            <p>
+                I <strong>Signal Events sono broadcast</strong>: un singolo signal può essere ricevuto da <em>tutti</em> i catch events che lo ascoltano simultaneamente. Nell'esempio:
+            </p>
+            <ul>
+                <li>Signal_Alert può attivare Subprocess 1 ogni volta che viene emesso (iniziale + cascading)</li>
+                <li>Signal_Cancel viene ricevuto dal Boundary Event se il task è attivo</li>
+                <li>Multiple listener possono reagire allo stesso signal indipendentemente</li>
+            </ul>
+        </div>
+
+        <div class="key-concept">
+            <h4>⚡ Event-Based Gateway</h4>
+            <p>
+                L'<strong>Event-Based Gateway</strong> permette decisioni basate su "quale evento arriva per primo". Differenze con Exclusive Gateway:
+            </p>
+            <ul>
+                <li><strong>Exclusive Gateway:</strong> decisione basata su <em>condizioni dati</em></li>
+                <li><strong>Event-Based Gateway:</strong> decisione basata su <em>eventi temporali</em></li>
+            </ul>
+            <p>
+                Nel nostro esempio: il processo attende Approve O Reject, e procede con il path corrispondente al primo segnale ricevuto.
+            </p>
+        </div>
+
+        <div class="key-concept">
+            <h4>🎯 Interrupting vs Non-Interrupting</h4>
+            <p>Differenza cruciale per il comportamento dei subprocess:</p>
+            <table class="table table-bordered mt-2">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Comportamento</th>
+                        <th>Uso nell'esempio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Non-Interrupting</strong></td>
+                        <td>Esegue in parallelo, il processo principale continua</td>
+                        <td>Subprocess 1 (Alert) e 3 (Reject) - possono essere attivati ripetutamente</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Interrupting</strong></td>
+                        <td>Interrompe il processo/task corrente</td>
+                        <td>Boundary_Cancel su Task_LongRunning - ferma il task immediatamente</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>🎓 Best Practices</h2>
+
+        <ul class="checklist">
+            <li><strong>Naming convention:</strong> Usa nomi descrittivi per i signal (Alert, Approve, Reject vs generici Signal1, Signal2)</li>
+            <li><strong>Event Subprocess:</strong> Usa triggeredByEvent="true" per logic che deve reagire a signal ma non è parte del flusso principale</li>
+            <li><strong>Boundary Events:</strong> Preferisci cancelActivity="true" per interruzioni definitive, "false" per monitoring</li>
+            <li><strong>Event-Based Gateway:</strong> Usa solo con catch events, non con task normali</li>
+            <li><strong>Cascading Signals:</strong> Documenta chiaramente le catene di signal per evitare loop infiniti</li>
+            <li><strong>Testing:</strong> Testa tutti i path possibili, specialmente le interazioni tra signal multipli simultanei</li>
+        </ul>
+
+        <h2>🚀 Scenari di Utilizzo Reale</h2>
+
+        <div class="example-box">
+            <h4>1. Sistema di Orchestrazione Microservizi</h4>
+            <p>
+                <strong>Scenario:</strong> Coordinamento di microservizi asincroni dove il completamento di un servizio triggera altri servizi.<br>
+                <strong>Pattern utilizzati:</strong> Event-Based Gateway (attesa risposte), Cascading Signals (propagazione stato), Boundary Events (timeout/cancellazione)
+            </p>
+        </div>
+
+        <div class="example-box">
+            <h4>2. Sistema di Approvazione Multi-Livello</h4>
+            <p>
+                <strong>Scenario:</strong> Workflow che richiede approvazioni sequenziali con possibilità di escalation o cancellazione.<br>
+                <strong>Pattern utilizzati:</strong> Event-Based Gateway (attesa decisioni), Non-Interrupting Start (logging/audit paralleli), Interrupting Boundary (cancellazione workflow)
+            </p>
+        </div>
+
+        <div class="example-box">
+            <h4>3. Monitoring e Alerting Distribuito</h4>
+            <p>
+                <strong>Scenario:</strong> Sistema che deve loggare e notificare eventi senza bloccare l'operazione principale.<br>
+                <strong>Pattern utilizzati:</strong> Non-Interrupting Event Subprocess (logging parallelo), Cascading Signals (propagazione alerts), Multiple listeners (vari team notificati)
+            </p>
+        </div>
+
+        <h2>⚠️ Attenzione</h2>
+
+        <div class="example-box" style="border-left-color: #ff9800; background: #fff3e0;">
+            <h4 style="color: #e65100;">Potenziali Problemi</h4>
+            <ul>
+                <li><strong>Race Conditions:</strong> Con Event-Based Gateway, l'ordine di arrivo dei signal può essere non deterministico</li>
+                <li><strong>Signal Storms:</strong> Cascading signal possono creare troppi eventi se non controllati</li>
+                <li><strong>Deadlock:</strong> If tutti gli event-based gateway attendono signal che nessuno emette</li>
+                <li><strong>Memory Leaks:</strong> Subprocess non-interrupting che continuano ad accumularsi se triggerati troppo frequentemente</li>
+            </ul>
+            <h4 style="color: #e65100; margin-top: 20px;">Soluzioni</h4>
+            <ul class="checklist">
+                <li>Implementa <strong>timeout</strong> sui catch event (usando Timer Event in OR con Signal)</li>
+                <li>Usa <strong>correlation keys</strong> per distinguere signal destinati a istanze specifiche</li>
+                <li>Implementa <strong>rate limiting</strong> per cascade signal</li>
+                <li>Monitora il numero di <strong>subprocess attivi</strong> e implementa cleanup</li>
+            </ul>
+        </div>
+
+        <h2>🎯 Cosa Imparare dall'Esempio</h2>
+
+        <ol>
+            <li><strong>Event-Based Gateway:</strong> Come creare decisioni basate su quale evento arriva per primo</li>
+            <li><strong>Signal Throw/Catch:</strong> Pattern coordinati di emissione e ricezione signal</li>
+            <li><strong>Event Subprocess:</strong> Come subprocess possono reagire automaticamente a signal globali</li>
+            <li><strong>Boundary Events:</strong> Come interrompere task in esecuzione con signal esterni</li>
+            <li><strong>Cascading Signals:</strong> Come un signal può triggeerare l'emissione di altri signal</li>
+            <li><strong>Interrupting vs Non-Interrupting:</strong> Differenze comportamentali e casi d'uso</li>
+            <li><strong>Parallel Processing:</strong> Come gestire logic parallele che reagiscono agli stessi eventi</li>
+        </ol>
+
+        <h2>📚 Prossimi Passi</h2>
+
+        <p>Dopo aver compreso questo esempio, puoi esplorare:</p>
+        <ul>
+            <li>Combinare <strong>Signal + Timer Events</strong> per timeout su attese</li>
+            <li>Usare <strong>Conditional Events</strong> insieme a Signal per decisioni data-driven</li>
+            <li>Implementare <strong>Correlation</strong> per signal destinati a istanze specifiche</li>
+            <li>Studiare <strong>Escalation Events</strong> per pattern gerarchici</li>
+        </ul>
+
+        <a href="documentation.html" class="btn-back">← Torna alla Documentazione</a>
+    </div>
+
+  <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

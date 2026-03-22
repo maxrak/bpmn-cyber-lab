@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPMN Cyber Lab — Esempio Gateway Comparison</title>
+  <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>    .dropdown-header {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #adb5bd;
+      padding: 0.1rem 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .navbar .dropdown-divider {
+      margin: 0.15rem 0;
+    }    body {
+      padding-top: 48px;
+      font-family: sans-serif;
+    }
+    .navbar {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      min-height: 48px;
+    }
+    .navbar-brand {
+      font-size: 1.1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .navbar-nav .nav-link {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .doc-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .doc-section {
+      padding: 2rem 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .doc-section:last-child {
+      border-bottom: none;
+    }
+    .doc-section h2 {
+      color: #667eea;
+      margin-bottom: 1.5rem;
+    }
+    .doc-section h3 {
+      color: #764ba2;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .gateway-card {
+      background: #f8f9fa;
+      border-left: 4px solid #667eea;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .gateway-card h4 {
+      color: #667eea;
+      margin-bottom: 1rem;
+    }
+    .gateway-symbol {
+      font-size: 2rem;
+      margin-right: 1rem;
+      color: #764ba2;
+    }
+    .example-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .tip-box {
+      background: #d1ecf1;
+      border-left: 4px solid #0dcaf0;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .back-link {
+      margin-bottom: 2rem;
+    }
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+    }
+    @media (min-width: 1200px) {
+      .container {
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
+    }
+    .comparison-table {
+      margin: 2rem 0;
+    }
+    .comparison-table th {
+      background: #667eea;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="navbar-brand me-3" href="index.html">BPMN Cyber Lab</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="simulation.html">Simulation</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-current="page">
+              Documentation
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="documentation.html">📚 Panoramica</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Guide</div>
+              <!-- <li><h6 class="dropdown-header">Guide</h6></li> -->
+              <li><a class="dropdown-item" href="documentation-modeler.html">✏️ Modeler</a></li>
+              <li><a class="dropdown-item" href="documentation-simulation.html">▶️ Simulation</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Esempi</div>
+              <li><a class="dropdown-item" href="documentation-gateway-comparison.html">🔀 Gateway Comparison</a></li>
+              <li><a class="dropdown-item" href="documentation-message-events.html">✉️ Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
+              <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
+              <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-header">
+    <div class="container">
+      <h1 class="display-5 fw-bold mb-2">Esempio: Confronto Gateway</h1>
+      <p class="lead">Analisi comparativa dei diversi tipi di gateway BPMN</p>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <div class="back-link">
+      <a href="documentation.html" class="btn btn-outline-primary">
+        ← Torna all'indice della documentazione
+      </a>
+    </div>
+
+    <!-- Introduzione -->
+    <div class="doc-section">
+      <h2>📊 Obiettivo dell'esempio</h2>
+      <p>
+        Il file <strong>gateway-comparison.bpmn</strong> è stato progettato per illustrare visivamente 
+        il comportamento dei tre principali tipi di gateway BPMN utilizzati per controllare il flusso 
+        di esecuzione in un processo. Caricando questo esempio nel <strong>Modeler</strong> e simulandolo 
+        nel modulo <strong>Simulation</strong>, potrai osservare le differenze pratiche nel modo in cui 
+        i token attraversano ciascun tipo di gateway.
+      </p>
+
+      <div class="tip-box">
+        <h5>💡 Come utilizzare questo esempio</h5>
+        <ol>
+          <li>Apri il file <code>gateway-comparison.bpmn</code> dal menu <strong>File</strong> nel Modeler</li>
+          <li>Passa al modulo <strong>Simulation</strong> (il file verrà caricato automaticamente)</li>
+          <li>Avvia la simulazione e osserva come i token si dividono e si ricongiungono</li>
+          <li>Presta particolare attenzione ai punti di split e join di ciascun gateway</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Struttura -->
+    <div class="doc-section">
+      <h2>🏗️ Struttura del diagramma</h2>
+      <p>Il processo è organizzato in modo da confrontare direttamente i tre gateway:</p>
+      
+      <div class="example-box">
+        <h5>Flusso generale:</h5>
+        <p>
+          <strong>Start Event</strong> → <strong>Parallel Gateway (Split)</strong> →<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;→ Path 1: <strong>Exclusive Gateway</strong> (XOR) →<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;→ Path 2: <strong>Inclusive Gateway</strong> (OR) →<br>
+          <strong>Parallel Gateway (Join)</strong> → <strong>End Event</strong>
+        </p>
+      </div>
+
+      <p>
+        Il <strong>Parallel Gateway</strong> iniziale divide il flusso in due percorsi paralleli, 
+        permettendo di osservare contemporaneamente il comportamento dell'Exclusive e dell'Inclusive Gateway. 
+        Alla fine, un altro Parallel Gateway sincronizza i due percorsi prima di terminare.
+      </p>
+    </div>
+
+    <!-- Gateway Descriptions -->
+    <div class="doc-section">
+      <h2>🔀 Tipi di Gateway</h2>
+
+      <div class="gateway-card">
+        <h4><span class="gateway-symbol">⬥</span>Exclusive Gateway (XOR)</h4>
+        <p><strong>Simbolo:</strong> Rombo vuoto o con una "X"</p>
+        <p><strong>Comportamento (Split):</strong> Il token segue <strong>uno e uno solo</strong> dei percorsi in uscita, 
+        basandosi su condizioni o sul primo percorso disponibile.</p>
+        <p><strong>Comportamento (Join):</strong> Attende un token da <strong>uno qualsiasi</strong> dei percorsi in ingresso, 
+        poi prosegue immediatamente.</p>
+        
+        <div class="alert alert-warning mt-3">
+          <strong>Nel diagramma di esempio:</strong> L'Exclusive Gateway divide il flusso in 3 opzioni 
+          (Task User 1, Task Service 1, Task Manual 1), ma <strong>solo una verrà eseguita</strong>. 
+          Il gateway di join aspetta il completamento di quel singolo percorso.
+        </div>
+      </div>
+
+      <div class="gateway-card">
+        <h4><span class="gateway-symbol">⬥</span>Parallel Gateway (AND)</h4>
+        <p><strong>Simbolo:</strong> Rombo con un "+"</p>
+        <p><strong>Comportamento (Split):</strong> Il token viene <strong>duplicato</strong> e inviato 
+        contemporaneamente su <strong>tutti</strong> i percorsi in uscita.</p>
+        <p><strong>Comportamento (Join):</strong> Attende che arrivino token da <strong>tutti</strong> 
+        i percorsi in ingresso prima di proseguire (sincronizzazione).</p>
+        
+        <div class="alert alert-info mt-3">
+          <strong>Nel diagramma di esempio:</strong> Il primo Parallel Gateway crea due token simultanei 
+          che eseguono in parallelo il path XOR e il path OR. Il secondo Parallel Gateway aspetta che 
+          entrambi i percorsi siano completati prima di proseguire verso l'End Event.
+        </div>
+      </div>
+
+      <div class="gateway-card">
+        <h4><span class="gateway-symbol">⬥</span>Inclusive Gateway (OR)</h4>
+        <p><strong>Simbolo:</strong> Rombo con un cerchio interno</p>
+        <p><strong>Comportamento (Split):</strong> Il token viene inviato su <strong>uno o più</strong> 
+        percorsi in uscita, basandosi su condizioni. Se più condizioni sono vere, vengono eseguiti 
+        tutti i percorsi corrispondenti.</p>
+        <p><strong>Comportamento (Join):</strong> Attende token da <strong>tutti i percorsi attivi</strong> 
+        (cioè quelli che sono stati effettivamente attivati durante lo split).</p>
+        
+        <div class="alert alert-success mt-3">
+          <strong>Nel diagramma di esempio:</strong> L'Inclusive Gateway divide il flusso in 3 opzioni 
+          (Task Service 2, Task Manual 2, Task Send 2), e <strong>una o più possono essere eseguite</strong> 
+          in base alle condizioni. Il gateway di join attende il completamento di tutti i percorsi attivati.
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="doc-section">
+      <h2>📋 Tabella comparativa</h2>
+      
+      <table class="table table-bordered comparison-table">
+        <thead>
+          <tr>
+            <th>Caratteristica</th>
+            <th>Exclusive (XOR)</th>
+            <th>Parallel (AND)</th>
+            <th>Inclusive (OR)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Percorsi attivati (Split)</strong></td>
+            <td>Esattamente 1</td>
+            <td>Tutti</td>
+            <td>1 o più (in base a condizioni)</td>
+          </tr>
+          <tr>
+            <td><strong>Decisione</strong></td>
+            <td>Basata su condizioni mutualmente esclusive</td>
+            <td>Nessuna decisione, sempre tutti</td>
+            <td>Basata su condizioni indipendenti</td>
+          </tr>
+          <tr>
+            <td><strong>Sincronizzazione (Join)</strong></td>
+            <td>Primo token in arrivo</td>
+            <td>Tutti i token da tutti i percorsi</td>
+            <td>Tutti i token dai percorsi attivi</td>
+          </tr>
+          <tr>
+            <td><strong>Uso tipico</strong></td>
+            <td>Scelta tra alternative</td>
+            <td>Esecuzione parallela di attività indipendenti</td>
+            <td>Scelta multipla opzionale</td>
+          </tr>
+          <tr>
+            <td><strong>Esempio business</strong></td>
+            <td>Approvazione: SI o NO</td>
+            <td>Preparazione fattura + Spedizione merce</td>
+            <td>Notifiche: email, SMS, push (una o più)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Simulation Tips -->
+    <div class="doc-section">
+      <h2>🎯 Osservazioni durante la simulazione</h2>
+      
+      <h3>1. Avvio del processo</h3>
+      <p>
+        Quando avvii la simulazione, vedrai un token partire dallo <strong>Start Event</strong> e 
+        raggiungere il primo <strong>Parallel Gateway</strong>. Qui il token si divide in <strong>due token</strong> 
+        che procedono simultaneamente:
+      </p>
+      <ul>
+        <li>Un token entra nel percorso con l'Exclusive Gateway</li>
+        <li>Un token entra nel percorso con l'Inclusive Gateway</li>
+      </ul>
+
+      <h3>2. Exclusive Gateway in azione</h3>
+      <p>
+        Osserva attentamente quando il token raggiunge l'<strong>Exclusive Gateway (Split)</strong>:
+      </p>
+      <ul>
+        <li>Il token sceglie <strong>una sola</strong> delle tre task disponibili</li>
+        <li>Le altre due task rimangono <strong>non eseguite</strong></li>
+        <li>Al gateway di join, il processo prosegue <strong>immediatamente</strong> dopo aver completato la singola task</li>
+      </ul>
+
+      <h3>3. Inclusive Gateway in azione</h3>
+      <p>
+        Parallelamente, osserva il comportamento dell'<strong>Inclusive Gateway</strong>:
+      </p>
+      <ul>
+        <li>Il token può attivare <strong>una, due o tutte e tre</strong> le task</li>
+        <li>Se più task vengono attivate, vengono eseguite <strong>in parallelo</strong></li>
+        <li>Al gateway di join, il processo <strong>attende</strong> il completamento di tutte le task attivate</li>
+      </ul>
+
+      <h3>4. Sincronizzazione finale</h3>
+      <p>
+        Il <strong>Parallel Gateway (Join)</strong> finale aspetta che:
+      </p>
+      <ul>
+        <li>Il percorso dell'Exclusive Gateway sia completato (1 task)</li>
+        <li>Il percorso dell'Inclusive Gateway sia completato (1-3 task)</li>
+      </ul>
+      <p>
+        Solo quando <strong>entrambi i percorsi</strong> hanno terminato, il token finale procede verso l'End Event.
+      </p>
+
+      <div class="tip-box mt-4">
+        <h5>💡 Suggerimento per la simulazione</h5>
+        <ul>
+          <li>Usa la velocità di simulazione <strong>lenta</strong> per osservare meglio il comportamento dei token</li>
+          <li>Metti in <strong>pausa</strong> la simulazione quando i token raggiungono i gateway per analizzare le scelte</li>
+          <li>Osserva il <strong>log degli eventi</strong> per vedere l'ordine di esecuzione delle attività</li>
+          <li>Riavvia la simulazione più volte: potresti vedere comportamenti diversi nell'Inclusive Gateway</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="doc-section">
+      <h2>🎓 Conclusioni chiave</h2>
+      
+      <div class="gateway-card">
+        <h4>Quando usare ciascun gateway</h4>
+        <ul>
+          <li>
+            <strong>Exclusive Gateway:</strong> Quando devi scegliere <strong>esattamente una</strong> 
+            tra diverse alternative (es: approvazione SI/NO, routing basato su categoria)
+          </li>
+          <li>
+            <strong>Parallel Gateway:</strong> Quando devi eseguire <strong>tutte</strong> le attività 
+            contemporaneamente e sincronizzare alla fine (es: attività indipendenti ma necessarie)
+          </li>
+          <li>
+            <strong>Inclusive Gateway:</strong> Quando devi scegliere <strong>una o più</strong> 
+            alternative in base a condizioni non esclusive (es: notifiche multiple, controlli paralleli opzionali)
+          </li>
+        </ul>
+      </div>
+
+      <div class="example-box mt-4">
+        <h5>⚠️ Nota: Complex Gateway</h5>
+        <p>
+          Esiste anche un quarto tipo di gateway chiamato <strong>Complex Gateway</strong>, 
+          utilizzato per logiche di merge/split molto complesse con regole personalizzate. 
+          Tuttavia, <strong>non è supportato dalla libreria di simulazione token</strong> utilizzata 
+          in BPMN Cyber Lab, quindi non è incluso in questo esempio.
+        </p>
+      </div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="doc-section">
+      <h2>➡️ Prossimi passi</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Prova a modificare l'esempio</h5>
+              <p class="card-text">
+                Apri il file nel <strong>Modeler</strong> e prova a:
+              </p>
+              <ul>
+                <li>Aggiungere più percorsi ai gateway</li>
+                <li>Combinare diversi tipi di gateway</li>
+                <li>Osservare come cambia il comportamento</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Esplora altri esempi</h5>
+              <p class="card-text">
+                Continua l'apprendimento con altri esempi disponibili:
+              </p>
+              <ul>
+                <li><a href="documentation-message-events.html">Message Events Example</a></li>
+                <li><a href="documentation-modeler.html">Guida completa al Modeler</a></li>
+                <li><a href="documentation-simulation.html">Guida completa alla Simulation</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white text-center py-3 mt-5">
+    <div class="container">
+      <p class="mb-0">&copy; 2026 BPMN Cyber Lab. Powered by bpmn.io</p>
+    </div>
+  </footer>
+
+  <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

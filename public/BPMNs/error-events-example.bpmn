@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_ErrorEvents" targetNamespace="http://bpmn.io/schema/bpmn">
+  
+  <!-- Error Definitions -->
+  <bpmn:error id="Error_Payment" name="PaymentError" errorCode="ERR_PAYMENT" />
+  <bpmn:error id="Error_Inventory" name="InventoryError" errorCode="ERR_INVENTORY" />
+
+  <bpmn:process id="Process_OrderProcessing" isExecutable="false">
+    
+    <!-- Start Event -->
+    <bpmn:startEvent id="StartEvent_1" name="Order Received">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Validate Order -->
+    <bpmn:task id="Task_ValidateOrder" name="Validate Order">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Payment Subprocess -->
+    <bpmn:subProcess id="SubProcess_Payment" name="Process Payment">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+
+      <bpmn:startEvent id="Start_Payment">
+        <bpmn:outgoing>Flow_Pay_1</bpmn:outgoing>
+      </bpmn:startEvent>
+
+      <bpmn:task id="Task_ChargeCard" name="Charge Card">
+        <bpmn:incoming>Flow_Pay_1</bpmn:incoming>
+        <bpmn:outgoing>Flow_Pay_2</bpmn:outgoing>
+      </bpmn:task>
+
+      <bpmn:exclusiveGateway id="Gateway_PaymentCheck" name="Success?">
+        <bpmn:incoming>Flow_Pay_2</bpmn:incoming>
+        <bpmn:outgoing>Flow_Pay_Success</bpmn:outgoing>
+        <bpmn:outgoing>Flow_Pay_Fail</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+
+      <bpmn:endEvent id="End_PaymentSuccess">
+        <bpmn:incoming>Flow_Pay_Success</bpmn:incoming>
+      </bpmn:endEvent>
+
+      <bpmn:endEvent id="End_PaymentError" name="Payment Failed">
+        <bpmn:incoming>Flow_Pay_Fail</bpmn:incoming>
+        <bpmn:errorEventDefinition errorRef="Error_Payment" />
+      </bpmn:endEvent>
+
+      <bpmn:sequenceFlow id="Flow_Pay_1" sourceRef="Start_Payment" targetRef="Task_ChargeCard" />
+      <bpmn:sequenceFlow id="Flow_Pay_2" sourceRef="Task_ChargeCard" targetRef="Gateway_PaymentCheck" />
+      <bpmn:sequenceFlow id="Flow_Pay_Success" name="Yes" sourceRef="Gateway_PaymentCheck" targetRef="End_PaymentSuccess" />
+      <bpmn:sequenceFlow id="Flow_Pay_Fail" name="No" sourceRef="Gateway_PaymentCheck" targetRef="End_PaymentError" />
+    </bpmn:subProcess>
+
+    <!-- Error Boundary on Payment -->
+    <bpmn:boundaryEvent id="Boundary_PaymentError" name="Payment Error" attachedToRef="SubProcess_Payment">
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="Error_Payment" />
+    </bpmn:boundaryEvent>
+
+    <!-- Inventory Subprocess -->
+    <bpmn:subProcess id="SubProcess_Inventory" name="Check Inventory">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+
+      <bpmn:startEvent id="Start_Inventory">
+        <bpmn:outgoing>Flow_Inv_1</bpmn:outgoing>
+      </bpmn:startEvent>
+
+      <bpmn:task id="Task_CheckStock" name="Check Stock">
+        <bpmn:incoming>Flow_Inv_1</bpmn:incoming>
+        <bpmn:outgoing>Flow_Inv_2</bpmn:outgoing>
+      </bpmn:task>
+
+      <bpmn:exclusiveGateway id="Gateway_InventoryCheck" name="Available?">
+        <bpmn:incoming>Flow_Inv_2</bpmn:incoming>
+        <bpmn:outgoing>Flow_Inv_Success</bpmn:outgoing>
+        <bpmn:outgoing>Flow_Inv_Fail</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+
+      <bpmn:endEvent id="End_InventorySuccess">
+        <bpmn:incoming>Flow_Inv_Success</bpmn:incoming>
+      </bpmn:endEvent>
+
+      <bpmn:endEvent id="End_InventoryError" name="Out of Stock">
+        <bpmn:incoming>Flow_Inv_Fail</bpmn:incoming>
+        <bpmn:errorEventDefinition errorRef="Error_Inventory" />
+      </bpmn:endEvent>
+
+      <bpmn:sequenceFlow id="Flow_Inv_1" sourceRef="Start_Inventory" targetRef="Task_CheckStock" />
+      <bpmn:sequenceFlow id="Flow_Inv_2" sourceRef="Task_CheckStock" targetRef="Gateway_InventoryCheck" />
+      <bpmn:sequenceFlow id="Flow_Inv_Success" name="Yes" sourceRef="Gateway_InventoryCheck" targetRef="End_InventorySuccess" />
+      <bpmn:sequenceFlow id="Flow_Inv_Fail" name="No" sourceRef="Gateway_InventoryCheck" targetRef="End_InventoryError" />
+    </bpmn:subProcess>
+
+    <!-- Error Boundary on Inventory -->
+    <bpmn:boundaryEvent id="Boundary_InventoryError" name="Inventory Error" attachedToRef="SubProcess_Inventory">
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="Error_Inventory" />
+    </bpmn:boundaryEvent>
+
+    <!-- Complete Order -->
+    <bpmn:task id="Task_CompleteOrder" name="Complete Order">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Success End -->
+    <bpmn:endEvent id="End_Success" name="Order Complete">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Payment Error Handler -->
+    <bpmn:task id="Task_NotifyPaymentError" name="Notify Customer Payment Failed">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="End_PaymentCancel" name="Order Cancelled">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Inventory Error Handler -->
+    <bpmn:task id="Task_RefundPayment" name="Refund Payment">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_NotifyOutOfStock" name="Notify Out of Stock">
+      <bpmn:incoming>Flow_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="End_InventoryCancel" name="Order Cancelled">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Sequence Flows -->
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_ValidateOrder" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_ValidateOrder" targetRef="SubProcess_Payment" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="SubProcess_Payment" targetRef="SubProcess_Inventory" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Boundary_PaymentError" targetRef="Task_NotifyPaymentError" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="SubProcess_Inventory" targetRef="Task_CompleteOrder" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Boundary_InventoryError" targetRef="Task_RefundPayment" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_CompleteOrder" targetRef="End_Success" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Task_NotifyPaymentError" targetRef="End_PaymentCancel" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Task_RefundPayment" targetRef="Task_NotifyOutOfStock" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_NotifyOutOfStock" targetRef="End_InventoryCancel" />
+
+  </bpmn:process>
+
+  <!-- Diagram -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_OrderProcessing">
+      
+      <!-- Start Event -->
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="131" y="235" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Validate Order -->
+      <bpmndi:BPMNShape id="Task_ValidateOrder_di" bpmnElement="Task_ValidateOrder">
+        <dc:Bounds x="240" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Payment Subprocess -->
+      <bpmndi:BPMNShape id="SubProcess_Payment_di" bpmnElement="SubProcess_Payment" isExpanded="true">
+        <dc:Bounds x="390" y="90" width="350" height="240" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Start_Payment_di" bpmnElement="Start_Payment">
+        <dc:Bounds x="420" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_ChargeCard_di" bpmnElement="Task_ChargeCard">
+        <dc:Bounds x="490" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_PaymentCheck_di" bpmnElement="Gateway_PaymentCheck" isMarkerVisible="true">
+        <dc:Bounds x="625" y="185" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="625" y="161" width="50" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_PaymentSuccess_di" bpmnElement="End_PaymentSuccess">
+        <dc:Bounds x="692" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_PaymentError_di" bpmnElement="End_PaymentError">
+        <dc:Bounds x="632" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="611" y="305" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_Pay_1_di" bpmnElement="Flow_Pay_1">
+        <di:waypoint x="456" y="210" />
+        <di:waypoint x="490" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Pay_2_di" bpmnElement="Flow_Pay_2">
+        <di:waypoint x="590" y="210" />
+        <di:waypoint x="625" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Pay_Success_di" bpmnElement="Flow_Pay_Success">
+        <di:waypoint x="650" y="185" />
+        <di:waypoint x="650" y="150" />
+        <di:waypoint x="692" y="150" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="656" y="165" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Pay_Fail_di" bpmnElement="Flow_Pay_Fail">
+        <di:waypoint x="650" y="235" />
+        <di:waypoint x="650" y="262" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="658" y="246" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <!-- Payment Error Boundary -->
+      <bpmndi:BPMNShape id="Boundary_PaymentError_di" bpmnElement="Boundary_PaymentError">
+        <dc:Bounds x="702" y="312" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="736" y="343" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Inventory Subprocess -->
+      <bpmndi:BPMNShape id="SubProcess_Inventory_di" bpmnElement="SubProcess_Inventory" isExpanded="true">
+        <dc:Bounds x="790" y="90" width="350" height="240" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Start_Inventory_di" bpmnElement="Start_Inventory">
+        <dc:Bounds x="820" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_CheckStock_di" bpmnElement="Task_CheckStock">
+        <dc:Bounds x="890" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_InventoryCheck_di" bpmnElement="Gateway_InventoryCheck" isMarkerVisible="true">
+        <dc:Bounds x="1025" y="185" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1023" y="161" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_InventorySuccess_di" bpmnElement="End_InventorySuccess">
+        <dc:Bounds x="1092" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_InventoryError_di" bpmnElement="End_InventoryError">
+        <dc:Bounds x="1032" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1015" y="305" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_Inv_1_di" bpmnElement="Flow_Inv_1">
+        <di:waypoint x="856" y="210" />
+        <di:waypoint x="890" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Inv_2_di" bpmnElement="Flow_Inv_2">
+        <di:waypoint x="990" y="210" />
+        <di:waypoint x="1025" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Inv_Success_di" bpmnElement="Flow_Inv_Success">
+        <di:waypoint x="1050" y="185" />
+        <di:waypoint x="1050" y="150" />
+        <di:waypoint x="1092" y="150" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1056" y="165" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Inv_Fail_di" bpmnElement="Flow_Inv_Fail">
+        <di:waypoint x="1050" y="235" />
+        <di:waypoint x="1050" y="262" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1058" y="246" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <!-- Inventory Error Boundary -->
+      <bpmndi:BPMNShape id="Boundary_InventoryError_di" bpmnElement="Boundary_InventoryError">
+        <dc:Bounds x="1102" y="312" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1136" y="343" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Complete Order -->
+      <bpmndi:BPMNShape id="Task_CompleteOrder_di" bpmnElement="Task_CompleteOrder">
+        <dc:Bounds x="1190" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Success End -->
+      <bpmndi:BPMNShape id="End_Success_di" bpmnElement="End_Success">
+        <dc:Bounds x="1342" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1320" y="235" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Payment Error Handler -->
+      <bpmndi:BPMNShape id="Task_NotifyPaymentError_di" bpmnElement="Task_NotifyPaymentError">
+        <dc:Bounds x="670" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_PaymentCancel_di" bpmnElement="End_PaymentCancel">
+        <dc:Bounds x="702" y="540" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="679" y="583" width="83" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Inventory Error Handler -->
+      <bpmndi:BPMNShape id="Task_RefundPayment_di" bpmnElement="Task_RefundPayment">
+        <dc:Bounds x="1070" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_NotifyOutOfStock_di" bpmnElement="Task_NotifyOutOfStock">
+        <dc:Bounds x="1070" y="540" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="End_InventoryCancel_di" bpmnElement="End_InventoryCancel">
+        <dc:Bounds x="1102" y="660" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1079" y="703" width="83" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Main Sequence Flows -->
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="188" y="210" />
+        <di:waypoint x="240" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="340" y="210" />
+        <di:waypoint x="390" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="740" y="210" />
+        <di:waypoint x="790" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="720" y="348" />
+        <di:waypoint x="720" y="420" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="1140" y="210" />
+        <di:waypoint x="1190" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="1120" y="348" />
+        <di:waypoint x="1120" y="420" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="1290" y="210" />
+        <di:waypoint x="1342" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="720" y="500" />
+        <di:waypoint x="720" y="540" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9">
+        <di:waypoint x="1120" y="500" />
+        <di:waypoint x="1120" y="540" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="1120" y="620" />
+        <di:waypoint x="1120" y="660" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

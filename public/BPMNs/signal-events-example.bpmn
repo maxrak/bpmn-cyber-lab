@@ -1,0 +1,743 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_SignalEvents" targetNamespace="http://bpmn.io/schema/bpmn">
+  
+  <!-- Signal Definitions -->
+  <bpmn:signal id="Signal_FireAlarm" name="Allarme Incendio" />
+  <bpmn:signal id="Signal_Evacuation" name="Evacuazione" />
+  <bpmn:signal id="Signal_AllClear" name="Fine Emergenza" />
+  <bpmn:signal id="Signal_Maintenance" name="Manutenzione Programmata" />
+  
+  <!-- Collaboration -->
+  <bpmn:collaboration id="Collaboration_SignalEvents">
+    <bpmn:participant id="Participant_ControlCenter" name="Sistema Centrale di Controllo" processRef="Process_ControlCenter" />
+    <bpmn:participant id="Participant_Security" name="Dipartimento Sicurezza" processRef="Process_Security" />
+    <bpmn:participant id="Participant_Production" name="Reparto Produzione" processRef="Process_Production" />
+    <bpmn:participant id="Participant_Admin" name="Reparto Amministrativo" processRef="Process_Admin" />
+  </bpmn:collaboration>
+  
+  <!-- Process: Sistema Centrale di Controllo -->
+  <bpmn:process id="Process_ControlCenter" isExecutable="false">
+    <bpmn:startEvent id="Start_Control" name="Sistema Attivo">
+      <bpmn:outgoing>Flow_C1</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <bpmn:task id="Task_Monitor" name="Monitora Sensori">
+      <bpmn:incoming>Flow_C1</bpmn:incoming>
+      <bpmn:outgoing>Flow_C2</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:exclusiveGateway id="Gateway_Alert" name="Rilevato problema?">
+      <bpmn:incoming>Flow_C2</bpmn:incoming>
+      <bpmn:outgoing>Flow_C3_Fire</bpmn:outgoing>
+      <bpmn:outgoing>Flow_C3_Normal</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <bpmn:intermediateThrowEvent id="Event_ThrowFireAlarm" name="Emetti Allarme Incendio">
+      <bpmn:incoming>Flow_C3_Fire</bpmn:incoming>
+      <bpmn:outgoing>Flow_C4</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_FireAlarm" />
+    </bpmn:intermediateThrowEvent>
+    
+    <bpmn:task id="Task_AssessEmergency" name="Valuta Situazione">
+      <bpmn:incoming>Flow_C4</bpmn:incoming>
+      <bpmn:outgoing>Flow_C5</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:exclusiveGateway id="Gateway_Evacuate" name="Evacuare?">
+      <bpmn:incoming>Flow_C5</bpmn:incoming>
+      <bpmn:outgoing>Flow_C6_Yes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_C6_No</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <bpmn:intermediateThrowEvent id="Event_ThrowEvacuation" name="Emetti Evacuazione">
+      <bpmn:incoming>Flow_C6_Yes</bpmn:incoming>
+      <bpmn:outgoing>Flow_C7</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_Evacuation" />
+    </bpmn:intermediateThrowEvent>
+    
+    <bpmn:task id="Task_CoordinateResponse" name="Coordina Risposta">
+      <bpmn:incoming>Flow_C7</bpmn:incoming>
+      <bpmn:incoming>Flow_C6_No</bpmn:incoming>
+      <bpmn:outgoing>Flow_C8</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_ResolveEmergency" name="Risolvi Emergenza">
+      <bpmn:incoming>Flow_C8</bpmn:incoming>
+      <bpmn:outgoing>Flow_C9</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:intermediateThrowEvent id="Event_ThrowAllClear" name="Emetti Fine Emergenza">
+      <bpmn:incoming>Flow_C9</bpmn:incoming>
+      <bpmn:outgoing>Flow_C10</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_AllClear" />
+    </bpmn:intermediateThrowEvent>
+    
+    <bpmn:task id="Task_NormalOps" name="Operazioni Normali">
+      <bpmn:incoming>Flow_C3_Normal</bpmn:incoming>
+      <bpmn:incoming>Flow_C10</bpmn:incoming>
+      <bpmn:outgoing>Flow_C11</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:endEvent id="End_Control" name="Fine Turno">
+      <bpmn:incoming>Flow_C11</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Flows Control Center -->
+    <bpmn:sequenceFlow id="Flow_C1" sourceRef="Start_Control" targetRef="Task_Monitor" />
+    <bpmn:sequenceFlow id="Flow_C2" sourceRef="Task_Monitor" targetRef="Gateway_Alert" />
+    <bpmn:sequenceFlow id="Flow_C3_Fire" name="Incendio" sourceRef="Gateway_Alert" targetRef="Event_ThrowFireAlarm" />
+    <bpmn:sequenceFlow id="Flow_C3_Normal" name="Tutto OK" sourceRef="Gateway_Alert" targetRef="Task_NormalOps" />
+    <bpmn:sequenceFlow id="Flow_C4" sourceRef="Event_ThrowFireAlarm" targetRef="Task_AssessEmergency" />
+    <bpmn:sequenceFlow id="Flow_C5" sourceRef="Task_AssessEmergency" targetRef="Gateway_Evacuate" />
+    <bpmn:sequenceFlow id="Flow_C6_Yes" name="Sì" sourceRef="Gateway_Evacuate" targetRef="Event_ThrowEvacuation" />
+    <bpmn:sequenceFlow id="Flow_C6_No" name="No" sourceRef="Gateway_Evacuate" targetRef="Task_CoordinateResponse" />
+    <bpmn:sequenceFlow id="Flow_C7" sourceRef="Event_ThrowEvacuation" targetRef="Task_CoordinateResponse" />
+    <bpmn:sequenceFlow id="Flow_C8" sourceRef="Task_CoordinateResponse" targetRef="Task_ResolveEmergency" />
+    <bpmn:sequenceFlow id="Flow_C9" sourceRef="Task_ResolveEmergency" targetRef="Event_ThrowAllClear" />
+    <bpmn:sequenceFlow id="Flow_C10" sourceRef="Event_ThrowAllClear" targetRef="Task_NormalOps" />
+    <bpmn:sequenceFlow id="Flow_C11" sourceRef="Task_NormalOps" targetRef="End_Control" />
+  </bpmn:process>
+  
+  <!-- Process: Dipartimento Sicurezza -->
+  <bpmn:process id="Process_Security" isExecutable="false">
+    <bpmn:startEvent id="Start_Security_Signal" name="Ricevi Allarme">
+      <bpmn:outgoing>Flow_S1</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_FireAlarm" />
+    </bpmn:startEvent>
+    
+    <bpmn:task id="Task_SecurityCheck" name="Verifica Allarme">
+      <bpmn:incoming>Flow_S1</bpmn:incoming>
+      <bpmn:outgoing>Flow_S2</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_DeployTeam" name="Schiera Squadra">
+      <bpmn:incoming>Flow_S2</bpmn:incoming>
+      <bpmn:outgoing>Flow_S3</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:intermediateCatchEvent id="Event_CatchEvacuation" name="Attendi Ordine Evacuazione">
+      <bpmn:incoming>Flow_S3</bpmn:incoming>
+      <bpmn:outgoing>Flow_S4</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_Evacuation" />
+    </bpmn:intermediateCatchEvent>
+    
+    <bpmn:task id="Task_GuideEvacuation" name="Guida Evacuazione">
+      <bpmn:incoming>Flow_S4</bpmn:incoming>
+      <bpmn:outgoing>Flow_S5</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_SecureArea" name="Metti in Sicurezza">
+      <bpmn:incoming>Flow_S5</bpmn:incoming>
+      <bpmn:outgoing>Flow_S6</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:intermediateCatchEvent id="Event_CatchAllClear" name="Attendi Fine Emergenza">
+      <bpmn:incoming>Flow_S6</bpmn:incoming>
+      <bpmn:outgoing>Flow_S7</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_AllClear" />
+    </bpmn:intermediateCatchEvent>
+    
+    <bpmn:task id="Task_SecurityDebrief" name="Rapporto Finale">
+      <bpmn:incoming>Flow_S7</bpmn:incoming>
+      <bpmn:outgoing>Flow_S8</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:endEvent id="End_Security" name="Ritorno Normale">
+      <bpmn:incoming>Flow_S8</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Flows Security -->
+    <bpmn:sequenceFlow id="Flow_S1" sourceRef="Start_Security_Signal" targetRef="Task_SecurityCheck" />
+    <bpmn:sequenceFlow id="Flow_S2" sourceRef="Task_SecurityCheck" targetRef="Task_DeployTeam" />
+    <bpmn:sequenceFlow id="Flow_S3" sourceRef="Task_DeployTeam" targetRef="Event_CatchEvacuation" />
+    <bpmn:sequenceFlow id="Flow_S4" sourceRef="Event_CatchEvacuation" targetRef="Task_GuideEvacuation" />
+    <bpmn:sequenceFlow id="Flow_S5" sourceRef="Task_GuideEvacuation" targetRef="Task_SecureArea" />
+    <bpmn:sequenceFlow id="Flow_S6" sourceRef="Task_SecureArea" targetRef="Event_CatchAllClear" />
+    <bpmn:sequenceFlow id="Flow_S7" sourceRef="Event_CatchAllClear" targetRef="Task_SecurityDebrief" />
+    <bpmn:sequenceFlow id="Flow_S8" sourceRef="Task_SecurityDebrief" targetRef="End_Security" />
+  </bpmn:process>
+  
+  <!-- Process: Reparto Produzione -->
+  <bpmn:process id="Process_Production" isExecutable="false">
+    <bpmn:startEvent id="Start_Production" name="Inizio Produzione">
+      <bpmn:outgoing>Flow_P1</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <bpmn:task id="Task_Manufacturing" name="Produzione in Corso">
+      <bpmn:incoming>Flow_P1</bpmn:incoming>
+      <bpmn:outgoing>Flow_P2</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:boundaryEvent id="Boundary_FireAlarm" name="Allarme Incendio" attachedToRef="Task_Manufacturing">
+      <bpmn:outgoing>Flow_P_Alarm</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_FireAlarm" />
+    </bpmn:boundaryEvent>
+    
+    <bpmn:boundaryEvent id="Boundary_Maintenance" name="Manutenzione" attachedToRef="Task_Manufacturing">
+      <bpmn:outgoing>Flow_P_Maint</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_Maintenance" />
+    </bpmn:boundaryEvent>
+    
+    <bpmn:task id="Task_EmergencyShutdown" name="Arresto di Emergenza">
+      <bpmn:incoming>Flow_P_Alarm</bpmn:incoming>
+      <bpmn:outgoing>Flow_P3</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_SecureMachinery" name="Metti in Sicurezza Macchinari">
+      <bpmn:incoming>Flow_P3</bpmn:incoming>
+      <bpmn:outgoing>Flow_P4</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:intermediateCatchEvent id="Event_ProdAllClear" name="Attendi Fine Emergenza">
+      <bpmn:incoming>Flow_P4</bpmn:incoming>
+      <bpmn:outgoing>Flow_P5</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_AllClear" />
+    </bpmn:intermediateCatchEvent>
+    
+    <bpmn:task id="Task_RestartProduction" name="Riavvia Produzione">
+      <bpmn:incoming>Flow_P5</bpmn:incoming>
+      <bpmn:incoming>Flow_P_MaintEnd</bpmn:incoming>
+      <bpmn:outgoing>Flow_P6</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_MaintenanceWork" name="Esegui Manutenzione">
+      <bpmn:incoming>Flow_P_Maint</bpmn:incoming>
+      <bpmn:outgoing>Flow_P_MaintEnd</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_CompleteProduction" name="Completa Lotto">
+      <bpmn:incoming>Flow_P2</bpmn:incoming>
+      <bpmn:incoming>Flow_P6</bpmn:incoming>
+      <bpmn:outgoing>Flow_P7</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:endEvent id="End_Production" name="Fine Turno">
+      <bpmn:incoming>Flow_P7</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Flows Production -->
+    <bpmn:sequenceFlow id="Flow_P1" sourceRef="Start_Production" targetRef="Task_Manufacturing" />
+    <bpmn:sequenceFlow id="Flow_P2" sourceRef="Task_Manufacturing" targetRef="Task_CompleteProduction" />
+    <bpmn:sequenceFlow id="Flow_P_Alarm" sourceRef="Boundary_FireAlarm" targetRef="Task_EmergencyShutdown" />
+    <bpmn:sequenceFlow id="Flow_P_Maint" sourceRef="Boundary_Maintenance" targetRef="Task_MaintenanceWork" />
+    <bpmn:sequenceFlow id="Flow_P3" sourceRef="Task_EmergencyShutdown" targetRef="Task_SecureMachinery" />
+    <bpmn:sequenceFlow id="Flow_P4" sourceRef="Task_SecureMachinery" targetRef="Event_ProdAllClear" />
+    <bpmn:sequenceFlow id="Flow_P5" sourceRef="Event_ProdAllClear" targetRef="Task_RestartProduction" />
+    <bpmn:sequenceFlow id="Flow_P6" sourceRef="Task_RestartProduction" targetRef="Task_CompleteProduction" />
+    <bpmn:sequenceFlow id="Flow_P7" sourceRef="Task_CompleteProduction" targetRef="End_Production" />
+    <bpmn:sequenceFlow id="Flow_P_MaintEnd" sourceRef="Task_MaintenanceWork" targetRef="Task_RestartProduction" />
+  </bpmn:process>
+  
+  <!-- Process: Reparto Amministrativo -->
+  <bpmn:process id="Process_Admin" isExecutable="false">
+    <bpmn:startEvent id="Start_Admin" name="Giornata Lavorativa">
+      <bpmn:outgoing>Flow_A1</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <bpmn:task id="Task_OfficeWork" name="Lavoro d'Ufficio">
+      <bpmn:incoming>Flow_A1</bpmn:incoming>
+      <bpmn:outgoing>Flow_A2</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:boundaryEvent id="Boundary_AdminAlarm" name="Allarme" attachedToRef="Task_OfficeWork">
+      <bpmn:outgoing>Flow_A_Alarm</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_FireAlarm" />
+    </bpmn:boundaryEvent>
+    
+    <bpmn:task id="Task_SaveDocuments" name="Salva Documenti">
+      <bpmn:incoming>Flow_A_Alarm</bpmn:incoming>
+      <bpmn:outgoing>Flow_A3</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:intermediateCatchEvent id="Event_AdminEvacuation" name="Attendi Evacuazione">
+      <bpmn:incoming>Flow_A3</bpmn:incoming>
+      <bpmn:outgoing>Flow_A4</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_Evacuation" />
+    </bpmn:intermediateCatchEvent>
+    
+    <bpmn:task id="Task_Evacuate" name="Evacua Ufficio">
+      <bpmn:incoming>Flow_A4</bpmn:incoming>
+      <bpmn:outgoing>Flow_A5</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:intermediateCatchEvent id="Event_AdminAllClear" name="Attendi Rientro">
+      <bpmn:incoming>Flow_A5</bpmn:incoming>
+      <bpmn:outgoing>Flow_A6</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_AllClear" />
+    </bpmn:intermediateCatchEvent>
+    
+    <bpmn:task id="Task_ResumeWork" name="Riprendi Lavoro">
+      <bpmn:incoming>Flow_A6</bpmn:incoming>
+      <bpmn:outgoing>Flow_A7</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_EndDay" name="Concludi Giornata">
+      <bpmn:incoming>Flow_A2</bpmn:incoming>
+      <bpmn:incoming>Flow_A7</bpmn:incoming>
+      <bpmn:outgoing>Flow_A8</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:endEvent id="End_Admin" name="Fine Giornata">
+      <bpmn:incoming>Flow_A8</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Flows Admin -->
+    <bpmn:sequenceFlow id="Flow_A1" sourceRef="Start_Admin" targetRef="Task_OfficeWork" />
+    <bpmn:sequenceFlow id="Flow_A2" sourceRef="Task_OfficeWork" targetRef="Task_EndDay" />
+    <bpmn:sequenceFlow id="Flow_A_Alarm" sourceRef="Boundary_AdminAlarm" targetRef="Task_SaveDocuments" />
+    <bpmn:sequenceFlow id="Flow_A3" sourceRef="Task_SaveDocuments" targetRef="Event_AdminEvacuation" />
+    <bpmn:sequenceFlow id="Flow_A4" sourceRef="Event_AdminEvacuation" targetRef="Task_Evacuate" />
+    <bpmn:sequenceFlow id="Flow_A5" sourceRef="Task_Evacuate" targetRef="Event_AdminAllClear" />
+    <bpmn:sequenceFlow id="Flow_A6" sourceRef="Event_AdminAllClear" targetRef="Task_ResumeWork" />
+    <bpmn:sequenceFlow id="Flow_A7" sourceRef="Task_ResumeWork" targetRef="Task_EndDay" />
+    <bpmn:sequenceFlow id="Flow_A8" sourceRef="Task_EndDay" targetRef="End_Admin" />
+  </bpmn:process>
+  
+  <!-- Diagram -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SignalEvents">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_SignalEvents">
+      
+      <!-- Pool Sistema Centrale -->
+      <bpmndi:BPMNShape id="Participant_ControlCenter_di" bpmnElement="Participant_ControlCenter" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1600" height="250" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Start_Control_di" bpmnElement="Start_Control">
+        <dc:Bounds x="220" y="187" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="201" y="230" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_Monitor_di" bpmnElement="Task_Monitor">
+        <dc:Bounds x="310" y="165" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Gateway_Alert_di" bpmnElement="Gateway_Alert" isMarkerVisible="true">
+        <dc:Bounds x="465" y="180" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="454" y="150" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Event_ThrowFireAlarm_di" bpmnElement="Event_ThrowFireAlarm">
+        <dc:Bounds x="572" y="187" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="549" y="230" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_AssessEmergency_di" bpmnElement="Task_AssessEmergency">
+        <dc:Bounds x="660" y="165" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Gateway_Evacuate_di" bpmnElement="Gateway_Evacuate" isMarkerVisible="true">
+        <dc:Bounds x="815" y="180" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="811" y="156" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Event_ThrowEvacuation_di" bpmnElement="Event_ThrowEvacuation">
+        <dc:Bounds x="922" y="187" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="900" y="230" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_CoordinateResponse_di" bpmnElement="Task_CoordinateResponse">
+        <dc:Bounds x="1010" y="165" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_ResolveEmergency_di" bpmnElement="Task_ResolveEmergency">
+        <dc:Bounds x="1160" y="165" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Event_ThrowAllClear_di" bpmnElement="Event_ThrowAllClear">
+        <dc:Bounds x="1312" y="187" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1289" y="230" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_NormalOps_di" bpmnElement="Task_NormalOps">
+        <dc:Bounds x="1400" y="165" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="End_Control_di" bpmnElement="End_Control">
+        <dc:Bounds x="1552" y="187" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1543" y="230" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Edges Control -->
+      <bpmndi:BPMNEdge id="Flow_C1_di" bpmnElement="Flow_C1">
+        <di:waypoint x="256" y="205" />
+        <di:waypoint x="310" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C2_di" bpmnElement="Flow_C2">
+        <di:waypoint x="410" y="205" />
+        <di:waypoint x="465" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C3_Fire_di" bpmnElement="Flow_C3_Fire">
+        <di:waypoint x="515" y="205" />
+        <di:waypoint x="572" y="205" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="522" y="187" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C3_Normal_di" bpmnElement="Flow_C3_Normal">
+        <di:waypoint x="490" y="180" />
+        <di:waypoint x="490" y="120" />
+        <di:waypoint x="1450" y="120" />
+        <di:waypoint x="1450" y="165" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="943" y="102" width="45" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C4_di" bpmnElement="Flow_C4">
+        <di:waypoint x="608" y="205" />
+        <di:waypoint x="660" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C5_di" bpmnElement="Flow_C5">
+        <di:waypoint x="760" y="205" />
+        <di:waypoint x="815" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C6_Yes_di" bpmnElement="Flow_C6_Yes">
+        <di:waypoint x="865" y="205" />
+        <di:waypoint x="922" y="205" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="888" y="187" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C6_No_di" bpmnElement="Flow_C6_No">
+        <di:waypoint x="840" y="230" />
+        <di:waypoint x="840" y="280" />
+        <di:waypoint x="1060" y="280" />
+        <di:waypoint x="1060" y="245" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="853" y="262" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C7_di" bpmnElement="Flow_C7">
+        <di:waypoint x="958" y="205" />
+        <di:waypoint x="1010" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C8_di" bpmnElement="Flow_C8">
+        <di:waypoint x="1110" y="205" />
+        <di:waypoint x="1160" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C9_di" bpmnElement="Flow_C9">
+        <di:waypoint x="1260" y="205" />
+        <di:waypoint x="1312" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C10_di" bpmnElement="Flow_C10">
+        <di:waypoint x="1348" y="205" />
+        <di:waypoint x="1400" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C11_di" bpmnElement="Flow_C11">
+        <di:waypoint x="1500" y="205" />
+        <di:waypoint x="1552" y="205" />
+      </bpmndi:BPMNEdge>
+      
+      <!-- Pool Sicurezza -->
+      <bpmndi:BPMNShape id="Participant_Security_di" bpmnElement="Participant_Security" isHorizontal="true">
+        <dc:Bounds x="160" y="360" width="1600" height="200" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Start_Security_Signal_di" bpmnElement="Start_Security_Signal">
+        <dc:Bounds x="572" y="442" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="553" y="485" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_SecurityCheck_di" bpmnElement="Task_SecurityCheck">
+        <dc:Bounds x="660" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_DeployTeam_di" bpmnElement="Task_DeployTeam">
+        <dc:Bounds x="810" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Event_CatchEvacuation_di" bpmnElement="Event_CatchEvacuation">
+        <dc:Bounds x="960" y="442" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="937" y="485" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_GuideEvacuation_di" bpmnElement="Task_GuideEvacuation">
+        <dc:Bounds x="1046" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_SecureArea_di" bpmnElement="Task_SecureArea">
+        <dc:Bounds x="1196" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Event_CatchAllClear_di" bpmnElement="Event_CatchAllClear">
+        <dc:Bounds x="1346" y="442" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1323" y="485" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_SecurityDebrief_di" bpmnElement="Task_SecurityDebrief">
+        <dc:Bounds x="1432" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="End_Security_di" bpmnElement="End_Security">
+        <dc:Bounds x="1582" y="442" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1559" y="485" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Edges Security -->
+      <bpmndi:BPMNEdge id="Flow_S1_di" bpmnElement="Flow_S1">
+        <di:waypoint x="608" y="460" />
+        <di:waypoint x="660" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S2_di" bpmnElement="Flow_S2">
+        <di:waypoint x="760" y="460" />
+        <di:waypoint x="810" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S3_di" bpmnElement="Flow_S3">
+        <di:waypoint x="910" y="460" />
+        <di:waypoint x="960" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S4_di" bpmnElement="Flow_S4">
+        <di:waypoint x="996" y="460" />
+        <di:waypoint x="1046" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S5_di" bpmnElement="Flow_S5">
+        <di:waypoint x="1146" y="460" />
+        <di:waypoint x="1196" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S6_di" bpmnElement="Flow_S6">
+        <di:waypoint x="1296" y="460" />
+        <di:waypoint x="1346" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S7_di" bpmnElement="Flow_S7">
+        <di:waypoint x="1382" y="460" />
+        <di:waypoint x="1432" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S8_di" bpmnElement="Flow_S8">
+        <di:waypoint x="1532" y="460" />
+        <di:waypoint x="1582" y="460" />
+      </bpmndi:BPMNEdge>
+      
+      <!-- Pool Produzione -->
+      <bpmndi:BPMNShape id="Participant_Production_di" bpmnElement="Participant_Production" isHorizontal="true">
+        <dc:Bounds x="160" y="590" width="1600" height="280" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Start_Production_di" bpmnElement="Start_Production">
+        <dc:Bounds x="220" y="712" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="217" y="755" width="43" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_Manufacturing_di" bpmnElement="Task_Manufacturing">
+        <dc:Bounds x="310" y="690" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Boundary_FireAlarm_di" bpmnElement="Boundary_FireAlarm">
+        <dc:Bounds x="342" y="752" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="319" y="795" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Boundary_Maintenance_di" bpmnElement="Boundary_Maintenance">
+        <dc:Bounds x="392" y="752" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="375" y="795" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_EmergencyShutdown_di" bpmnElement="Task_EmergencyShutdown">
+        <dc:Bounds x="460" y="610" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_SecureMachinery_di" bpmnElement="Task_SecureMachinery">
+        <dc:Bounds x="610" y="610" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Event_ProdAllClear_di" bpmnElement="Event_ProdAllClear">
+        <dc:Bounds x="762" y="632" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="739" y="675" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_RestartProduction_di" bpmnElement="Task_RestartProduction">
+        <dc:Bounds x="848" y="690" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_MaintenanceWork_di" bpmnElement="Task_MaintenanceWork">
+        <dc:Bounds x="460" y="770" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_CompleteProduction_di" bpmnElement="Task_CompleteProduction">
+        <dc:Bounds x="1000" y="690" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="End_Production_di" bpmnElement="End_Production">
+        <dc:Bounds x="1152" y="712" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1143" y="755" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Edges Production -->
+      <bpmndi:BPMNEdge id="Flow_P1_di" bpmnElement="Flow_P1">
+        <di:waypoint x="256" y="730" />
+        <di:waypoint x="310" y="730" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P2_di" bpmnElement="Flow_P2">
+        <di:waypoint x="410" y="730" />
+        <di:waypoint x="1000" y="730" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P_Alarm_di" bpmnElement="Flow_P_Alarm">
+        <di:waypoint x="360" y="788" />
+        <di:waypoint x="360" y="650" />
+        <di:waypoint x="460" y="650" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P_Maint_di" bpmnElement="Flow_P_Maint">
+        <di:waypoint x="410" y="788" />
+        <di:waypoint x="410" y="810" />
+        <di:waypoint x="460" y="810" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P3_di" bpmnElement="Flow_P3">
+        <di:waypoint x="560" y="650" />
+        <di:waypoint x="610" y="650" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P4_di" bpmnElement="Flow_P4">
+        <di:waypoint x="710" y="650" />
+        <di:waypoint x="762" y="650" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P5_di" bpmnElement="Flow_P5">
+        <di:waypoint x="798" y="650" />
+        <di:waypoint x="898" y="650" />
+        <di:waypoint x="898" y="690" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P6_di" bpmnElement="Flow_P6">
+        <di:waypoint x="948" y="730" />
+        <di:waypoint x="1000" y="730" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P7_di" bpmnElement="Flow_P7">
+        <di:waypoint x="1100" y="730" />
+        <di:waypoint x="1152" y="730" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P_MaintEnd_di" bpmnElement="Flow_P_MaintEnd">
+        <di:waypoint x="560" y="810" />
+        <di:waypoint x="898" y="810" />
+        <di:waypoint x="898" y="770" />
+      </bpmndi:BPMNEdge>
+      
+      <!-- Pool Amministrativo -->
+      <bpmndi:BPMNShape id="Participant_Admin_di" bpmnElement="Participant_Admin" isHorizontal="true">
+        <dc:Bounds x="160" y="900" width="1600" height="250" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Start_Admin_di" bpmnElement="Start_Admin">
+        <dc:Bounds x="220" y="1007" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="216" y="1050" width="45" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_OfficeWork_di" bpmnElement="Task_OfficeWork">
+        <dc:Bounds x="310" y="985" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Boundary_AdminAlarm_di" bpmnElement="Boundary_AdminAlarm">
+        <dc:Bounds x="342" y="1047" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="336" y="1090" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_SaveDocuments_di" bpmnElement="Task_SaveDocuments">
+        <dc:Bounds x="460" y="925" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Event_AdminEvacuation_di" bpmnElement="Event_AdminEvacuation">
+        <dc:Bounds x="612" y="947" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="589" y="990" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_Evacuate_di" bpmnElement="Task_Evacuate">
+        <dc:Bounds x="700" y="925" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Event_AdminAllClear_di" bpmnElement="Event_AdminAllClear">
+        <dc:Bounds x="852" y="947" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="829" y="990" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_ResumeWork_di" bpmnElement="Task_ResumeWork">
+        <dc:Bounds x="940" y="925" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_EndDay_di" bpmnElement="Task_EndDay">
+        <dc:Bounds x="1090" y="985" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="End_Admin_di" bpmnElement="End_Admin">
+        <dc:Bounds x="1242" y="1007" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1225" y="1050" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Edges Admin -->
+      <bpmndi:BPMNEdge id="Flow_A1_di" bpmnElement="Flow_A1">
+        <di:waypoint x="256" y="1025" />
+        <di:waypoint x="310" y="1025" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_A2_di" bpmnElement="Flow_A2">
+        <di:waypoint x="410" y="1025" />
+        <di:waypoint x="1090" y="1025" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_A_Alarm_di" bpmnElement="Flow_A_Alarm">
+        <di:waypoint x="360" y="1083" />
+        <di:waypoint x="360" y="965" />
+        <di:waypoint x="460" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_A3_di" bpmnElement="Flow_A3">
+        <di:waypoint x="560" y="965" />
+        <di:waypoint x="612" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_A4_di" bpmnElement="Flow_A4">
+        <di:waypoint x="648" y="965" />
+        <di:waypoint x="700" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_A5_di" bpmnElement="Flow_A5">
+        <di:waypoint x="800" y="965" />
+        <di:waypoint x="852" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_A6_di" bpmnElement="Flow_A6">
+        <di:waypoint x="888" y="965" />
+        <di:waypoint x="940" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_A7_di" bpmnElement="Flow_A7">
+        <di:waypoint x="1040" y="965" />
+        <di:waypoint x="1140" y="965" />
+        <di:waypoint x="1140" y="985" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_A8_di" bpmnElement="Flow_A8">
+        <di:waypoint x="1190" y="1025" />
+        <di:waypoint x="1242" y="1025" />
+      </bpmndi:BPMNEdge>
+      
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

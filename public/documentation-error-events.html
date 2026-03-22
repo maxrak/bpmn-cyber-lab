@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error Events - Gestione Errori BPMN</title>
+  <link href="vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .dropdown-header {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #adb5bd;
+      padding: 0.1rem 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .navbar .dropdown-divider {
+      margin: 0.15rem 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding-top: 56px;
+      padding-bottom: 2rem;
+    }
+    .navbar {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      min-height: 48px;
+    }
+    .navbar-brand {
+      font-size: 1.1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .navbar-nav .nav-link {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .container {
+      max-width: 1200px;
+    }
+
+    .docs-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .docs-header {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .docs-header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .docs-header p {
+      font-size: 1.2rem;
+      opacity: 0.95;
+      margin-bottom: 0;
+    }
+
+    .docs-content {
+      padding: 3rem 2rem;
+    }
+
+    .section-title {
+      color: #2d3748;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-top: 2.5rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 3px solid #f5576c;
+    }
+
+    .section-title:first-child {
+      margin-top: 0;
+    }
+
+    .subsection-title {
+      color: #4a5568;
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      border-left: 4px solid #f5576c;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+    }
+
+    .info-box h4 {
+      color: #c53030;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .info-box p {
+      color: #2d3748;
+      margin-bottom: 0;
+      line-height: 1.6;
+    }
+
+    .comparison-box {
+      background: #fff5f5;
+      border: 2px solid #feb2b2;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+    }
+
+    .comparison-box h4 {
+      color: #c53030;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .event-type-card {
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 12px rgba(245, 87, 108, 0.15);
+    }
+
+    .event-type-card h3 {
+      color: #c53030;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .event-type-card .event-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .event-type-card ul {
+      margin-bottom: 0;
+      padding-left: 1.5rem;
+    }
+
+    .event-type-card li {
+      margin-bottom: 0.5rem;
+      color: #2d3748;
+    }
+
+    .scenario-card {
+      background: white;
+      border: 2px solid #feb2b2;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .scenario-card h4 {
+      color: #c53030;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .scenario-card p {
+      color: #4a5568;
+      margin-bottom: 0.5rem;
+    }
+
+    .scenario-card .badge {
+      background: #f5576c;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .step-list {
+      background: #f7fafc;
+      border-left: 4px solid #f5576c;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+
+    .step-list ol {
+      margin-bottom: 0;
+      padding-left: 1.5rem;
+    }
+
+    .step-list li {
+      color: #2d3748;
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+    }
+
+    .step-list li strong {
+      color: #c53030;
+    }
+
+    table {
+      width: 100%;
+      margin: 1.5rem 0;
+      border-collapse: collapse;
+    }
+
+    table th {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    table td {
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      color: #4a5568;
+    }
+
+    table tr:hover {
+      background: #fff5f5;
+    }
+
+    .best-practice {
+      background: white;
+      border: 2px solid #f5576c;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .best-practice h4 {
+      color: #c53030;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .best-practice ul {
+      margin-bottom: 0;
+      padding-left: 1.5rem;
+    }
+
+    .best-practice li {
+      color: #2d3748;
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+    }
+
+    .warning-box {
+      background: #fffaf0;
+      border: 2px solid #ed8936;
+      border-left: 6px solid #ed8936;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+    }
+
+    .warning-box h4 {
+      color: #c05621;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .warning-box h4::before {
+      content: "⚠️";
+      margin-right: 0.5rem;
+      font-size: 1.5rem;
+    }
+
+    .warning-box p {
+      color: #2d3748;
+      margin-bottom: 0;
+      line-height: 1.6;
+    }
+
+    .btn-custom {
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary-custom {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      border: none;
+    }
+
+    .btn-primary-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(245, 87, 108, 0.4);
+      color: white;
+    }
+
+    .btn-outline-custom {
+      background: white;
+      color: #f5576c;
+      border: 2px solid #f5576c;
+    }
+
+    .btn-outline-custom:hover {
+      background: #f5576c;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(245, 87, 108, 0.3);
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    code {
+      background: #fff5f5;
+      color: #c53030;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+
+    .flow-diagram {
+      background: white;
+      border: 2px solid #feb2b2;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+
+    .flow-diagram .flow-step {
+      display: inline-block;
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      color: #2d3748;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      margin: 0.5rem;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(245, 87, 108, 0.15);
+    }
+
+    .flow-diagram .flow-arrow {
+      display: inline-block;
+      color: #f5576c;
+      font-size: 1.5rem;
+      margin: 0 0.5rem;
+    }
+
+    .error-definition {
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .error-definition .error-name {
+      font-weight: 700;
+      color: #c53030;
+      font-size: 1.1rem;
+    }
+
+    .error-definition .error-code {
+      color: #2d3748;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+
+    .error-definition .error-desc {
+      color: #4a5568;
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="navbar-brand me-3" href="index.html">BPMN Cyber Lab</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="simulation.html">Simulation</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-current="page">
+              Documentation
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="documentation.html">📚 Panoramica</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Guide</div>
+              <!-- <li><h6 class="dropdown-header">Guide</h6></li> -->
+              <li><a class="dropdown-item" href="documentation-modeler.html">✏️ Modeler</a></li>
+              <li><a class="dropdown-item" href="documentation-simulation.html">▶️ Simulation</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Esempi</div>
+              <li><a class="dropdown-item" href="documentation-gateway-comparison.html">🔀 Gateway Comparison</a></li>
+              <li><a class="dropdown-item" href="documentation-message-events.html">✉️ Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
+              <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
+              <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="docs-card">
+      <!-- Header -->
+      <div class="docs-header">
+        <h1>🚨 Error Events - Gestione Errori</h1>
+        <p>Impara a gestire errori ed eccezioni nei processi BPMN</p>
+      </div>
+
+      <!-- Content -->
+      <div class="docs-content">
+        <!-- Obiettivo -->
+        <h2 class="section-title">📋 Obiettivo dell'Esempio</h2>
+        <p style="font-size: 1.1rem; color: #4a5568; line-height: 1.8;">
+          Questo esempio dimostra come utilizzare gli <strong>Error Events</strong> in BPMN per gestire
+          errori ed eccezioni durante l'esecuzione di un processo. Gli Error Events permettono di
+          implementare strategie di error handling, recovery e compensazione in modo strutturato e visuale.
+        </p>
+
+        <div class="info-box">
+          <h4>Concetto Chiave: Error Events</h4>
+          <p>
+            Gli Error Events rappresentano situazioni eccezionali che interrompono il flusso normale
+            di un processo. A differenza dei Message Events (comunicazione) e Signal Events (broadcast),
+            gli Error Events sono specificamente progettati per la <strong>gestione delle eccezioni</strong>
+            e il <strong>recovery da errori</strong>.
+          </p>
+        </div>
+
+        <!-- Cos'è un Error Event -->
+        <h2 class="section-title">🎯 Cos'è un Error Event?</h2>
+        <p style="color: #4a5568; line-height: 1.8;">
+          Un Error Event è un evento BPMN che permette di modellare e gestire condizioni di errore
+          all'interno di un processo. Gli errori possono essere lanciati (thrown) e catturati (caught)
+          in punti specifici del processo.
+        </p>
+
+        <div class="comparison-box">
+          <h4>Caratteristiche degli Error Events:</h4>
+          <ul style="color: #2d3748; line-height: 1.8; margin-bottom: 0;">
+            <li><strong>Interrupting:</strong> Gli Error Boundary Events interrompono l'attività a cui sono attaccati</li>
+            <li><strong>Propagazione:</strong> Gli errori si propagano verso l'alto fino al primo handler disponibile</li>
+            <li><strong>Tipizzazione:</strong> Ogni errore ha un nome e un codice univoco per identificarlo</li>
+            <li><strong>Scope limitato:</strong> Gli errori sono visibili solo all'interno del processo/subprocess</li>
+            <li><strong>Recovery:</strong> Permettono di implementare logiche di compensazione e retry</li>
+          </ul>
+        </div>
+
+        <!-- Scenario -->
+        <h2 class="section-title">🛒 Scenario: Order Processing System</h2>
+        <p style="color: #4a5568; line-height: 1.8;">
+          L'esempio simula un <strong>sistema di processamento ordini e-commerce</strong> che può fallire
+          in diversi punti. Il processo include tre fasi critiche, ciascuna con possibili errori:
+        </p>
+
+        <div class="row g-3 my-4">
+          <div class="col-md-4">
+            <div class="scenario-card">
+              <h4>💳 Payment Processing</h4>
+              <p><strong>Possibile errore:</strong> Carta di credito rifiutata</p>
+              <p><strong>Recovery:</strong> Notifica cliente, suggerisci metodi alternativi</p>
+              <span class="badge">PaymentError</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="scenario-card">
+              <h4>📦 Inventory Check</h4>
+              <p><strong>Possibile errore:</strong> Prodotto esaurito</p>
+              <p><strong>Recovery:</strong> Rimborso pagamento, notifica cliente</p>
+              <span class="badge">InventoryError</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="scenario-card">
+              <h4>🚚 Shipping Arrangement</h4>
+              <p><strong>Possibile errore:</strong> Corriere non disponibile</p>
+              <p><strong>Recovery:</strong> Rimborso, rilascia stock, notifica cliente</p>
+              <span class="badge">ShippingError</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error Definitions -->
+        <h2 class="section-title">📝 Definizioni degli Errori</h2>
+        <p style="color: #4a5568; line-height: 1.8; margin-bottom: 1.5rem;">
+          Il processo definisce quattro tipi di errori, ciascuno con un nome e un codice univoco:
+        </p>
+
+        <div class="error-definition">
+          <div class="error-name">PaymentError</div>
+          <div class="error-code">Codice: ERR_PAYMENT</div>
+          <p class="error-desc">Errore durante il processo di pagamento (carta rifiutata, fondi insufficienti)</p>
+        </div>
+
+        <div class="error-definition">
+          <div class="error-name">InventoryError</div>
+          <div class="error-code">Codice: ERR_INVENTORY</div>
+          <p class="error-desc">Prodotto non disponibile in magazzino</p>
+        </div>
+
+        <div class="error-definition">
+          <div class="error-name">ShippingError</div>
+          <div class="error-code">Codice: ERR_SHIPPING</div>
+          <p class="error-desc">Impossibile organizzare la spedizione (corriere non disponibile)</p>
+        </div>
+
+        <div class="error-definition">
+          <div class="error-name">SystemError</div>
+          <div class="error-code">Codice: ERR_SYSTEM</div>
+          <p class="error-desc">Errore di sistema generico (gestito da Event Subprocess)</p>
+        </div>
+
+        <!-- Tipi di Error Events -->
+        <h2 class="section-title">🔧 Tipi di Error Events</h2>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="event-type-card">
+              <div class="event-icon">❌</div>
+              <h3>Error End Event</h3>
+              <p style="color: #2d3748; margin-bottom: 1rem;">
+                Termina un processo o subprocess <strong>lanciando un errore</strong> che può essere
+                catturato da un Boundary Event.
+              </p>
+              <p style="color: #4a5568; font-weight: 600; margin-bottom: 0.5rem;">Nell'esempio:</p>
+              <ul>
+                <li><code>End_PaymentError</code> - Lancia PaymentError se il pagamento fallisce</li>
+                <li><code>End_InventoryError</code> - Lancia InventoryError se lo stock non è disponibile</li>
+                <li><code>End_ShippingError</code> - Lancia ShippingError se il corriere non è disponibile</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="event-type-card">
+              <div class="event-icon">🛡️</div>
+              <h3>Error Boundary Event</h3>
+              <p style="color: #2d3748; margin-bottom: 1rem;">
+                Cattura errori che si verificano durante l'esecuzione di un'attività o subprocess,
+                <strong>interrompendo</strong> l'attività in corso.
+              </p>
+              <p style="color: #4a5568; font-weight: 600; margin-bottom: 0.5rem;">Nell'esempio:</p>
+              <ul>
+                <li><code>Boundary_PaymentError</code> - Cattura errori dal subprocess di pagamento</li>
+                <li><code>Boundary_InventoryError</code> - Cattura errori dal subprocess di inventario</li>
+                <li><code>Boundary_ShippingError</code> - Cattura errori dal subprocess di spedizione</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="event-type-card">
+              <div class="event-icon">🔄</div>
+              <h3>Error Start Event (in Event Subprocess)</h3>
+              <p style="color: #2d3748; margin-bottom: 1rem;">
+                Avvia un subprocess dedicato alla gestione degli errori quando un errore specifico
+                viene lanciato. Può essere <strong>interrupting</strong> o <strong>non-interrupting</strong>.
+              </p>
+              <p style="color: #4a5568; font-weight: 600; margin-bottom: 0.5rem;">Nell'esempio:</p>
+              <ul>
+                <li><code>Start_SystemError</code> - Gestione centralizzata degli errori di sistema (non-interrupting)</li>
+                <li>Log dell'errore e notifica al supporto IT</li>
+                <li>Il processo principale continua l'esecuzione</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="event-type-card">
+              <div class="event-icon">⚡</div>
+              <h3>Propagazione degli Errori</h3>
+              <p style="color: #2d3748; margin-bottom: 1rem;">
+                Gli errori si <strong>propagano verso l'alto</strong> attraverso i livelli di subprocess
+                fino a trovare un handler (Boundary Event o Error Start Event) appropriato.
+              </p>
+              <p style="color: #4a5568; font-weight: 600; margin-bottom: 0.5rem;">Comportamento:</p>
+              <ul>
+                <li>Se non catturato, l'errore termina l'intero processo</li>
+                <li>Gli Error Events sono specifici per tipo (nome/codice)</li>
+                <li>Un handler può catturare un errore specifico o generico</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flusso del Processo -->
+        <h2 class="section-title">🔄 Flusso del Processo</h2>
+        
+        <h3 class="subsection-title">Happy Path (Nessun Errore)</h3>
+        <div class="flow-diagram">
+          <div class="flow-step">Order Received</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Validate Order</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Process Payment ✓</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Check Inventory ✓</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Arrange Shipping ✓</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Complete Order</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Order Completed ✅</div>
+        </div>
+
+        <h3 class="subsection-title">Error Path 1: Payment Failure</h3>
+        <div class="flow-diagram">
+          <div class="flow-step">Order Received</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Validate Order</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Process Payment ❌</div>
+          <span class="flow-arrow">↓</span>
+          <div class="flow-step">Boundary Error Caught</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Notify Customer</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Suggest Alternative</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Order Cancelled 🚫</div>
+        </div>
+
+        <h3 class="subsection-title">Error Path 2: Inventory Failure</h3>
+        <div class="flow-diagram">
+          <div class="flow-step">Payment Success ✓</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Check Inventory ❌</div>
+          <span class="flow-arrow">↓</span>
+          <div class="flow-step">Boundary Error Caught</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Refund Payment 💰</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Notify Out of Stock</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Order Cancelled 🚫</div>
+        </div>
+
+        <h3 class="subsection-title">Error Path 3: Shipping Failure</h3>
+        <div class="flow-diagram">
+          <div class="flow-step">Inventory Reserved ✓</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Arrange Shipping ❌</div>
+          <span class="flow-arrow">↓</span>
+          <div class="flow-step">Boundary Error Caught</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Refund Payment 💰</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Release Stock 📦</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Notify Customer</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">Order Cancelled 🚫</div>
+        </div>
+
+        <!-- Guida alla Simulazione -->
+        <h2 class="section-title">🎮 Guida alla Simulazione</h2>
+        <p style="color: #4a5568; line-height: 1.8; margin-bottom: 1rem;">
+          Per esplorare l'esempio di Error Events, segui questi passaggi:
+        </p>
+
+        <div class="step-list">
+          <ol>
+            <li>
+              <strong>Apri il Modeler:</strong> Carica <code>error-events-example.bpmn</code> nel Modeler
+              per visualizzare la struttura completa del processo.
+            </li>
+            <li>
+              <strong>Identifica i Subprocess:</strong> Nota i tre subprocess (Payment, Inventory, Shipping),
+              ciascuno con la propria logica interna e Error End Event.
+            </li>
+            <li>
+              <strong>Esamina i Boundary Events:</strong> Osserva come ogni subprocess ha un Error Boundary
+              Event attaccato che cattura gli errori specifici.
+            </li>
+            <li>
+              <strong>Segui i flussi di error handling:</strong> Traccia i percorsi da ciascun Boundary Event
+              attraverso le attività di recovery fino agli End Events di cancellazione.
+            </li>
+            <li>
+              <strong>Event Subprocess:</strong> Nota l'Event Subprocess nella parte inferiore che gestisce
+              gli errori di sistema in modo non-interrupting.
+            </li>
+            <li>
+              <strong>Simula scenari diversi:</strong> Immagina cosa succede se:
+              <ul style="margin-top: 0.5rem;">
+                <li>Il pagamento fallisce → notifica al cliente</li>
+                <li>L'inventario è vuoto → rimborso + notifica</li>
+                <li>La spedizione non è disponibile → rimborso + rilascio stock + notifica</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Compensazione e Recovery -->
+        <h2 class="section-title">♻️ Strategie di Compensazione</h2>
+        <p style="color: #4a5568; line-height: 1.8;">
+          Ogni error handler implementa una strategia di compensazione appropriata al punto del processo
+          in cui si verifica l'errore:
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Errore</th>
+              <th>Fase del Processo</th>
+              <th>Azioni di Compensazione</th>
+              <th>Esito</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>PaymentError</strong></td>
+              <td>Inizio (nessuna risorsa allocata)</td>
+              <td>
+                1. Notifica cliente<br>
+                2. Suggerisci metodo alternativo
+              </td>
+              <td>Cancellazione ordine</td>
+            </tr>
+            <tr>
+              <td><strong>InventoryError</strong></td>
+              <td>Dopo pagamento (pagamento completato)</td>
+              <td>
+                1. <strong>Rimborso pagamento</strong><br>
+                2. Notifica cliente out of stock
+              </td>
+              <td>Cancellazione ordine</td>
+            </tr>
+            <tr>
+              <td><strong>ShippingError</strong></td>
+              <td>Dopo inventory (pagamento + stock riservato)</td>
+              <td>
+                1. <strong>Rimborso pagamento</strong><br>
+                2. <strong>Rilascio stock riservato</strong><br>
+                3. Notifica cliente problema spedizione
+              </td>
+              <td>Cancellazione ordine</td>
+            </tr>
+            <tr>
+              <td><strong>SystemError</strong></td>
+              <td>In qualsiasi momento</td>
+              <td>
+                1. Log errore<br>
+                2. Notifica supporto IT<br>
+                3. Processo continua (non-interrupting)
+              </td>
+              <td>Monitoraggio parallelo</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="warning-box">
+          <h4>Principio della Compensazione</h4>
+          <p>
+            Più avanti nel processo si verifica un errore, più azioni di compensazione sono necessarie
+            per "annullare" le operazioni già completate. Questo è visibile nella sequenza crescente
+            di compensazioni: PaymentError (solo notifica) → InventoryError (+ rimborso) → ShippingError
+            (+ rimborso + rilascio stock).
+          </p>
+        </div>
+
+        <!-- Use Cases -->
+        <h2 class="section-title">🌍 Applicazioni nel Mondo Reale</h2>
+
+        <div class="best-practice">
+          <h4>📱 E-commerce e Retail</h4>
+          <ul>
+            <li>Gestione errori nei processi di checkout e pagamento</li>
+            <li>Recovery da problemi di inventario e disponibilità prodotti</li>
+            <li>Handling di errori nelle integrazioni con sistemi di shipping</li>
+            <li>Compensazioni automatiche per ordini che non possono essere completati</li>
+          </ul>
+        </div>
+
+        <div class="best-practice">
+          <h4>🏦 Banking e Finance</h4>
+          <ul>
+            <li>Rollback di transazioni in caso di errori durante bonifici</li>
+            <li>Gestione errori nelle richieste di prestito e approvazioni</li>
+            <li>Recovery da timeout o problemi di connettività con sistemi esterni</li>
+            <li>Compensazione automatica per operazioni parzialmente completate</li>
+          </ul>
+        </div>
+
+        <div class="best-practice">
+          <h4>🏥 Healthcare</h4>
+          <ul>
+            <li>Gestione errori nei processi di prenotazione e scheduling</li>
+            <li>Recovery da problemi di disponibilità sale operatorie o attrezzature</li>
+            <li>Handling di eccezioni durante l'elaborazione di prescrizioni</li>
+            <li>Notifiche automatiche a staff medico in caso di errori critici</li>
+          </ul>
+        </div>
+
+        <div class="best-practice">
+          <h4>🏭 Manufacturing</h4>
+          <ul>
+            <li>Gestione anomalie nei processi produttivi</li>
+            <li>Recovery da guasti di macchinari o carenza di materiali</li>
+            <li>Escalation automatica di problemi critici al management</li>
+            <li>Compensazioni per ordini di produzione che non possono essere completati</li>
+          </ul>
+        </div>
+
+        <!-- Pattern Avanzati -->
+        <h2 class="section-title">🚀 Pattern Avanzati</h2>
+
+        <h3 class="subsection-title">1. Error Event Subprocess (Non-Interrupting)</h3>
+        <p style="color: #4a5568; line-height: 1.8;">
+          L'esempio include un Event Subprocess con Error Start Event <strong>non-interrupting</strong>
+          per gestire errori di sistema senza fermare il processo principale:
+        </p>
+        <div class="info-box">
+          <h4>Caratteristiche:</h4>
+          <p style="margin-bottom: 0.5rem;">
+            <strong>Non-Interrupting:</strong> Il processo principale continua mentre viene eseguita la gestione dell'errore in parallelo.
+          </p>
+          <p style="margin-bottom: 0.5rem;">
+            <strong>Logging e Monitoring:</strong> Utile per registrare errori e allertare il team IT senza bloccare l'operatività.
+          </p>
+          <p style="margin-bottom: 0;">
+            <strong>Use Case:</strong> Errori non critici che richiedono attenzione ma non devono fermare il flusso.
+          </p>
+        </div>
+
+        <h3 class="subsection-title">2. Cascading Error Handling</h3>
+        <p style="color: #4a5568; line-height: 1.8;">
+          Gli errori possono essere catturati a diversi livelli di un processo complesso:
+        </p>
+        <ul style="color: #4a5568; line-height: 1.8;">
+          <li><strong>Livello Task:</strong> Errori specifici di una singola attività</li>
+          <li><strong>Livello Subprocess:</strong> Errori all'interno di un subprocess (come nell'esempio)</li>
+          <li><strong>Livello Process:</strong> Errori globali catturati a livello di processo principale</li>
+        </ul>
+
+        <h3 class="subsection-title">3. Retry Pattern</h3>
+        <p style="color: #4a5568; line-height: 1.8;">
+          Sebbene non implementato nell'esempio, è possibile estendere il pattern per includerel'attività di retry:
+        </p>
+        <div class="comparison-box">
+          <h4>Implementazione Retry:</h4>
+          <ul style="color: #2d3748; line-height: 1.8; margin-bottom: 0;">
+            <li>Cattura l'errore con un Boundary Event</li>
+            <li>Aggiungi un gateway per verificare il numero di tentativi</li>
+            <li>Reindirizza al task originale se sotto il limite di retry</li>
+            <li>Procedi con la compensazione se superato il limite</li>
+          </ul>
+        </div>
+
+        <h3 class="subsection-title">4. Error Escalation</h3>
+        <p style="color: #4a5568; line-height: 1.8;">
+          Per errori che richiedono intervento umano o decisioni manageriali:
+        </p>
+        <ul style="color: #4a5568; line-height: 1.8;">
+          <li>Cattura l'errore e crea un task per il team appropriato</li>
+          <li>Usa Timer Events per escalation automatica se non gestito entro un timeout</li>
+          <li>Integra con sistemi di ticketing o notifica</li>
+        </ul>
+
+        <!-- Best Practices -->
+        <h2 class="section-title">💡 Best Practices</h2>
+
+        <div class="best-practice">
+          <h4>✅ Quando Usare Error Events</h4>
+          <ul>
+            <li><strong>Condizioni eccezionali:</strong> Situazioni che non fanno parte del flusso normale</li>
+            <li><strong>Errori tecnici:</strong> Problemi di connettività, timeout, system failures</li>
+            <li><strong>Validazioni fallite:</strong> Dati non validi, business rules violate</li>
+            <li><strong>Risorse non disponibili:</strong> Stock esaurito, servizi offline</li>
+            <li><strong>Transazioni fallite:</strong> Pagamenti rifiutati, operazioni non completate</li>
+          </ul>
+        </div>
+
+        <div class="warning-box">
+          <h4>Quando NON Usare Error Events</h4>
+          <p style="margin-bottom: 0.5rem;">
+            <strong>Flussi decisionali normali:</strong> Usa Exclusive Gateway invece di Error Events
+            per decisioni business standard (es: "Cliente VIP?" → Yes/No).
+          </p>
+          <p style="margin-bottom: 0;">
+            <strong>Validazioni previste:</strong> Se una condizione è prevedibile e frequente
+            (es: età &lt; 18), modellala come parte del flusso normale, non come errore.
+          </p>
+        </div>
+
+        <div class="best-practice">
+          <h4>🎯 Design Guidelines</h4>
+          <ul>
+            <li><strong>Nomi descrittivi:</strong> Usa nomi chiari per error types (PaymentError, InventoryError)</li>
+            <li><strong>Codici univoci:</strong> Assegna error codes univoci per facilitare debugging e logging</li>
+            <li><strong>Granularità appropriata:</strong> Non creare troppi error types, ma nemmeno troppo pochi</li>
+            <li><strong>Documentazione:</strong> Documenta cosa causa ogni errore e come viene gestito</li>
+            <li><strong>Compensazione completa:</strong> Assicurati che ogni error handler annulli tutte le operazioni necessarie</li>
+            <li><strong>Logging:</strong> Registra sempre gli errori per analisi e debugging</li>
+          </ul>
+        </div>
+
+        <div class="best-practice">
+          <h4>⚙️ Implementation Tips</h4>
+          <ul>
+            <li><strong>Interrupting vs Non-Interrupting:</strong> Scegli basandoti sulla criticità dell'errore</li>
+            <li><strong>Error Propagation:</strong> Struttura subprocess nidificati per error handling granulare</li>
+            <li><strong>Timeout handling:</strong> Combina Error Events con Timer Events per gestire timeout</li>
+            <li><strong>User notification:</strong> Sempre notificare gli utenti quando un processo fallisce</li>
+            <li><strong>Audit trail:</strong> Mantieni traccia di tutti gli errori e le azioni di recovery</li>
+          </ul>
+        </div>
+
+        <!-- Comparison Table -->
+        <h2 class="section-title">📊 Confronto: Error vs Message vs Signal</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Caratteristica</th>
+              <th>Error Events</th>
+              <th>Message Events</th>
+              <th>Signal Events</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Scopo</strong></td>
+              <td>Gestione eccezioni</td>
+              <td>Comunicazione punto-a-punto</td>
+              <td>Broadcast a processi multipli</td>
+            </tr>
+            <tr>
+              <td><strong>Visibilità</strong></td>
+              <td>Solo all'interno del processo/subprocess</td>
+              <td>Tra processi specifici</td>
+              <td>Globale (tutti i processi)</td>
+            </tr>
+            <tr>
+              <td><strong>Direzione</strong></td>
+              <td>Verso l'alto (propagazione)</td>
+              <td>Sender → Receiver specifico</td>
+              <td>Broadcaster → N listeners</td>
+            </tr>
+            <tr>
+              <td><strong>Comportamento</strong></td>
+              <td>Interrupting (tipicamente)</td>
+              <td>Varia (può essere interrupting o no)</td>
+              <td>Varia (può essere interrupting o no)</td>
+            </tr>
+            <tr>
+              <td><strong>Tipizzazione</strong></td>
+              <td>Tipizzato (nome + codice)</td>
+              <td>Tipizzato (nome messaggio)</td>
+              <td>Tipizzato (nome segnale)</td>
+            </tr>
+            <tr>
+              <td><strong>Use Case</strong></td>
+              <td>Error handling, recovery, compensazione</td>
+              <td>Interazione tra pools, richieste/risposte</td>
+              <td>Allarmi globali, eventi broadcast</td>
+            </tr>
+            <tr>
+              <td><strong>Accoppiamento</strong></td>
+              <td>Stretto (padre-figlio)</td>
+              <td>Medio (sender-receiver)</td>
+              <td>Loose (emitter non conosce receivers)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Prossimi Passi -->
+        <h2 class="section-title">🎓 Prossimi Passi</h2>
+        <p style="color: #4a5568; line-height: 1.8; margin-bottom: 1.5rem;">
+          Dopo aver compreso la gestione degli errori con Error Events, esplora altri pattern BPMN:
+        </p>
+
+        <div class="nav-buttons">
+          <a href="modeler.html" class="btn-custom btn-primary-custom">
+            📝 Apri nel Modeler
+          </a>
+          <a href="simulation.html" class="btn-custom btn-primary-custom">
+            ▶️ Simula Processo
+          </a>
+          <a href="documentation-gateway-comparison.html" class="btn-custom btn-outline-custom">
+            📊 Gateway Comparison
+          </a>
+          <a href="documentation-message-events.html" class="btn-custom btn-outline-custom">
+            ✉️ Message Events
+          </a>
+          <a href="documentation-signal-events.html" class="btn-custom btn-outline-custom">
+            📡 Signal Events
+          </a>
+          <a href="documentation.html" class="btn-custom btn-outline-custom">
+            📚 Torna alla Documentazione
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

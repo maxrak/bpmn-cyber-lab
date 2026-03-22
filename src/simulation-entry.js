@@ -3,6 +3,7 @@ import TokenSim from 'bpmn-js-token-simulation';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 import { setupFileHandlers, loadSampleDiagram } from './fileHandlers';
 import { getCurrentBpmn, updateFilenameUI } from './globalBpmnState';
+import { initializeBpmnFileMenu } from './bpmnFileMenu';
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import 'bpmn-js-token-simulation/assets/css/bpmn-js-token-simulation.css';
@@ -15,9 +16,22 @@ import './styles/form-controls.css';
 // mark mode
 window.appMode = 'simulation';
 
+// Modulo per disabilitare il context pad in simulation
+const DisableContextPadModule = {
+  __init__: ['contextPadProvider'],
+  contextPadProvider: ['type', function() {
+    this.getContextPadEntries = function() {
+      return {}; // Ritorna oggetto vuoto = nessun elemento nel context pad
+    };
+  }]
+};
+
 const simModeler = new BpmnModeler({
   container: '#canvas-sim',
-  additionalModules: [ TokenSim ],
+  additionalModules: [ 
+    TokenSim,
+    DisableContextPadModule 
+  ],
   moddleExtensions: { camunda: camundaModdleDescriptor }
 });
 window._simModeler = simModeler;
@@ -95,21 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Aggiorna l'indicatore del filename nella navbar
   updateFilenameUI();
-
-  // Setup navbar menu buttons to trigger toolbar buttons
-  const navOpenBtn = document.getElementById('nav-btn-open');
-  const navSaveBtn = document.getElementById('nav-btn-save');
-  const toolbarOpenBtn = document.getElementById('btn-open');
-  const toolbarSaveBtn = document.getElementById('btn-save');
-
-  // Wire navbar buttons to toolbar buttons
-  if (navOpenBtn && toolbarOpenBtn) {
-    navOpenBtn.addEventListener('click', () => toolbarOpenBtn.click());
-  }
-
-  if (navSaveBtn && toolbarSaveBtn) {
-    navSaveBtn.addEventListener('click', () => toolbarSaveBtn.click());
-  }
+  
+  // Inizializza il menu dinamico dei file BPMN
+  initializeBpmnFileMenu(simModeler);
 
   // Setup clear log button
   const clearLogBtn = document.getElementById('btn-clear-log');

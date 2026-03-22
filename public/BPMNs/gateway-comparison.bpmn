@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_GatewayComparison" isExecutable="false">
+    <!-- Start Event -->
+    <bpmn:startEvent id="StartEvent_1" name="Inizio">
+      <bpmn:outgoing>Flow_start_to_parallel</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <!-- Parallel Gateway Split (AND) - Tutti i path vengono eseguiti -->
+    <bpmn:parallelGateway id="Gateway_Parallel_Split" name="Parallel Split (AND)">
+      <bpmn:incoming>Flow_start_to_parallel</bpmn:incoming>
+      <bpmn:outgoing>Flow_parallel_to_xor</bpmn:outgoing>
+      <bpmn:outgoing>Flow_parallel_to_inclusive</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    
+    <bpmn:sequenceFlow id="Flow_start_to_parallel" sourceRef="StartEvent_1" targetRef="Gateway_Parallel_Split" />
+    
+    <!-- Path 1: Exclusive Gateway (XOR) -->
+    <bpmn:task id="Task_BeforeXOR" name="Setup XOR Test">
+      <bpmn:incoming>Flow_parallel_to_xor</bpmn:incoming>
+      <bpmn:outgoing>Flow_to_xor</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:exclusiveGateway id="Gateway_XOR" name="Exclusive (XOR)&#10;Solo 1 path">
+      <bpmn:incoming>Flow_to_xor</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_xor_b</bpmn:outgoing>
+      <bpmn:outgoing>Flow_xor_c</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <bpmn:userTask id="Task_XOR_A" name="XOR Path A">
+      <bpmn:incoming>Flow_xor_a</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_a_to_join</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:serviceTask id="Task_XOR_B" name="XOR Path B">
+      <bpmn:incoming>Flow_xor_b</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_b_to_join</bpmn:outgoing>
+    </bpmn:serviceTask>
+    
+    <bpmn:manualTask id="Task_XOR_C" name="XOR Path C">
+      <bpmn:incoming>Flow_xor_c</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_c_to_join</bpmn:outgoing>
+    </bpmn:manualTask>
+    
+    <bpmn:exclusiveGateway id="Gateway_XOR_Join" name="XOR Join">
+      <bpmn:incoming>Flow_xor_a_to_join</bpmn:incoming>
+      <bpmn:incoming>Flow_xor_b_to_join</bpmn:incoming>
+      <bpmn:incoming>Flow_xor_c_to_join</bpmn:incoming>
+      <bpmn:outgoing>Flow_xor_to_merge</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <!-- Path 2: Inclusive Gateway (OR) -->
+    <bpmn:task id="Task_BeforeInclusive" name="Setup Inclusive Test">
+      <bpmn:incoming>Flow_parallel_to_inclusive</bpmn:incoming>
+      <bpmn:outgoing>Flow_to_inclusive</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:inclusiveGateway id="Gateway_Inclusive" name="Inclusive (OR)&#10;1 o più paths">
+      <bpmn:incoming>Flow_to_inclusive</bpmn:incoming>
+      <bpmn:outgoing>Flow_inc_a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_inc_b</bpmn:outgoing>
+      <bpmn:outgoing>Flow_inc_c</bpmn:outgoing>
+    </bpmn:inclusiveGateway>
+    
+    <bpmn:userTask id="Task_INC_A" name="Inclusive Path A">
+      <bpmn:incoming>Flow_inc_a</bpmn:incoming>
+      <bpmn:outgoing>Flow_inc_a_to_join</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:serviceTask id="Task_INC_B" name="Inclusive Path B">
+      <bpmn:incoming>Flow_inc_b</bpmn:incoming>
+      <bpmn:outgoing>Flow_inc_b_to_join</bpmn:outgoing>
+    </bpmn:serviceTask>
+    
+    <bpmn:scriptTask id="Task_INC_C" name="Inclusive Path C">
+      <bpmn:incoming>Flow_inc_c</bpmn:incoming>
+      <bpmn:outgoing>Flow_inc_c_to_join</bpmn:outgoing>
+    </bpmn:scriptTask>
+    
+    <bpmn:inclusiveGateway id="Gateway_Inclusive_Join" name="Inclusive Join">
+      <bpmn:incoming>Flow_inc_a_to_join</bpmn:incoming>
+      <bpmn:incoming>Flow_inc_b_to_join</bpmn:incoming>
+      <bpmn:incoming>Flow_inc_c_to_join</bpmn:incoming>
+      <bpmn:outgoing>Flow_inc_to_merge</bpmn:outgoing>
+    </bpmn:inclusiveGateway>
+    
+    <!-- Parallel Gateway Join (AND) - Attende tutti i path -->
+    <bpmn:parallelGateway id="Gateway_Parallel_Join" name="Parallel Join (AND)">
+      <bpmn:incoming>Flow_xor_to_merge</bpmn:incoming>
+      <bpmn:incoming>Flow_inc_to_merge</bpmn:incoming>
+      <bpmn:outgoing>Flow_to_end</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    
+    <!-- End Event -->
+    <bpmn:endEvent id="EndEvent_1" name="Fine">
+      <bpmn:incoming>Flow_to_end</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Sequence Flows -->
+    <bpmn:sequenceFlow id="Flow_parallel_to_xor" sourceRef="Gateway_Parallel_Split" targetRef="Task_BeforeXOR" />
+    <bpmn:sequenceFlow id="Flow_to_xor" sourceRef="Task_BeforeXOR" targetRef="Gateway_XOR" />
+    <bpmn:sequenceFlow id="Flow_xor_a" name="Condizione A" sourceRef="Gateway_XOR" targetRef="Task_XOR_A" />
+    <bpmn:sequenceFlow id="Flow_xor_b" name="Condizione B" sourceRef="Gateway_XOR" targetRef="Task_XOR_B" />
+    <bpmn:sequenceFlow id="Flow_xor_c" name="Default" sourceRef="Gateway_XOR" targetRef="Task_XOR_C" />
+    <bpmn:sequenceFlow id="Flow_xor_a_to_join" sourceRef="Task_XOR_A" targetRef="Gateway_XOR_Join" />
+    <bpmn:sequenceFlow id="Flow_xor_b_to_join" sourceRef="Task_XOR_B" targetRef="Gateway_XOR_Join" />
+    <bpmn:sequenceFlow id="Flow_xor_c_to_join" sourceRef="Task_XOR_C" targetRef="Gateway_XOR_Join" />
+    <bpmn:sequenceFlow id="Flow_xor_to_merge" sourceRef="Gateway_XOR_Join" targetRef="Gateway_Parallel_Join" />
+    
+    <bpmn:sequenceFlow id="Flow_parallel_to_inclusive" sourceRef="Gateway_Parallel_Split" targetRef="Task_BeforeInclusive" />
+    <bpmn:sequenceFlow id="Flow_to_inclusive" sourceRef="Task_BeforeInclusive" targetRef="Gateway_Inclusive" />
+    <bpmn:sequenceFlow id="Flow_inc_a" name="Opzione A" sourceRef="Gateway_Inclusive" targetRef="Task_INC_A" />
+    <bpmn:sequenceFlow id="Flow_inc_b" name="Opzione B" sourceRef="Gateway_Inclusive" targetRef="Task_INC_B" />
+    <bpmn:sequenceFlow id="Flow_inc_c" name="Opzione C" sourceRef="Gateway_Inclusive" targetRef="Task_INC_C" />
+    <bpmn:sequenceFlow id="Flow_inc_a_to_join" sourceRef="Task_INC_A" targetRef="Gateway_Inclusive_Join" />
+    <bpmn:sequenceFlow id="Flow_inc_b_to_join" sourceRef="Task_INC_B" targetRef="Gateway_Inclusive_Join" />
+    <bpmn:sequenceFlow id="Flow_inc_c_to_join" sourceRef="Task_INC_C" targetRef="Gateway_Inclusive_Join" />
+    <bpmn:sequenceFlow id="Flow_inc_to_merge" sourceRef="Gateway_Inclusive_Join" targetRef="Gateway_Parallel_Join" />
+    
+    <bpmn:sequenceFlow id="Flow_to_end" sourceRef="Gateway_Parallel_Join" targetRef="EndEvent_1" />
+  </bpmn:process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_GatewayComparison">
+      <!-- Start Event -->
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="312" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="155" y="355" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Parallel Split -->
+      <bpmndi:BPMNShape id="Gateway_Parallel_Split_di" bpmnElement="Gateway_Parallel_Split">
+        <dc:Bounds x="245" y="305" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="233" y="362" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- XOR Path -->
+      <bpmndi:BPMNShape id="Task_BeforeXOR_di" bpmnElement="Task_BeforeXOR">
+        <dc:Bounds x="360" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_XOR_di" bpmnElement="Gateway_XOR" isMarkerVisible="true">
+        <dc:Bounds x="525" y="105" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="513" y="67" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_XOR_A_di" bpmnElement="Task_XOR_A">
+        <dc:Bounds x="640" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_XOR_B_di" bpmnElement="Task_XOR_B">
+        <dc:Bounds x="640" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_XOR_C_di" bpmnElement="Task_XOR_C">
+        <dc:Bounds x="640" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_XOR_Join_di" bpmnElement="Gateway_XOR_Join" isMarkerVisible="true">
+        <dc:Bounds x="805" y="105" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="803" y="81" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Inclusive Path -->
+      <bpmndi:BPMNShape id="Task_BeforeInclusive_di" bpmnElement="Task_BeforeInclusive">
+        <dc:Bounds x="360" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Inclusive_di" bpmnElement="Gateway_Inclusive">
+        <dc:Bounds x="525" y="305" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="509" y="267" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_INC_A_di" bpmnElement="Task_INC_A">
+        <dc:Bounds x="640" y="350" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_INC_B_di" bpmnElement="Task_INC_B">
+        <dc:Bounds x="640" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_INC_C_di" bpmnElement="Task_INC_C">
+        <dc:Bounds x="640" y="550" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Inclusive_Join_di" bpmnElement="Gateway_Inclusive_Join">
+        <dc:Bounds x="805" y="305" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="790" y="281" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Parallel Join -->
+      <bpmndi:BPMNShape id="Gateway_Parallel_Join_di" bpmnElement="Gateway_Parallel_Join">
+        <dc:Bounds x="925" y="305" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="916" y="362" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- End Event -->
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="1042" y="312" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1048" y="355" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="Flow_start_to_parallel_di" bpmnElement="Flow_start_to_parallel">
+        <di:waypoint x="188" y="330" />
+        <di:waypoint x="245" y="330" />
+      </bpmndi:BPMNEdge>
+      
+      <!-- XOR Edges -->
+      <bpmndi:BPMNEdge id="Flow_parallel_to_xor_di" bpmnElement="Flow_parallel_to_xor">
+        <di:waypoint x="270" y="305" />
+        <di:waypoint x="270" y="130" />
+        <di:waypoint x="360" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_to_xor_di" bpmnElement="Flow_to_xor">
+        <di:waypoint x="460" y="130" />
+        <di:waypoint x="525" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_a_di" bpmnElement="Flow_xor_a">
+        <di:waypoint x="550" y="105" />
+        <di:waypoint x="550" y="70" />
+        <di:waypoint x="640" y="70" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="562" y="53" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_b_di" bpmnElement="Flow_xor_b">
+        <di:waypoint x="575" y="130" />
+        <di:waypoint x="608" y="130" />
+        <di:waypoint x="608" y="170" />
+        <di:waypoint x="640" y="170" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="579" y="113" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_c_di" bpmnElement="Flow_xor_c">
+        <di:waypoint x="550" y="155" />
+        <di:waypoint x="550" y="270" />
+        <di:waypoint x="640" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="562" y="253" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_a_to_join_di" bpmnElement="Flow_xor_a_to_join">
+        <di:waypoint x="740" y="70" />
+        <di:waypoint x="830" y="70" />
+        <di:waypoint x="830" y="105" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_b_to_join_di" bpmnElement="Flow_xor_b_to_join">
+        <di:waypoint x="740" y="170" />
+        <di:waypoint x="773" y="170" />
+        <di:waypoint x="773" y="130" />
+        <di:waypoint x="805" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_c_to_join_di" bpmnElement="Flow_xor_c_to_join">
+        <di:waypoint x="740" y="270" />
+        <di:waypoint x="830" y="270" />
+        <di:waypoint x="830" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_xor_to_merge_di" bpmnElement="Flow_xor_to_merge">
+        <di:waypoint x="855" y="130" />
+        <di:waypoint x="950" y="130" />
+        <di:waypoint x="950" y="305" />
+      </bpmndi:BPMNEdge>
+      
+      <!-- Inclusive Edges -->
+      <bpmndi:BPMNEdge id="Flow_parallel_to_inclusive_di" bpmnElement="Flow_parallel_to_inclusive">
+        <di:waypoint x="295" y="330" />
+        <di:waypoint x="360" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_to_inclusive_di" bpmnElement="Flow_to_inclusive">
+        <di:waypoint x="460" y="330" />
+        <di:waypoint x="525" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_inc_a_di" bpmnElement="Flow_inc_a">
+        <di:waypoint x="575" y="330" />
+        <di:waypoint x="608" y="330" />
+        <di:waypoint x="608" y="390" />
+        <di:waypoint x="640" y="390" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="579" y="313" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_inc_b_di" bpmnElement="Flow_inc_b">
+        <di:waypoint x="575" y="330" />
+        <di:waypoint x="608" y="330" />
+        <di:waypoint x="608" y="490" />
+        <di:waypoint x="640" y="490" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="579" y="473" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_inc_c_di" bpmnElement="Flow_inc_c">
+        <di:waypoint x="550" y="355" />
+        <di:waypoint x="550" y="590" />
+        <di:waypoint x="640" y="590" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="562" y="573" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_inc_a_to_join_di" bpmnElement="Flow_inc_a_to_join">
+        <di:waypoint x="740" y="390" />
+        <di:waypoint x="773" y="390" />
+        <di:waypoint x="773" y="330" />
+        <di:waypoint x="805" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_inc_b_to_join_di" bpmnElement="Flow_inc_b_to_join">
+        <di:waypoint x="740" y="490" />
+        <di:waypoint x="773" y="490" />
+        <di:waypoint x="773" y="330" />
+        <di:waypoint x="805" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_inc_c_to_join_di" bpmnElement="Flow_inc_c_to_join">
+        <di:waypoint x="740" y="590" />
+        <di:waypoint x="830" y="590" />
+        <di:waypoint x="830" y="355" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_inc_to_merge_di" bpmnElement="Flow_inc_to_merge">
+        <di:waypoint x="855" y="330" />
+        <di:waypoint x="925" y="330" />
+      </bpmndi:BPMNEdge>
+      
+      <!-- Final Edge -->
+      <bpmndi:BPMNEdge id="Flow_to_end_di" bpmnElement="Flow_to_end">
+        <di:waypoint x="975" y="330" />
+        <di:waypoint x="1042" y="330" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

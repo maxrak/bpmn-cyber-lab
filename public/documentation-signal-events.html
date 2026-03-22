@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPMN Cyber Lab — Esempio Signal Events</title>
+  <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>    .dropdown-header {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #adb5bd;
+      padding: 0.1rem 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .navbar .dropdown-divider {
+      margin: 0.15rem 0;
+    }    body {
+      padding-top: 48px;
+      font-family: sans-serif;
+    }
+    .navbar {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      min-height: 48px;
+    }
+    .navbar-brand {
+      font-size: 1.1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .navbar-nav .nav-link {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .doc-header {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .doc-section {
+      padding: 2rem 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .doc-section:last-child {
+      border-bottom: none;
+    }
+    .doc-section h2 {
+      color: #ff6b6b;
+      margin-bottom: 1.5rem;
+    }
+    .doc-section h3 {
+      color: #ee5a6f;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .signal-card {
+      background: #f8f9fa;
+      border-left: 4px solid #ff6b6b;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .signal-card h4 {
+      color: #ff6b6b;
+      margin-bottom: 1rem;
+    }
+    .signal-icon {
+      font-size: 2rem;
+      margin-right: 1rem;
+      color: #ee5a6f;
+    }
+    .example-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .tip-box {
+      background: #d1ecf1;
+      border-left: 4px solid #0dcaf0;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .comparison-box {
+      background: #e7f3ff;
+      border: 2px solid #0d6efd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .broadcast-visual {
+      background: #fff5f5;
+      border: 2px dashed #ff6b6b;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+    .back-link {
+      margin-bottom: 2rem;
+    }
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+    }
+    @media (min-width: 1200px) {
+      .container {
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="navbar-brand me-3" href="index.html">BPMN Cyber Lab</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="simulation.html">Simulation</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-current="page">
+              Documentation
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="documentation.html">📚 Panoramica</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Guide</div>
+              <!-- <li><h6 class="dropdown-header">Guide</h6></li> -->
+              <li><a class="dropdown-item" href="documentation-modeler.html">✏️ Modeler</a></li>
+              <li><a class="dropdown-item" href="documentation-simulation.html">▶️ Simulation</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Esempi</div>
+              <li><a class="dropdown-item" href="documentation-gateway-comparison.html">🔀 Gateway Comparison</a></li>
+              <li><a class="dropdown-item" href="documentation-message-events.html">✉️ Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
+              <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
+              <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-header">
+    <div class="container">
+      <h1 class="display-5 fw-bold mb-2">Esempio: Signal Events</h1>
+      <p class="lead">Comunicazione broadcast tra processi multipli tramite segnali</p>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <div class="back-link">
+      <a href="documentation.html" class="btn btn-outline-primary">
+        ← Torna all'indice della documentazione
+      </a>
+    </div>
+
+    <!-- Introduzione -->
+    <div class="doc-section">
+      <h2>📡 Obiettivo dell'esempio</h2>
+      <p>
+        Il file <strong>signal-events-example.bpmn</strong> dimostra come utilizzare i <strong>Signal Events</strong> 
+        in BPMN per coordinare <strong>molteplici processi</strong> attraverso comunicazioni <strong>broadcast</strong>. 
+        L'esempio modella un sistema di gestione emergenze in un edificio industriale, dove un evento critico 
+        deve essere notificato simultaneamente a tutti i reparti.
+      </p>
+
+      <div class="broadcast-visual">
+        <h5>🔊 Caratteristica chiave: BROADCAST</h5>
+        <p style="font-size: 1.1rem; margin-top: 1rem;">
+          <strong>1 segnale emesso</strong> → <strong>N processi ricevono</strong>
+        </p>
+        <p class="text-muted mb-0">
+          A differenza dei Message Events (punto-a-punto), i Signal Events permettono 
+          a <strong>un singolo evento</strong> di attivare o notificare <strong>tutti i processi 
+          che lo ascoltano</strong> contemporaneamente.
+        </p>
+      </div>
+
+      <div class="tip-box">
+        <h5>💡 Come utilizzare questo esempio</h5>
+        <ol>
+          <li>Carica <code>signal-events-example.bpmn</code> dal menu <strong>File</strong></li>
+          <li>Osserva nel <strong>Modeler</strong> i 4 pool (Control Center, Sicurezza, Produzione, Admin)</li>
+          <li>Nota che <strong>non ci sono message flow</strong> tra i pool (solo sequence flow interni)</li>
+          <li>Passa alla <strong>Simulation</strong> e osserva come un singolo segnale attiva tutti i pool</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Signal vs Message -->
+    <div class="doc-section">
+      <h2>⚡ Signal Events vs Message Events</h2>
+      
+      <div class="comparison-box">
+        <h4>Differenze fondamentali</h4>
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <h5 class="text-primary">📨 Message Events</h5>
+            <ul>
+              <li><strong>Comunicazione punto-a-punto</strong></li>
+              <li>Un mittente → Un destinatario specifico</li>
+              <li>Richiede <strong>message flow</strong> esplicito</li>
+              <li>Identifica il processo target</li>
+              <li>Come una lettera postale con indirizzo</li>
+            </ul>
+            <div class="example-box mt-3">
+              <small><strong>Esempio:</strong> Cliente invia richiesta → Venditore specifico riceve</small>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h5 class="text-danger">📡 Signal Events</h5>
+            <ul>
+              <li><strong>Comunicazione broadcast</strong></li>
+              <li>Un mittente → Tutti gli ascoltatori</li>
+              <li><strong>Nessun message flow</strong> necessario</li>
+              <li>Non identifica destinatari specifici</li>
+              <li>Come una sirena o annuncio pubblico</li>
+            </ul>
+            <div class="example-box mt-3">
+              <small><strong>Esempio:</strong> Sistema emette allarme → Tutti i reparti reagiscono</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box mt-4">
+        <h5>🎯 Quando usare Signal vs Message</h5>
+        <p><strong>Usa Signal Event quando:</strong></p>
+        <ul>
+          <li>Devi notificare <strong>molteplici processi</strong> contemporaneamente</li>
+          <li>Non sai in anticipo <strong>quanti processi</strong> riceveranno il segnale</li>
+          <li>Vuoi implementare pattern <strong>publish-subscribe</strong></li>
+          <li>La comunicazione è <strong>unidirezionale</strong> (nessuna risposta attesa)</li>
+        </ul>
+        <p class="mt-3"><strong>Usa Message Event quando:</strong></p>
+        <ul>
+          <li>La comunicazione è tra <strong>due processi specifici</strong></li>
+          <li>Serve una <strong>conversazione punto-a-punto</strong></li>
+          <li>Il destinatario deve essere <strong>identificato esplicitamente</strong></li>
+          <li>Serve tracciare la <strong>relazione mittente-destinatario</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Scenario -->
+    <div class="doc-section">
+      <h2>🏭 Scenario: Sistema di Gestione Emergenze</h2>
+      <p>
+        L'esempio modella un sistema industriale con 4 partecipanti che devono coordinarsi 
+        durante situazioni di emergenza:
+      </p>
+
+      <div class="row mt-4">
+        <div class="col-md-3">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-danger">🎛️ Sistema Centrale</h5>
+              <p class="card-text"><strong>Ruolo:</strong> Coordinatore</p>
+              <ul>
+                <li>Monitora sensori</li>
+                <li><strong>Emette segnali</strong> broadcast</li>
+                <li>Decide se evacuare</li>
+                <li>Risolve l'emergenza</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-warning">🛡️ Sicurezza</h5>
+              <p class="card-text"><strong>Ruolo:</strong> Risposta rapida</p>
+              <ul>
+                <li><strong>Attivato</strong> da segnale allarme</li>
+                <li>Verifica situazione</li>
+                <li>Guida evacuazione</li>
+                <li>Rapporto finale</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-primary">⚙️ Produzione</h5>
+              <p class="card-text"><strong>Ruolo:</strong> Arresto sicuro</p>
+              <ul>
+                <li>Produzione in corso</li>
+                <li><strong>Interrotta</strong> da segnale</li>
+                <li>Mette in sicurezza macchinari</li>
+                <li>Riavvia quando possibile</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-success">📄 Amministrativo</h5>
+              <p class="card-text"><strong>Ruolo:</strong> Gestione persone</p>
+              <ul>
+                <li>Lavoro d'ufficio</li>
+                <li><strong>Riceve</strong> segnale allarme</li>
+                <li>Salva documenti</li>
+                <li>Evacua se necessario</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="signal-card mt-4">
+        <h4>📡 I 4 segnali broadcast</h4>
+        <div class="row">
+          <div class="col-md-6">
+            <h5>1. 🚨 Allarme Incendio</h5>
+            <ul>
+              <li><strong>Emesso da:</strong> Sistema Centrale (quando rileva problema)</li>
+              <li><strong>Ricevuto da:</strong> Sicurezza (Start Event), Produzione (Boundary), Admin (Boundary)</li>
+              <li><strong>Effetto:</strong> Avvia processo Sicurezza, interrompe Produzione e Admin</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h5>2. 🏃 Evacuazione</h5>
+            <ul>
+              <li><strong>Emesso da:</strong> Sistema Centrale (se decide evacuazione)</li>
+              <li><strong>Ricevuto da:</strong> Sicurezza (Catch Event), Admin (Catch Event)</li>
+              <li><strong>Effetto:</strong> Sblocca processi in attesa, avvia evacuazione coordinata</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h5>3. ✅ Fine Emergenza</h5>
+            <ul>
+              <li><strong>Emesso da:</strong> Sistema Centrale (quando situazione risolta)</li>
+              <li><strong>Ricevuto da:</strong> Sicurezza (Catch), Produzione (Catch), Admin (Catch)</li>
+              <li><strong>Effetto:</strong> Tutti i reparti riprendono operazioni normali</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h5>4. 🔧 Manutenzione Programmata</h5>
+            <ul>
+              <li><strong>Emesso da:</strong> (non mostrato nell'esempio, ma supportato)</li>
+              <li><strong>Ricevuto da:</strong> Produzione (Boundary Event)</li>
+              <li><strong>Effetto:</strong> Interrompe produzione per manutenzione pianificata</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signal Event Types -->
+    <div class="doc-section">
+      <h2>📋 Tipi di Signal Events</h2>
+
+      <div class="signal-card">
+        <h4><span class="signal-icon">📤</span>Signal Intermediate Throw Event</h4>
+        <p><strong>Simbolo:</strong> Cerchio doppio con icona triangolo (vuoto)</p>
+        <p><strong>Funzione:</strong> <strong>Emettere</strong> un segnale broadcast a tutti gli ascoltatori</p>
+        <p><strong>Comportamento:</strong> 
+          Il processo emette il segnale nell'etere. <strong>Tutti i processi</strong> che hanno un catch/start/boundary 
+          event per quel segnale lo ricevono <strong>simultaneamente</strong>. Il processo mittente continua 
+          immediatamente senza aspettare.
+        </p>
+        
+        <div class="alert alert-danger mt-3">
+          <strong>Nel diagramma di esempio:</strong>
+          <ul>
+            <li><code>Event_ThrowFireAlarm</code> - Sistema Centrale emette "Allarme Incendio"</li>
+            <li><code>Event_ThrowEvacuation</code> - Sistema Centrale emette "Evacuazione"</li>
+            <li><code>Event_ThrowAllClear</code> - Sistema Centrale emette "Fine Emergenza"</li>
+          </ul>
+          <p class="mb-0 mt-2">
+            <strong>💡 Nota:</strong> Un singolo throw event attiva <strong>3 processi contemporaneamente</strong> 
+            (Sicurezza, Produzione, Admin).
+          </p>
+        </div>
+      </div>
+
+      <div class="signal-card">
+        <h4><span class="signal-icon">📥</span>Signal Intermediate Catch Event</h4>
+        <p><strong>Simbolo:</strong> Cerchio doppio con icona triangolo (pieno)</p>
+        <p><strong>Funzione:</strong> <strong>Attendere</strong> la ricezione di un segnale specifico</p>
+        <p><strong>Comportamento:</strong> 
+          Il processo si ferma in attesa. Quando <strong>qualsiasi processo</strong> emette quel segnale 
+          (anche uno sconosciuto), il token prosegue. Non c'è legame diretto mittente-destinatario.
+        </p>
+        
+        <div class="alert alert-info mt-3">
+          <strong>Nel diagramma di esempio:</strong>
+          <ul>
+            <li><code>Event_CatchEvacuation</code> - Sicurezza aspetta ordine evacuazione</li>
+            <li><code>Event_CatchAllClear</code> - Sicurezza, Produzione, Admin aspettano fine emergenza</li>
+            <li><code>Event_AdminEvacuation</code> - Admin aspetta conferma evacuazione</li>
+          </ul>
+          <p class="mb-0 mt-2">
+            <strong>💡 Nota:</strong> Questi eventi creano punti di <strong>sincronizzazione globale</strong>. 
+            Quando il Sistema Centrale emette "Fine Emergenza", <strong>tutti e 3 i reparti</strong> 
+            si sbloccano contemporaneamente.
+          </p>
+        </div>
+      </div>
+
+      <div class="signal-card">
+        <h4><span class="signal-icon">▶️</span>Signal Start Event</h4>
+        <p><strong>Simbolo:</strong> Cerchio singolo con icona triangolo (pieno)</p>
+        <p><strong>Funzione:</strong> <strong>Avviare</strong> un processo quando viene emesso un segnale specifico</p>
+        <p><strong>Comportamento:</strong> 
+          Il processo non esiste fino a quando qualcuno emette il segnale. Quando il segnale arriva, 
+          una <strong>nuova istanza del processo viene creata</strong>. Possono essere create 
+          <strong>molteplici istanze</strong> se il segnale viene emesso più volte.
+        </p>
+        
+        <div class="alert alert-success mt-3">
+          <strong>Nel diagramma di esempio:</strong>
+          <ul>
+            <li><code>Start_Security_Signal</code> - Il processo Sicurezza si <strong>avvia solo</strong> 
+            quando riceve il segnale "Allarme Incendio"</li>
+          </ul>
+          <p class="mb-0 mt-2">
+            <strong>💡 Caso d'uso:</strong> Ideale per processi "on-demand" o "event-driven" che devono 
+            attivarsi in risposta a eventi globali. Il Dipartimento Sicurezza non è sempre attivo, 
+            ma viene "svegliato" dall'allarme.
+          </p>
+        </div>
+      </div>
+
+      <div class="signal-card">
+        <h4><span class="signal-icon">⚠️</span>Signal Boundary Event</h4>
+        <p><strong>Simbolo:</strong> Cerchio doppio con triangolo, attaccato al bordo di un'attività</p>
+        <p><strong>Funzione:</strong> <strong>Interrompere</strong> un'attività in corso quando viene emesso un segnale</p>
+        <p><strong>Comportamento:</strong> 
+          Mentre l'attività è in esecuzione, se <strong>qualsiasi processo</strong> emette il segnale 
+          specificato (anche uno non collegato direttamente), l'attività viene <strong>interrotta</strong> 
+          e il flusso segue il percorso del boundary event.
+        </p>
+        
+        <div class="alert alert-warning mt-3">
+          <strong>Nel diagramma di esempio:</strong>
+          <ul>
+            <li><code>Boundary_FireAlarm</code> - Attaccato a "Produzione in Corso" nel reparto Produzione</li>
+            <li><code>Boundary_Maintenance</code> - Attaccato a "Produzione in Corso" (secondo boundary)</li>
+            <li><code>Boundary_AdminAlarm</code> - Attaccato a "Lavoro d'Ufficio" nel reparto Admin</li>
+          </ul>
+          <p class="mb-0 mt-2">
+            <strong>💡 Potenza:</strong> Un singolo segnale "Allarme Incendio" interrompe 
+            <strong>simultaneamente</strong> sia la Produzione che l'Amministrazione, 
+            anche se non sanno chi ha emesso il segnale.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simulation Guide -->
+    <div class="doc-section">
+      <h2>🎮 Guida alla simulazione</h2>
+
+      <h3>Fase 1: Avvio e monitoraggio normale</h3>
+      <div class="example-box">
+        <strong>Cosa succede:</strong>
+        <ol>
+          <li><strong>Sistema Centrale:</strong> Inizia con Start Event, esegue "Monitora Sensori"</li>
+          <li><strong>Produzione:</strong> Inizia con Start Event, esegue "Produzione in Corso"</li>
+          <li><strong>Admin:</strong> Inizia con Start Event, esegue "Lavoro d'Ufficio"</li>
+          <li><strong>Sicurezza:</strong> NON inizia (aspetta segnale di allarme)</li>
+        </ol>
+        <p class="mb-0 mt-2">
+          <strong>Osserva:</strong> Sicurezza è l'unico processo che non parte automaticamente. 
+          Ha un <strong>Signal Start Event</strong> che lo mantiene dormiente.
+        </p>
+      </div>
+
+      <h3>Fase 2: Rilevazione emergenza</h3>
+      <div class="example-box">
+        <strong>Sistema Centrale raggiunge Gateway "Rilevato problema?"</strong>
+        <p><strong>Se seleziona "Incendio":</strong></p>
+        <ol>
+          <li>Arriva a <code>Event_ThrowFireAlarm</code> (Signal Throw Event)</li>
+          <li><strong>🔊 BROADCAST:</strong> Segnale "Allarme Incendio" viene emesso nell'etere</li>
+          <li><strong>⚡ Effetto simultaneo su 3 pool:</strong>
+            <ul>
+              <li><strong>Sicurezza:</strong> Il processo SI AVVIA da <code>Start_Security_Signal</code></li>
+              <li><strong>Produzione:</strong> "Produzione in Corso" viene INTERROTTA da <code>Boundary_FireAlarm</code></li>
+              <li><strong>Admin:</strong> "Lavoro d'Ufficio" viene INTERROTTO da <code>Boundary_AdminAlarm</code></li>
+            </ul>
+          </li>
+        </ol>
+        <p class="mb-0 mt-3">
+          <strong>💡 Nota critica:</strong> Un singolo throw event ha attivato/interrotto 3 processi diversi 
+          contemporaneamente. Questa è la potenza del broadcast signal!
+        </p>
+      </div>
+
+      <h3>Fase 3: Evacuazione condizionale</h3>
+      <div class="example-box">
+        <strong>Sistema Centrale valuta situazione:</strong>
+        <ol>
+          <li>Esegue "Valuta Situazione"</li>
+          <li>Raggiunge Gateway "Evacuare?"</li>
+          <li><strong>Se sceglie "Sì":</strong>
+            <ul>
+              <li>Emette segnale <code>Event_ThrowEvacuation</code></li>
+              <li><strong>Sicurezza:</strong> Si sblocca da <code>Event_CatchEvacuation</code>, esegue "Guida Evacuazione"</li>
+              <li><strong>Admin:</strong> Si sblocca da <code>Event_AdminEvacuation</code>, esegue "Evacua Ufficio"</li>
+            </ul>
+          </li>
+          <li><strong>Se sceglie "No":</strong>
+            <ul>
+              <li>Sicurezza rimane bloccata (attende evacuazione che non arriva mai - caso teorico)</li>
+              <li>Sistema coordina risposta senza evacuazione totale</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+
+      <h3>Fase 4: Risoluzione e ripristino</h3>
+      <div class="example-box">
+        <strong>Sistema Centrale risolve emergenza:</strong>
+        <ol>
+          <li>Esegue "Risolvi Emergenza"</li>
+          <li>Emette segnale <code>Event_ThrowAllClear</code></li>
+          <li><strong>🔊 BROADCAST "Fine Emergenza":</strong>
+            <ul>
+              <li><strong>Sicurezza:</strong> Si sblocca da <code>Event_CatchAllClear</code>, fa rapporto finale</li>
+              <li><strong>Produzione:</strong> Si sblocca da <code>Event_ProdAllClear</code>, riavvia produzione</li>
+              <li><strong>Admin:</strong> Si sblocca da <code>Event_AdminAllClear</code>, riprende lavoro</li>
+            </ul>
+          </li>
+          <li>Tutti i processi ritornano a operazioni normali e terminano</li>
+        </ol>
+        <p class="mb-0 mt-3">
+          <strong>⚡ Sincronizzazione globale:</strong> Di nuovo, un singolo segnale ha sbloccato 
+          contemporaneamente 3 processi che erano tutti in attesa. Tutti riprendono "in sincronia".
+        </p>
+      </div>
+
+      <div class="tip-box mt-4">
+        <h5>🎯 Suggerimenti per la simulazione</h5>
+        <ul>
+          <li><strong>Velocità lenta:</strong> Imposta velocità molto bassa per osservare l'effetto broadcast</li>
+          <li><strong>Pausa strategica:</strong> Metti in pausa PRIMA di ogni Throw Event per anticipare l'effetto</li>
+          <li><strong>Osserva i 4 pool:</strong> Assicurati che tutti i pool siano visibili contemporaneamente</li>
+          <li><strong>Conta i token:</strong> Quando viene emesso un segnale, conta quanti token si muovono simultaneamente</li>
+          <li><strong>Testa percorsi diversi:</strong> Prova "Tutto OK" per vedere il flusso normale senza emergenza</li>
+          <li><strong>Log eventi:</strong> Il log mostrerà che eventi in pool diversi accadono nello stesso istante</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Real World Applications -->
+    <div class="doc-section">
+      <h2>🌍 Applicazioni nel mondo reale</h2>
+      
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">🚨 Sistemi di emergenza</h5>
+              <ul>
+                <li>Allarmi incendio, evacuazione</li>
+                <li>Allerta meteo o terremoto</li>
+                <li>Codici rossi in ospedali</li>
+                <li>Notifiche di sicurezza pubblica</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">📢 Event-driven architecture</h5>
+              <ul>
+                <li>Publish-subscribe patterns</li>
+                <li>Event bus o message broker</li>
+                <li>Microservizi reattivi</li>
+                <li>Notifiche push a dispositivi</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">🏭 Controllo industriale</h5>
+              <ul>
+                <li>Stop linee produzione</li>
+                <li>Cambio turni sincronizzato</li>
+                <li>Aggiornamenti configurazione</li>
+                <li>Manutenzione coordinata</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="signal-card mt-4">
+        <h4>💼 Esempio pratico: Trading System</h4>
+        <div class="example-box">
+          <strong>Scenario:</strong> Sistema di trading con molteplici strategie automatiche
+          <p class="mt-2">
+            <strong>Signal "Market Volatility":</strong> Quando il sistema rileva alta volatilità, 
+            emette un segnale che:
+          </p>
+          <ul>
+            <li><strong>Strategy A:</strong> Riduce posizioni aperte (Boundary Event interrompe trading normale)</li>
+            <li><strong>Strategy B:</strong> Attiva hedging (Catch Event sblocca procedura protezione)</li>
+            <li><strong>Strategy C:</strong> Invia notifiche ai trader (Start Event avvia processo notifica)</li>
+            <li><strong>Risk Management:</strong> Aumenta margini richiesti (Catch Event attiva procedure rischio)</li>
+          </ul>
+          <p class="mb-0 mt-2">
+            <strong>Vantaggio:</strong> Tutte le strategie reagiscono <strong>simultaneamente</strong> 
+            allo stesso evento di mercato senza dover comunicare punto-a-punto.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multiple Receivers -->
+    <div class="doc-section">
+      <h2>🔄 Pattern avanzati con Signal Events</h2>
+
+      <div class="signal-card">
+        <h4>Pattern 1: Multiple Instances (Istanze Multiple)</h4>
+        <p>
+          Se <strong>più processi identici</strong> hanno lo stesso Signal Start Event, 
+          emettere il segnale <strong>crea istanze multiple</strong> del processo.
+        </p>
+        <div class="example-box">
+          <strong>Esempio:</strong> 10 operatori hanno processi con Signal Start "Chiamata Cliente Urgente". 
+          Quando arriva una chiamata urgente, il segnale può attivare tutti e 10 gli operatori 
+          contemporaneamente, e il primo che risponde la prende.
+        </div>
+      </div>
+
+      <div class="signal-card">
+        <h4>Pattern 2: Cascading Signals (Segnali a Cascata)</h4>
+        <p>
+          Un processo che riceve un segnale può <strong>emettere a sua volta un altro segnale</strong>, 
+          creando una catena di reazioni.
+        </p>
+        <div class="example-box">
+          <strong>Esempio:</strong> Segnale "Sistema Offline" → Process Monitor riceve → Emette "Failover" 
+          → Backup Systems ricevono → Ognuno emette "Service Ready" → Load Balancer riconfigura
+        </div>
+      </div>
+
+      <div class="signal-card">
+        <h4>Pattern 3: Optional Reception (Ricezione Opzionale)</h4>
+        <p>
+          Non tutti i processi devono ricevere ogni segnale. <strong>Solo chi ha definito un listener</strong> 
+          (catch/start/boundary) per quel segnale viene notificato.
+        </p>
+        <div class="example-box">
+          <strong>Nell'esempio:</strong> Il segnale "Manutenzione Programmata" viene ricevuto solo da 
+          Produzione (ha il Boundary Event), mentre Sicurezza e Admin lo ignorano (non hanno listener).
+        </div>
+      </div>
+    </div>
+
+    <!-- Best Practices -->
+    <div class="doc-section">
+      <h2>✅ Best Practices</h2>
+
+      <div class="signal-card">
+        <h4>Quando usare Signal Events</h4>
+        <ul>
+          <li>✅ <strong>Notifiche broadcast:</strong> Devi informare tutti i processi simultaneamente</li>
+          <li>✅ <strong>Eventi globali:</strong> Qualcosa accade che interessa molteplici parti del sistema</li>
+          <li>✅ <strong>Coordinazione loosely-coupled:</strong> I processi non devono conoscersi a vicenda</li>
+          <li>✅ <strong>Event-driven systems:</strong> Architetture reattive basate su eventi</li>
+          <li>✅ <strong>Sincronizzazione globale:</strong> Tutti devono fermarsi/ripartire insieme</li>
+        </ul>
+      </div>
+
+      <div class="tip-box">
+        <h4>⚠️ Attenzione a...</h4>
+        <ul>
+          <li>❌ <strong>Non usare per comunicazioni specifiche:</strong> Se devi inviare a UN destinatario preciso, usa Message</li>
+          <li>❌ <strong>Non aspettarti risposte:</strong> I Signal sono unidirezionali, non c'è acknowledgment</li>
+          <li>❌ <strong>Naming chiaro:</strong> Usa nomi descrittivi per i segnali (non "Signal1", "Signal2")</li>
+          <li>❌ <strong>Gestisci assenza di listener:</strong> Un segnale emesso senza listener è perso (non è un errore)</li>
+          <li>❌ <strong>Ordine non garantito:</strong> Se emetti più segnali velocemente, l'ordine di ricezione può variare</li>
+        </ul>
+      </div>
+
+      <div class="signal-card mt-4">
+        <h4>🎓 Linee guida di design</h4>
+        <ol>
+          <li><strong>Nomina segnali in modo esplicito:</strong> "EmergencyEvacuation" non "Signal1"</li>
+          <li><strong>Documenta chi emette e chi riceve:</strong> Mantieni una tabella dei segnali e listener</li>
+          <li><strong>Usa Signal Definitions:</strong> Definisci segnali a livello di diagram per riuso</li>
+          <li><strong>Considera timeout:</strong> Aggiungi Timer Boundary Events per gestire segnali che non arrivano</li>
+          <li><strong>Testa scenari senza listener:</strong> Verifica che emettere segnali "nel vuoto" non causi problemi</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="doc-section">
+      <h2>📊 Tabella riepilogativa</h2>
+      
+      <table class="table table-bordered">
+        <thead class="table-danger">
+          <tr>
+            <th>Aspetto</th>
+            <th>Signal Event</th>
+            <th>Message Event</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Tipo comunicazione</strong></td>
+            <td>Broadcast (1 a molti)</td>
+            <td>Point-to-point (1 a 1)</td>
+          </tr>
+          <tr>
+            <td><strong>Destinatari</strong></td>
+            <td>Tutti i listener attivi</td>
+            <td>Un processo specifico</td>
+          </tr>
+          <tr>
+            <td><strong>Message Flow</strong></td>
+            <td>NON necessario</td>
+            <td>Obbligatorio tra pool</td>
+          </tr>
+          <tr>
+            <td><strong>Accoppiamento</strong></td>
+            <td>Loose (emettitore ignora riceventi)</td>
+            <td>Tight (mittente conosce destinatario)</td>
+          </tr>
+          <tr>
+            <td><strong>Numero istanze</strong></td>
+            <td>Può creare N istanze con Start Event</td>
+            <td>Crea 1 istanza o comunica con esistente</td>
+          </tr>
+          <tr>
+            <td><strong>Visibilità in diagram</strong></td>
+            <td>Non visibile (implicito)</td>
+            <td>Visibile (message flow espliciti)</td>
+          </tr>
+          <tr>
+            <td><strong>Caso d'uso tipico</strong></td>
+            <td>Allarmi, notifiche globali, eventi sistema</td>
+            <td>Richieste/risposte, conversazioni business</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="doc-section">
+      <h2>➡️ Prossimi passi</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Sperimenta con l'esempio</h5>
+              <p class="card-text">
+                Prova a modificare nel <strong>Modeler</strong>:
+              </p>
+              <ul>
+                <li>Aggiungi un quinto pool (es: "Manutenzione")</li>
+                <li>Crea nuovi segnali per scenari diversi</li>
+                <li>Aggiungi Timer Boundary Events per timeout</li>
+                <li>Combina Signal e Message Events nello stesso processo</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Confronta con altri esempi</h5>
+              <p class="card-text">Approfondisci la tua conoscenza BPMN:</p>
+              <ul>
+                <li><a href="documentation-message-events.html">Message Events Example</a> - Confronta con comunicazione punto-a-punto</li>
+                <li><a href="documentation-gateway-comparison.html">Gateway Comparison</a> - Controllo del flusso</li>
+                <li><a href="documentation-modeler.html">Guida Modeler</a></li>
+                <li><a href="documentation-simulation.html">Guida Simulation</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white text-center py-3 mt-5">
+    <div class="container">
+      <p class="mb-0">&copy; 2026 BPMN Cyber Lab. Powered by bpmn.io</p>
+    </div>
+  </footer>
+
+  <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>
