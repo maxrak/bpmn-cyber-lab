@@ -10,7 +10,10 @@ import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 
 import CyberPropertiesProvider from './cyberPropertiesProvider';
 import RiskColorBehavior from './riskColorBehavior';
+import CustomPaletteProvider from './customPaletteProvider';
+import CustomContextPadProvider from './customContextPadProvider';
 import { setupFileHandlers, loadSampleDiagram } from './fileHandlers';
+import { getCurrentBpmn, updateFilenameUI } from './globalBpmnState';
 
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
@@ -35,7 +38,9 @@ const modeler = new BpmnModeler({
     BpmnPropertiesProviderModule,
     CamundaPlatformPropertiesProviderModule,
     CyberPropertiesProvider,
-    RiskColorBehavior
+    RiskColorBehavior,
+    { __init__: ['customPaletteProvider'], customPaletteProvider: ['type', CustomPaletteProvider] },
+    { __init__: ['customContextPadProvider'], customContextPadProvider: ['type', CustomContextPadProvider] }
   ],
   moddleExtensions: {
     camunda: camundaModdleDescriptor
@@ -48,13 +53,26 @@ window.getActiveModeler = function() {
   return window._modeler;
 };
 
-// Load initial sample diagram
-loadSampleDiagram(modeler, 'empty');
+// Carica il BPMN dallo stato globale (o BPMN vuoto di default)
+const initialBpmn = getCurrentBpmn();
+modeler.importXML(initialBpmn).then(() => {
+  try { 
+    modeler.get('canvas').zoom('fit-viewport'); 
+  } catch (e) { 
+    console.warn('zoom failed', e); 
+  }
+  console.log('✅ Modeler inizializzato con BPMN dallo stato globale');
+}).catch(err => {
+  console.error('❌ Errore caricamento BPMN iniziale', err);
+});
 
 // Setup navbar menu buttons to trigger toolbar buttons
 document.addEventListener('DOMContentLoaded', () => {
   // Wire file handlers (must be after DOM is ready)
   setupFileHandlers(modeler);
+  
+  // Aggiorna l'indicatore del filename nella navbar
+  updateFilenameUI();
 
   const navOpenBtn = document.getElementById('nav-btn-open');
   const navSaveBtn = document.getElementById('nav-btn-save');

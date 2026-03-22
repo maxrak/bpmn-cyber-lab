@@ -10,10 +10,34 @@
       height: 100%;
       margin: 0;
     }
+    body {
+      padding-top: 48px;
+    }
+    .navbar {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      min-height: 48px;
+    }
+    .navbar-brand {
+      font-size: 1.1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .navbar-nav .nav-link {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    #modeler-toolbar {
+      background-color: white;
+      border-top: 2px solid #6c757d;
+      border-bottom: 1px solid #dee2e6;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
     .content {
       display: flex;
-      height: calc(100% - 56px);
-      margin-top: 56px;
+      height: calc(100vh - 48px - 70px);
     }
     #canvas-sim {
       flex: 3;
@@ -26,11 +50,6 @@
       height: 100%;
       overflow-y: auto;
       padding: 1.5rem;
-    }
-    /* Margini per toolbar */
-    #modeler-toolbar {
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
     }
     /* Stili per i messaggi di log */
     .log-entry {
@@ -64,19 +83,22 @@
     .log-message {
       margin-top: 0.25rem;
     }
+    /* Nascondi la palette nella simulation - non serve modificare il diagramma */
+    .djs-palette {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
-      <a class="navbar-brand" href="index.html">BPMN Cyber Lab</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav me-auto">
+        <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" href="index.html">Home</a>
+            <a class="navbar-brand me-3" href="index.html">BPMN Cyber Lab</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="modeler.html">Modeler</a>
@@ -127,7 +149,7 @@
         </svg>
         Salva BPMN
       </button>
-      <div style="border-left: 1px solid #dee2e6; height: 30px; margin: 0 0.5rem;"></div>
+      <!-- <div style="border-left: 1px solid #dee2e6; height: 30px; margin: 0 0.5rem;"></div> -->
       <button id="btn-sim-play" class="btn btn-sm btn-success" style="display:none">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
           <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/>
@@ -153,9 +175,13 @@
         </svg>
         Reset
       </button>
-      <div class="ms-auto">
-        <span id="app-mode-badge" class="badge bg-success">Simulation</span>
+      <div class="ms-auto" style="color: #6c757d; font-size: 0.9rem; padding: 0.25rem 0.75rem; border-left: 2px solid #dee2e6; white-space: nowrap;">
+        <strong style="color: #495057;">BPMN:</strong> 
+        <span id="current-filename" style="color: #212529; font-weight: 500;">Nessun file</span>
       </div>
+      <!-- <div class="ms-auto">
+        <span id="app-mode-badge" class="badge bg-success">Simulation</span>
+      </div> -->
     </div>
   </div>
 

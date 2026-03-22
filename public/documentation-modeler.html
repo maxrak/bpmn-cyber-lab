@@ -7,8 +7,23 @@
   <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      padding-top: 56px;
+      padding-top: 48px;
       font-family: sans-serif;
+    }
+    .navbar {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      min-height: 48px;
+    }
+    .navbar-brand {
+      font-size: 1.1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .navbar-nav .nav-link {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.95rem;
     }
     .doc-header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -97,14 +112,10 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
-      <a class="navbar-brand" href="index.html">BPMN Cyber Lab</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" href="index.html">Home</a>
+            <a class="navbar-brand me-3" href="index.html">BPMN Cyber Lab</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="modeler.html">Modeler</a>
@@ -177,6 +188,191 @@
           Usa <em>File → Salva BPMN</em> per esportare il diagramma in formato .bpmn
         </li>
       </ol>
+
+      <h3>� Menu Contestuale (Context Pad)</h3>
+      <p>
+        Quando selezioni un elemento nel canvas, appare un menu contestuale intorno ad esso con azioni rapide. 
+        Questo menu permette di aggiungere nuovi elementi collegati direttamente all'elemento selezionato.
+      </p>
+
+      <div class="feature-box">
+        <strong>Azioni disponibili nel Context Pad:</strong>
+        <ul class="mt-2">
+          <li>
+            <strong>🔗 Connect</strong>: Crea una connessione Sequence Flow da questo elemento a un altro
+          </li>
+          <li>
+            <strong>👤 Append User Task</strong>: Aggiunge un User Task (task eseguito da un utente)
+          </li>
+          <li>
+            <strong>⚙️ Append Service Task</strong>: Aggiunge un Service Task (task automatico/servizio)
+          </li>
+          <li>
+            <strong>◇ Append Exclusive Gateway</strong>: Aggiunge un gateway XOR (scelta esclusiva tra percorsi)
+          </li>
+          <li>
+            <strong>≡ Append Parallel Gateway</strong>: Aggiunge un gateway AND (percorsi paralleli)
+          </li>
+          <li>
+            <strong>⭕ Append Intermediate Event</strong>: Aggiunge un evento intermedio
+          </li>
+          <li>
+            <strong>● Append End Event</strong>: Aggiunge un evento di fine
+          </li>
+          <li>
+            <strong>🗑️ Delete</strong>: Elimina l'elemento selezionato
+          </li>
+        </ul>
+      </div>
+
+      <div class="feature-box">
+        <strong>💡 Come usare il Context Pad:</strong><br>
+        <ol class="mt-2">
+          <li>Clicca su un elemento nel canvas per selezionarlo</li>
+          <li>Appare un menu circolare intorno all'elemento</li>
+          <li>Clicca sull'icona dell'elemento che vuoi aggiungere</li>
+          <li>L'elemento viene aggiunto automaticamente collegato al precedente</li>
+        </ol>
+        <em>Questo è il modo più rapido per costruire un processo BPMN!</em>
+      </div>
+
+      <div class="feature-box">
+        <strong>🔄 Per cambiare tipo di elemento:</strong><br>
+        Se hai aggiunto un User Task ma volevi uno Script Task, puoi facilmente cambiarlo:
+        <ol class="mt-2">
+          <li>Clicca sull'elemento da modificare</li>
+          <li>Nel context pad, clicca sull'icona della <strong>chiave inglese</strong> (wrench)</li>
+          <li>Si apre un menu con tutti i tipi compatibili</li>
+          <li>Seleziona il nuovo tipo desiderato</li>
+        </ol>
+        <p class="mt-2">
+          Il replace menu è disponibile per tutti gli elementi e mostra TUTTI i tipi di task, gateway, 
+          eventi disponibili in BPMN 2.0 (10 tipi di task, 5 tipi di gateway, ecc.).
+        </p>
+      </div>
+
+      <h3>�📦 Elementi della Palette</h3>
+      <p>
+        La palette sulla sinistra del canvas contiene tutti gli elementi BPMN 2.0 disponibili. 
+        Gli elementi sono organizzati in categorie.
+      </p>
+
+      <h4>⚙️ Strumenti (Tools)</h4>
+      <ul>
+        <li><strong>Hand Tool</strong>: Sposta il canvas trascinandolo</li>
+        <li><strong>Lasso Tool</strong>: Seleziona multipli elementi con un'area rettangolare</li>
+        <li><strong>Space Tool</strong>: Crea o rimuovi spazio tra elementi</li>
+        <li><strong>Global Connect</strong>: Collega rapidamente elementi multipli</li>
+      </ul>
+
+      <h4>⭕ Eventi (Events)</h4>
+      <ul>
+        <li><strong>Start Event</strong>: Evento di inizio processo - dove il processo inizia</li>
+        <li><strong>Intermediate Event</strong>: Evento intermedio o di confine - può essere usato per timer, messaggi, errori, ecc.</li>
+        <li><strong>End Event</strong>: Evento di fine processo - dove il processo termina</li>
+      </ul>
+
+      <h4>◇ Gateway (Punti di Decisione)</h4>
+      <ul>
+        <li>
+          <strong>Exclusive Gateway (XOR)</strong>: 
+          Percorso esclusivo - solo UNA delle uscite viene seguita in base a condizioni. 
+          Usa quando devi scegliere una sola opzione tra varie alternative.
+          <em>Esempio: "Il documento è approvato?" → Sì oppure No</em>
+        </li>
+        <li>
+          <strong>Parallel Gateway (AND)</strong>: 
+          Percorsi paralleli - TUTTE le uscite vengono seguite simultaneamente. 
+          Usa quando attività multiple devono essere eseguite in parallelo.
+          <em>Esempio: notifica utente E aggiorna database E registra log</em>
+        </li>
+        <li>
+          <strong>Inclusive Gateway (OR)</strong>: 
+          Percorsi inclusivi - una O PIÙ uscite possono essere seguite in base a condizioni. 
+          Usa quando più opzioni possono essere vere contemporaneamente.
+          <em>Esempio: "Quali verifiche applicare?" → verifica credito, verifica identità, verifica storico (una o più)</em>
+        </li>
+        <li>
+          <strong>Event-based Gateway</strong>: 
+          Gateway basato su eventi - il flusso continua sul primo evento che si verifica. 
+          Usa quando devi attendere uno tra vari eventi possibili.
+          <em>Esempio: attendi "timeout" OPPURE "risposta utente"</em>
+        </li>
+        <li>
+          <strong>Complex Gateway</strong>: 
+          Gateway con logica complessa - per condizioni di routing molto articolate non esprimibili con altri gateway.
+        </li>
+      </ul>
+
+      <h4>□ Task e Attività</h4>
+      <ul>
+        <li>
+          <strong>Task</strong>: 
+          Task generico - attività non specificata, utile per modellazione ad alto livello.
+        </li>
+        <li>
+          <strong>User Task</strong>: 
+          Task eseguito da un utente umano - richiede interazione umana.
+          <em>Esempio: "Approva richiesta", "Compila modulo"</em>
+        </li>
+        <li>
+          <strong>Service Task</strong>: 
+          Task eseguito automaticamente da un servizio/sistema - implementato tramite servizio web, API, ecc.
+          <em>Esempio: "Invia email", "Chiamata API esterna", "Query database"</em>
+        </li>
+        <li>
+          <strong>Manual Task</strong>: 
+          Task manuale eseguito senza supporto del sistema - lavoro fisico o manuale non tracciato dal sistema.
+          <em>Esempio: "Archivia documento cartaceo", "Firma contratto"</em>
+        </li>
+        <li>
+          <strong>Script Task</strong>: 
+          Task eseguito tramite script - codice eseguito dal motore del processo.
+          <em>Esempio: calcoli, trasformazioni dati, validazioni</em>
+        </li>
+        <li>
+          <strong>Business Rule Task</strong>: 
+          Task che esegue regole di business - valutazione di regole tramite business rule engine.
+          <em>Esempio: "Calcola sconto applicabile", "Determina livello rischio"</em>
+        </li>
+        <li>
+          <strong>Send Task</strong>: 
+          Task per inviare messaggi - invia un messaggio a un partecipante esterno.
+          <em>Esempio: "Invia notifica push", "Invia comando"</em>
+        </li>
+        <li>
+          <strong>Receive Task</strong>: 
+          Task in attesa di messaggio - attende la ricezione di un messaggio per continuare.
+          <em>Esempio: "Attendi conferma pagamento", "Attendi risposta"</em>
+        </li>
+        <li>
+          <strong>Call Activity</strong>: 
+          Riferimento a processo riutilizzabile - chiama un altro processo BPMN definito separatamente.
+        </li>
+        <li>
+          <strong>SubProcess</strong>: 
+          Sottoprocesso espanso - raggruppa attività correlate in un contenitore visibile sul diagramma.
+        </li>
+      </ul>
+
+      <h4>📊 Dati</h4>
+      <ul>
+        <li><strong>Data Object</strong>: Rappresenta dati/documenti utilizzati dal processo</li>
+        <li><strong>Data Store</strong>: Rappresenta un archivio persistente di dati (database, repository)</li>
+      </ul>
+
+      <h4>🏊 Collaborazione</h4>
+      <ul>
+        <li><strong>Pool/Participant</strong>: Contenitore per un processo, rappresenta un'entità o organizzazione</li>
+        <li><strong>Group</strong>: Raggruppamento visivo di elementi (solo per documentazione, non influenza l'esecuzione)</li>
+      </ul>
+
+      <div class="feature-box">
+        <strong>💡 Suggerimento</strong><br>
+        Quando modelli un processo, inizia con elementi semplici (Task, Exclusive Gateway) e raffina 
+        progressivamente usando tipi più specifici (User Task, Service Task, ecc.) man mano che i 
+        dettagli implementativi diventano chiari.
+      </div>
 
       <h3>Funzionalità avanzate</h3>
       <div class="feature-box">

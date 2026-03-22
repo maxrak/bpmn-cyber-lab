@@ -2,6 +2,7 @@ import BpmnModeler from 'bpmn-js/lib/Modeler';
 import TokenSim from 'bpmn-js-token-simulation';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 import { setupFileHandlers, loadSampleDiagram } from './fileHandlers';
+import { getCurrentBpmn, updateFilenameUI } from './globalBpmnState';
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import 'bpmn-js-token-simulation/assets/css/bpmn-js-token-simulation.css';
@@ -70,12 +71,18 @@ function clearLog() {
   logContainer.innerHTML = '<div class="text-muted small">In attesa di eventi di simulazione...</div>';
 }
 
-// load default sample into simulation modeler
-try {
-  loadSampleDiagram(simModeler, 'empty');
-} catch (e) {
-  console.warn('loadSampleDiagram failed in simulation-entry', e);
-}
+// Carica il BPMN dallo stato globale (o BPMN vuoto di default)
+const initialBpmn = getCurrentBpmn();
+simModeler.importXML(initialBpmn).then(() => {
+  try { 
+    simModeler.get('canvas').zoom('fit-viewport'); 
+  } catch (e) { 
+    console.warn('zoom failed', e); 
+  }
+  console.log('✅ Simulation inizializzata con BPMN dallo stato globale');
+}).catch(err => {
+  console.error('❌ Errore caricamento BPMN iniziale in simulation', err);
+});
 
 // Setup simulation controls
 document.addEventListener('DOMContentLoaded', () => {
@@ -85,6 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch (e) {
     console.warn('setupFileHandlers failed in simulation-entry', e);
   }
+  
+  // Aggiorna l'indicatore del filename nella navbar
+  updateFilenameUI();
 
   // Setup navbar menu buttons to trigger toolbar buttons
   const navOpenBtn = document.getElementById('nav-btn-open');

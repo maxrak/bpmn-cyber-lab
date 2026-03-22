@@ -1,4 +1,5 @@
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
+import { saveCurrentBpmn } from './globalBpmnState';
 
 // sample BPMN files are served from `public/`; load them at runtime via fetch
 
@@ -26,6 +27,10 @@ export function openBPMN(modeler, url) {
     }
     const prepared = ensureBpmnDiagram(xml);
     console.log('Importing BPMN file', url, 'size:', prepared.length);
+    
+    // Salva il BPMN nello stato globale per condividerlo tra modeler e simulation
+    const fileName = url.split('/').pop();
+    saveCurrentBpmn(prepared, fileName);
 
     // If the app is in simulation mode, try to load bpmn-js-token-simulation.
     if (typeof window !== 'undefined' && window.appMode === 'simulation') {
@@ -133,6 +138,10 @@ export function setupFileHandlers(modeler) {
       const xml = ev.target.result;
       const prepared = ensureBpmnDiagram(xml);
       console.log('Importing BPMN file, size:', prepared.length);
+      
+      // Salva il BPMN nello stato globale
+      saveCurrentBpmn(prepared, file.name);
+      
       const target = (typeof window !== 'undefined' && window.getActiveModeler) ? window.getActiveModeler() : modeler;
       if (!target) {
         console.error('No modeler instance available to import file');
