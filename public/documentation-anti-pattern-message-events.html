@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPMN Cyber Lab — Anti-Pattern: Message Events e Token Appeso</title>
+  <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .dropdown-header {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #adb5bd;
+      padding: 0.1rem 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .navbar .dropdown-divider {
+      margin: 0.15rem 0;
+    }
+    body {
+      padding-top: 48px;
+      font-family: sans-serif;
+    }
+    .navbar {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      min-height: 48px;
+    }
+    .navbar-brand {
+      font-size: 1.1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .navbar-nav .nav-link {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .doc-header {
+      background: linear-gradient(135deg, #8e44ad 0%, #6c3483 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .doc-section {
+      padding: 2rem 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .doc-section:last-child {
+      border-bottom: none;
+    }
+    .doc-section h2 {
+      color: #8e44ad;
+      margin-bottom: 1.5rem;
+    }
+    .doc-section h3 {
+      color: #6c3483;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .antipattern-card {
+      background: #fdf2f2;
+      border-left: 4px solid #c0392b;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .antipattern-card h4 {
+      color: #c0392b;
+      margin-bottom: 1rem;
+    }
+    .correct-card {
+      background: #edfaf1;
+      border-left: 4px solid #27ae60;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .correct-card h4 {
+      color: #27ae60;
+      margin-bottom: 1rem;
+    }
+    .example-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .tip-box {
+      background: #d1ecf1;
+      border-left: 4px solid #0dcaf0;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .danger-box {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .info-box {
+      background: #f0e6fa;
+      border-left: 4px solid #8e44ad;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .back-link {
+      margin-bottom: 2rem;
+    }
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+    }
+    @media (min-width: 1200px) {
+      .container {
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
+    }
+    .comparison-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 767px) {
+      .comparison-block { grid-template-columns: 1fr; }
+    }
+    .bpmn-code {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      margin: 0.75rem 0;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .badge-wrong {
+      background: #c0392b;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .badge-ok {
+      background: #27ae60;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .rule-list {
+      counter-reset: rule-counter;
+      list-style: none;
+      padding-left: 0;
+    }
+    .rule-list li {
+      counter-increment: rule-counter;
+      position: relative;
+      padding-left: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .rule-list li::before {
+      content: counter(rule-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: #8e44ad;
+      color: white;
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .flow-diagram {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+    .flow-diagram .node-ok {
+      color: #27ae60;
+      font-weight: 600;
+    }
+    .flow-diagram .node-bad {
+      color: #c0392b;
+      font-weight: 600;
+    }
+    .flow-diagram .node-stuck {
+      color: #c0392b;
+      background: #fdf2f2;
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+    .timeline {
+      border-left: 3px solid #8e44ad;
+      padding-left: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .timeline-step {
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+    .timeline-step::before {
+      content: '';
+      position: absolute;
+      left: -1.9rem;
+      top: 0.3rem;
+      width: 0.9rem;
+      height: 0.9rem;
+      border-radius: 50%;
+      background: #8e44ad;
+    }
+    .timeline-step.step-bad::before {
+      background: #c0392b;
+    }
+    .timeline-step.step-stuck::before {
+      background: #e74c3c;
+      box-shadow: 0 0 0 3px #fadbd8;
+    }
+    .timeline-step .step-label {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+    .timeline-step .step-actor {
+      font-size: 0.78rem;
+      color: #6c757d;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="navbar-brand me-3" href="index.html">BPMN Cyber Lab</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="simulation.html">Simulation</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-current="page">
+              Documentation
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="documentation.html">📚 Panoramica</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header">Guide</h6></li>
+              <li><a class="dropdown-item" href="documentation-modeler.html">✏️ Modeler</a></li>
+              <li><a class="dropdown-item" href="documentation-simulation.html">▶️ Simulation</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header">Esempi</h6></li>
+              <li><a class="dropdown-item" href="documentation-gateway-comparison.html">🔀 Gateway Comparison</a></li>
+              <li><a class="dropdown-item" href="documentation-message-events.html">✉️ Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
+              <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
+              <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-start-end.html">🚫 Anti-Pattern Start/End</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-gateway.html">❌ Anti-Pattern Gateway</a></li>
+              <li><a class="dropdown-item active" href="documentation-anti-pattern-message-events.html">📨 Anti-Pattern Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-loop.html">🔁 Anti-Pattern Loop</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-header">
+    <div class="container">
+      <h1 class="display-5 fw-bold mb-2">Anti-Pattern: Message Events e Token Appeso</h1>
+      <p class="lead">Boundary event fuori tempo: il messaggio di annullamento arriva quando il task a cui è agganciato è già completato</p>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <div class="back-link">
+      <a href="documentation.html" class="btn btn-outline-secondary" style="border-color: #8e44ad; color: #8e44ad;">
+        ← Torna all'indice della documentazione
+      </a>
+    </div>
+
+    <!-- Introduzione -->
+    <div class="doc-section">
+      <h2>📨 Il problema: un messaggio che non trova più il destinatario</h2>
+      <p>
+        Il <strong>Boundary Message Event</strong> è un evento di confine che ascolta un messaggio 
+        <em>mentre il task a cui è agganciato è in esecuzione</em>. Non appena il messaggio arriva, 
+        il task viene interrotto e il flusso si devia. Ma cosa succede se quel messaggio arriva 
+        <strong>dopo</strong> che il task è già stato completato? Il messaggio non trova il suo 
+        destinatario, viene ignorato — e il processo rimane bloccato in uno stato di attesa infinita.
+      </p>
+
+      <div class="danger-box">
+        <h5>⚠️ Scenario di questo anti-pattern</h5>
+        <p class="mb-2">
+          <strong>Cliente</strong> e <strong>Venditore</strong> si scambiano messaggi per gestire un ordine. 
+          Il Venditore usa un boundary event agganciato a <code>Task_ProcessOrder</code> per intercettare 
+          un eventuale annullamento da parte del Cliente.
+        </p>
+        <p class="mb-0">
+          Il problema: entro il tempo in cui il Cliente rivede l'ordine e decide di annullarlo, 
+          il Venditore ha <strong>già completato</strong> <code>Task_ProcessOrder</code> e il token 
+          si è spostato su <code>Event_ReceivePayment</code>. Il boundary event non è più attivo, 
+          il messaggio di annullamento viene perso, e il token del Venditore rimane <strong>sospeso 
+          ad aspettare un pagamento che non arriverà mai</strong>.
+        </p>
+      </div>
+
+      <div class="tip-box">
+        <h5>💡 Come usare questo esempio</h5>
+        <ol class="mb-0">
+          <li>Carica <code>anti-pattern-message-events-example.bpmn</code> dal menu <strong>File</strong></li>
+          <li>Avvia la <strong>Simulation</strong></li>
+          <li>Segui la sequenza descritta nella sezione "Come simularlo" — in particolare, 
+          <strong>completa prima Task_ProcessOrder</strong> nel pool Venditore, poi annulla nel pool Cliente</li>
+          <li>Osserva il token del Venditore che rimane bloccato su "Attendi Pagamento"</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Struttura del processo -->
+    <div class="doc-section">
+      <h2>🗺️ Struttura del processo</h2>
+      <p>Il diagramma mostra due pool che collaborano via message flow:</p>
+
+      <div class="comparison-block">
+        <div>
+          <h3 style="margin-top:0;">Pool: Cliente</h3>
+          <div class="flow-diagram">
+<span class="node-ok">Start</span> → Prepara Ordine
+  → <strong>Invia Richiesta</strong> ──msg──▶
+  → Attendi Conferma ◀──msg──
+  → Rivedi Ordine
+  → [XOR: Accetta?]
+      │ Sì → <strong>Invia Pagamento</strong> ──msg──▶
+      │      → Attendi Spedizione
+      │      → Ricevi Merce → End ✅
+      │
+      └ No → <strong>Annulla Ordine</strong> ──msg──▶
+             → End (Annullato)</div>
+        </div>
+        <div>
+          <h3 style="margin-top:0;">Pool: Venditore</h3>
+          <div class="flow-diagram">
+<span class="node-ok">Start</span> (msg) → Valida Ordine
+  → Verifica Disponibilità
+  → <strong>Invia Conferma</strong> ──msg──▶
+  → <span class="node-ok">Task_ProcessOrder</span>
+      │
+      ├─ [completato] → <span class="node-stuck">Event_ReceivePayment ⏳</span>
+      │                 → Verifica Pagamento
+      │                 → Prepara Spedizione
+      │                 → Notifica Spedizione ──msg──▶
+      │                 → Spedisci Merce → End ✅
+      │
+      └─ <span class="node-bad">Boundary_CancelOrder</span> ◀──msg── (solo se task attivo!)
+         → Annulla Ordine → End</div>
+        </div>
+      </div>
+
+      <div class="antipattern-card">
+        <h4><span class="badge-wrong">PROBLEMA</span> Il boundary event ha una finestra temporale limitata</h4>
+        <p>
+          Il <code>Boundary_CancelOrder</code> è un <strong>interrupting boundary message event</strong> 
+          agganciato a <code>Task_ProcessOrder</code>. Questo significa che può intercettare il messaggio 
+          <em>solo mentre</em> <code>Task_ProcessOrder</code> è in esecuzione.
+        </p>
+        <p>
+          Nel simulatore bpmn-js, i task completano non appena l'utente clicca su di essi. 
+          Non appena il Venditore completa <code>Task_ProcessOrder</code>, il token avanza 
+          su <code>Event_ReceivePayment</code> — e il boundary event cessa di essere in ascolto.
+        </p>
+        <p class="mb-0">
+          Se in quel momento (o dopo) il Cliente invia il messaggio di annullamento, 
+          <strong>non esiste più nessun receiver nel processo del Venditore</strong>. 
+          Il token del Venditore rimarrà bloccato su <code>Event_ReceivePayment</code> 
+          per sempre, aspettando un pagamento che il Cliente non invierà mai.
+        </p>
+      </div>
+    </div>
+
+    <!-- Come simularlo -->
+    <div class="doc-section">
+      <h2>🧪 Come simulare il token appeso</h2>
+
+      <div class="timeline">
+        <div class="timeline-step">
+          <div class="step-actor">Cliente</div>
+          <div class="step-label">Avvia il processo</div>
+          <p class="mb-0">Clicca su <strong>Start</strong> nel pool Cliente. Completa <strong>Prepara Ordine</strong> e poi <strong>Invia Richiesta</strong>: il messaggio parte verso il Venditore e istanzia il suo processo.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="step-actor">Venditore</div>
+          <div class="step-label">Elabora l'ordine ricevuto</div>
+          <p class="mb-0">Nel pool Venditore compaiono i task attivi. Completa in sequenza: <strong>Valida Ordine → Verifica Disponibilità → Invia Conferma → Task_ProcessOrder</strong>.</p>
+        </div>
+        <div class="timeline-step step-bad">
+          <div class="step-actor">⚠️ Momento critico</div>
+          <div class="step-label">Task_ProcessOrder viene completato</div>
+          <p class="mb-0">Non appena clicchi su <strong>Task_ProcessOrder</strong> per completarlo, il token avanza automaticamente su <strong>Event_ReceivePayment</strong>. Il boundary event <code>Boundary_CancelOrder</code> viene disattivato — non è più in ascolto di nessun messaggio.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="step-actor">Cliente</div>
+          <div class="step-label">Riceve conferma e decide di annullare</div>
+          <p class="mb-0">Nel pool Cliente, completa <strong>Attendi Conferma → Rivedi Ordine</strong>. Al gateway "Accetta?" scegli il ramo <strong>No</strong>: viene eseguito <strong>Annulla Ordine</strong> che invia il messaggio <em>Message_CancelOrder</em>.</p>
+        </div>
+        <div class="timeline-step step-stuck">
+          <div class="step-actor">🔴 Token appeso</div>
+          <div class="step-label">Il messaggio arriva, ma non trova destinatario</div>
+          <p class="mb-0">
+            Il messaggio <em>Message_CancelOrder</em> non viene ricevuto da nessuno nel pool Venditore. 
+            Il token del Venditore rimane <strong>bloccato su Event_ReceivePayment</strong>, in attesa 
+            di un pagamento che non arriverà mai. Il processo non si chiude.
+          </p>
+        </div>
+      </div>
+
+      <div class="example-box">
+        <h5>💡 Verifica visiva nel simulatore</h5>
+        <ul class="mb-0">
+          <li>Il pool <strong>Cliente</strong> termina regolarmente su "Ordine Annullato" ✅</li>
+          <li>Il pool <strong>Venditore</strong> mostra il token fermo su <strong>"Attendi Pagamento"</strong> — evidenziato nel simulatore come task in attesa (cerchio con busta + bordo azzurro)</li>
+          <li>Non c'è modo di proseguire: nessun click avanza il processo</li>
+          <li>L'unica uscita è riavviare la simulazione</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Analisi tecnica dell'anti-pattern -->
+    <div class="doc-section">
+      <h2>🔬 Analisi tecnica</h2>
+
+      <div class="antipattern-card">
+        <h4><span class="badge-wrong">SBAGLIATO</span> Boundary event agganciato al task sbagliato</h4>
+        <p>
+          Il <code>Boundary_CancelOrder</code> è definito come boundary event su <code>Task_ProcessOrder</code>. 
+          La semantica BPMN è chiara: un boundary event è attivo <em>only while its host task is active</em>.
+        </p>
+        <div class="bpmn-code">&lt;!-- ❌ ANTI-PATTERN: boundary event su Task_ProcessOrder --&gt;
+&lt;task id="Task_ProcessOrder" name="Elabora Ordine"&gt;
+  &lt;incoming&gt;Flow_S4&lt;/incoming&gt;
+  &lt;outgoing&gt;Flow_S5&lt;/outgoing&gt;
+&lt;/task&gt;
+
+&lt;!-- Questo boundary event smette di funzionare
+     non appena Task_ProcessOrder viene completato --&gt;
+&lt;boundaryEvent id="Boundary_CancelOrder"
+               name="Annullamento"
+               attachedToRef="Task_ProcessOrder"
+               cancelActivity="true"&gt;
+  &lt;messageEventDefinition
+    messageRef="Message_CancelOrder" /&gt;
+&lt;/boundaryEvent&gt;
+
+&lt;!-- Dopo il task, il token va qui... --&gt;
+&lt;intermediateCatchEvent id="Event_ReceivePayment"
+                        name="Attendi Pagamento"&gt;
+  &lt;messageEventDefinition
+    messageRef="Message_PaymentInfo" /&gt;
+&lt;/intermediateCatchEvent&gt;
+
+&lt;!-- ...ma a questo punto il boundary event è GIÀ MORTO.
+     Se arriva Message_CancelOrder ora, viene IGNORATO. --&gt;</div>
+        <p class="mb-0">
+          Il <code>messageFlow</code> di collegamento punta a <code>Boundary_CancelOrder</code>:
+        </p>
+        <div class="bpmn-code">&lt;!-- Flow_Msg_5 punta al boundary event: --&gt;
+&lt;messageFlow id="Flow_Msg_5"
+             sourceRef="Event_SendCancel"
+             targetRef="Boundary_CancelOrder" /&gt;
+
+&lt;!-- Quando arriva, Boundary_CancelOrder non è più attivo
+     → il messaggio viene perso → token appeso --&gt;</div>
+      </div>
+
+      <h3>Perché questo accade nel simulatore bpmn-js</h3>
+      <p>
+        In un motore BPMN reale (es. Camunda, Flowable), i task possono rimanere attivi per ore o giorni 
+        in attesa di input umano. Durante quell'attesa, il boundary event è in ascolto. In bpmn-js 
+        la simulazione è <strong>manuale e sincrona</strong>: un task diventa "completato" 
+        non appena l'utente ci clicca sopra. Non esiste parallelismo asincrono reale tra i due pool.
+      </p>
+      <p>
+        Il risultato pratico è che l'ordine in cui l'utente clicca  determina se il boundary event 
+        fa o meno in tempo ad intercettare il messaggio:
+      </p>
+      <table class="table table-bordered mt-2">
+        <thead class="table-light">
+          <tr>
+            <th>Ordine di click</th>
+            <th>Risultato</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Venditore: completa <code>Task_ProcessOrder</code> <strong>prima</strong> che il Cliente annulli</td>
+            <td class="text-danger fw-bold">🔴 Token appeso su Event_ReceivePayment</td>
+          </tr>
+          <tr>
+            <td>Cliente: annulla <strong>mentre</strong> <code>Task_ProcessOrder</code> è ancora attivo (prima di completarlo)</td>
+            <td class="text-success fw-bold">✅ Il boundary event intercetta — flusso corretto</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Un processo corretto non dovrebbe dipendere dall'ordine di esecuzione. L'anti-pattern produce 
+        un comportamento <strong>non deterministico</strong>: si ottengono risultati diversi a seconda 
+        di quando si clicca.
+      </p>
+    </div>
+
+    <!-- La soluzione corretta -->
+    <div class="doc-section">
+      <h2>✅ La soluzione: Event-Based Gateway</h2>
+      <p>
+        La correzione consiste nel sostituire il boundary event con un 
+        <strong>Event-Based Gateway</strong> posizionato <em>dopo</em> <code>Task_ProcessOrder</code>. 
+        Il gateway rimane attivo in attesa di <em>uno qualunque</em> dei messaggi previsti; 
+        il primo che arriva attiva il ramo corrispondente e disabilita tutti gli altri.
+      </p>
+      <p>
+        Questa è la struttura adottata in <code>message-events-example.bpmn</code> (la versione corretta).
+      </p>
+
+      <div class="correct-card">
+        <h4><span class="badge-ok">CORRETTO</span> Event-Based Gateway dopo Task_ProcessOrder</h4>
+        <div class="bpmn-code">&lt;!-- ✅ CORRETTO: Event-Based Gateway come punto di attesa --&gt;
+&lt;task id="Task_ProcessOrder" name="Elabora Ordine"&gt;
+  &lt;incoming&gt;Flow_S4&lt;/incoming&gt;
+  &lt;outgoing&gt;Flow_S5&lt;/outgoing&gt;
+&lt;/task&gt;
+
+&lt;!-- Il gateway aspetta uno dei due messaggi alternativi --&gt;
+&lt;eventBasedGateway id="Gateway_WaitForDecision"
+                   name="Pagamento o Annull.?"&gt;
+  &lt;incoming&gt;Flow_S5&lt;/incoming&gt;
+  &lt;outgoing&gt;Flow_S5b&lt;/outgoing&gt;  &lt;!-- → Event_ReceivePayment --&gt;
+  &lt;outgoing&gt;Flow_S5c&lt;/outgoing&gt;  &lt;!-- → Event_ReceiveCancel  --&gt;
+&lt;/eventBasedGateway&gt;
+
+&lt;!-- Ramo 1: arriva il pagamento → prosegui normalmente --&gt;
+&lt;intermediateCatchEvent id="Event_ReceivePayment"
+                        name="Attendi Pagamento"&gt;
+  &lt;messageEventDefinition
+    messageRef="Message_PaymentInfo" /&gt;
+&lt;/intermediateCatchEvent&gt;
+
+&lt;!-- Ramo 2: arriva l'annullamento → gestisci cancellazione --&gt;
+&lt;intermediateCatchEvent id="Event_ReceiveCancel"
+                        name="Annullamento"&gt;
+  &lt;messageEventDefinition
+    messageRef="Message_CancelOrder" /&gt;
+&lt;/intermediateCatchEvent&gt;
+
+&lt;!-- Message flow: punta all'intermediate catch event, non a un boundary --&gt;
+&lt;messageFlow id="Flow_Msg_5"
+             sourceRef="Event_SendCancel"
+             targetRef="Event_ReceiveCancel" /&gt;</div>
+      </div>
+
+      <h3>Come funziona il flusso corretto</h3>
+      <div class="flow-diagram">
+Task_ProcessOrder [completato]
+  ↓
+Gateway_WaitForDecision (eventBasedGateway)
+  ├── Event_ReceivePayment ◀──msg── Cliente invia pagamento
+  │     → Task_VerifyPayment → ... → End (Ordine Evaso) ✅
+  │
+  └── Event_ReceiveCancel ◀──msg── Cliente annulla ordine
+        → Task_CancelOrder → End (Ordine Annullato) ✅</div>
+
+      <div class="comparison-block">
+        <div class="antipattern-card" style="margin-top:0;">
+          <h4><span class="badge-wrong">SBAGLIATO</span> Boundary Event</h4>
+          <ul>
+            <li>Attivo solo <em>durante</em> il task ospite</li>
+            <li>Il messaggio arriva dopo: <strong>ignorato</strong></li>
+            <li>Token appeso su Event_ReceivePayment</li>
+            <li>Processo non si chiude mai</li>
+            <li>Comportamento non deterministico</li>
+          </ul>
+        </div>
+        <div class="correct-card" style="margin-top:0;">
+          <h4><span class="badge-ok">CORRETTO</span> Event-Based Gateway</h4>
+          <ul>
+            <li>Rimane attivo <em>fino all'arrivo del primo messaggio</em></li>
+            <li>Pagamento <strong>o</strong> annullamento: attende entrambi</li>
+            <li>Mutuamente esclusivo: una sola risposta viene processata</li>
+            <li>Processo sempre convergente</li>
+            <li>Comportamento deterministic e testabile</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Regole pratiche -->
+    <div class="doc-section">
+      <h2>📋 Regole pratiche per i Message Event</h2>
+
+      <ol class="rule-list">
+        <li>
+          <strong>Usa un Boundary Message Event solo per interruzioni che possono realisticamente avvenire mentre il task è ancora in esecuzione.</strong>
+          Se il task si completa istantaneamente (o quasi), la finestra di ascolto è troppo breve per essere affidabile.
+        </li>
+        <li>
+          <strong>Quando il processo deve attendere uno tra più messaggi alternativi, usa un Event-Based Gateway</strong>
+          posizionato <em>dopo</em> l'ultimo task sincronizzato. Il gateway resta in ascolto di tutti i messaggi configurati finché uno non arriva.
+        </li>
+        <li>
+          <strong>Non puntare mai un message flow a un boundary event se il messaggio può arrivare dopo la fine del task.</strong>
+          In quel caso, converte il boundary event in un intermediate catch event raggiungibile dall'Event-Based Gateway.
+        </li>
+        <li>
+          <strong>Verifica sempre che ogni token abbia un percorso verso un End Event in tutti gli scenari possibili.</strong>
+          Un token appeso è spesso il sintomo di un message event che non ha trovato il suo destinatario.
+        </li>
+        <li>
+          <strong>In fase di simulazione: testa sempre lo scenario "peggiore" (annullamento tardivo).</strong>
+          Completa prima tutti i task del Venditore fino al punto di attesa, poi simula l'annullamento dal pool Cliente.
+        </li>
+      </ol>
+
+      <div class="info-box">
+        <h5>📖 Confronto con il file corretto</h5>
+        <p class="mb-0">
+          Carica <code>message-events-example.bpmn</code> per vedere la versione corretta dello stesso scenario. 
+          In quel diagramma, l'<code>eventBasedGateway</code> (<em>Gateway_WaitForDecision</em>) sostituisce 
+          il boundary event e gestisce correttamente sia il pagamento che l'annullamento, indipendentemente 
+          dall'ordine di click nella simulazione.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

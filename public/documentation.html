@@ -106,6 +106,10 @@
               <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
               <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
               <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-start-end.html">🚫 Anti-Pattern Start/End</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-gateway.html">❌ Anti-Pattern Gateway</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-message-events.html">📨 Anti-Pattern Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-loop.html">🔁 Anti-Pattern Loop</a></li>
             </ul>
           </li>
         </ul>
@@ -317,7 +321,86 @@
           </div>
         </div>
       </div>
-    </div>
+
+      <div class="col-md-6">
+        <div class="card toc-card shadow-sm">
+          <div class="card-body p-4 text-center">
+            <div class="icon-large" style="color: #c0392b;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-slash-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                <path d="M11.354 4.646a.5.5 0 0 0-.708 0l-6 6a.5.5 0 0 0 .708.708l6-6a.5.5 0 0 0 0-.708"/>
+              </svg>
+            </div>
+            <h3 class="card-title mb-3">Anti-Pattern Start/End</h3>
+            <p class="card-text text-muted mb-3" style="font-size: 0.9rem;">
+              Start multipli ambigui, processi senza end event, end events indistinguibili: cosa evitare.
+            </p>
+            <a href="documentation-anti-pattern-start-end.html" class="btn" style="background: linear-gradient(135deg, #c0392b 0%, #922b21 100%); color: white;">
+              Apri esempio →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card toc-card shadow-sm">
+          <div class="card-body p-4 text-center">
+            <div class="icon-large" style="color: #d35400;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-sign-intersection" viewBox="0 0 16 16">
+                <path d="M7.25 4v2.25H5a.25.25 0 0 0-.25.25v3c0 .138.112.25.25.25h2.25V12h1.5V9.75H11a.25.25 0 0 0 .25-.25v-3a.25.25 0 0 0-.25-.25H8.75V4z"/>
+                <path d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58 1.519 0 2.098l6.516 6.516c.58.58 1.519.58 2.098 0l6.516-6.516c.58-.58.58-1.519 0-2.098zm-1.4.7a.495.495 0 0 1 .7 0l6.516 6.515a.495.495 0 0 1 0 .7L8.35 14.866a.495.495 0 0 1-.7 0L1.134 8.35a.495.495 0 0 1 0-.7z"/>
+              </svg>
+            </div>
+            <h3 class="card-title mb-3">Anti-Pattern Gateway</h3>
+            <p class="card-text text-muted mb-3" style="font-size: 0.9rem;">
+              AND vs XOR: errori concreti nel simulatore quando si usa il gateway sbagliato.
+            </p>
+            <a href="documentation-anti-pattern-gateway.html" class="btn" style="background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white;">
+              Apri esempio →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card toc-card shadow-sm">
+          <div class="card-body p-4 text-center">
+            <div class="icon-large" style="color: #8e44ad;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-envelope-exclamation" viewBox="0 0 16 16">
+                <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2zm3.708 6.208L1 11.105V5.383zM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2z"/>
+                <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1.5a.5.5 0 0 1-1 0V11a.5.5 0 0 1 1 0m0 3a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
+              </svg>
+            </div>
+            <h3 class="card-title mb-3">Anti-Pattern Message Events</h3>
+            <p class="card-text text-muted mb-3" style="font-size: 0.9rem;">
+              Boundary event fuori tempo: il messaggio di annullamento crea un token appeso in attesa infinita.
+            </p>
+            <a href="documentation-anti-pattern-message-events.html" class="btn" style="background: linear-gradient(135deg, #8e44ad 0%, #6c3483 100%); color: white;">
+              Apri esempio →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card toc-card shadow-sm">
+          <div class="card-body p-4 text-center">
+            <div class="icon-large" style="color: #16a085;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+                <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9"/>
+                <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/>
+              </svg>
+            </div>
+            <h3 class="card-title mb-3">Anti-Pattern Loop</h3>
+            <p class="card-text text-muted mb-3" style="font-size: 0.9rem;">
+              Loop senza condizione di uscita: il token cicla all'infinito quando la condizione di successo non viene mai soddisfatta.
+            </p>
+            <a href="documentation-anti-pattern-loop.html" class="btn" style="background: linear-gradient(135deg, #16a085 0%, #0e6655 100%); color: white;">
+              Apri esempio →
+            </a>
+          </div>
+        </div>
+      </div>
 
     <!-- Quick Links -->
     <div class="row mt-5">
@@ -361,6 +444,18 @@
                   </li>
                   <li class="mb-2">
                     <a href="documentation-error-events.html" class="text-decoration-none">→ Esempio Error Events</a>
+                  </li>
+                  <li class="mb-2">
+                    <a href="documentation-anti-pattern-start-end.html" class="text-decoration-none">→ Anti-Pattern Start/End Events</a>
+                  </li>
+                  <li class="mb-2">
+                    <a href="documentation-anti-pattern-gateway.html" class="text-decoration-none">→ Anti-Pattern Gateway (AND/XOR)</a>
+                  </li>
+                  <li class="mb-2">
+                    <a href="documentation-anti-pattern-message-events.html" class="text-decoration-none">→ Anti-Pattern Message Events</a>
+                  </li>
+                  <li class="mb-2">
+                    <a href="documentation-anti-pattern-loop.html" class="text-decoration-none">→ Anti-Pattern Loop (senza uscita)</a>
                   </li>
                 </ul>
               </div>

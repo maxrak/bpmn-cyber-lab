@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" id="Definitions_GatewayAntiPattern" targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <bpmn:collaboration id="Collaboration_GatewayAntiPattern">
+    <bpmn:participant id="Pool_1" name="Anti-Pattern A: AND al posto di XOR → richiesta approvata E rifiutata contemporaneamente" processRef="Process_1" />
+    <bpmn:participant id="Pool_2" name="Anti-Pattern B: XOR al posto di AND → due attività su tre vengono saltate" processRef="Process_2" />
+    <bpmn:participant id="Pool_3" name="Anti-Pattern C: AND split + XOR join → task eseguito due volte" processRef="Process_3" />
+  </bpmn:collaboration>
+
+  <!-- ============================================================ -->
+  <!-- ANTI-PATTERN A: Parallel Gateway used instead of Exclusive   -->
+  <!-- A "decision" gateway that executes BOTH branches at once     -->
+  <!-- ============================================================ -->
+  <bpmn:process id="Process_1" isExecutable="false">
+    <bpmn:startEvent id="S1" name="Richiesta Ricevuta">
+      <bpmn:outgoing>F1a</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="T1a" name="Valuta Richiesta">
+      <bpmn:incoming>F1a</bpmn:incoming>
+      <bpmn:outgoing>F1b</bpmn:outgoing>
+    </bpmn:task>
+    <!-- WRONG: parallelGateway here creates 2 simultaneous tokens -->
+    <bpmn:parallelGateway id="GW1" name="AND (sbagliato)">
+      <bpmn:incoming>F1b</bpmn:incoming>
+      <bpmn:outgoing>F1c</bpmn:outgoing>
+      <bpmn:outgoing>F1d</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:task id="T1b" name="Approva Richiesta">
+      <bpmn:incoming>F1c</bpmn:incoming>
+      <bpmn:outgoing>F1e</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T1c" name="Rifiuta Richiesta">
+      <bpmn:incoming>F1d</bpmn:incoming>
+      <bpmn:outgoing>F1f</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="E1a" name="Richiesta Approvata">
+      <bpmn:incoming>F1e</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="E1b" name="Richiesta Rifiutata">
+      <bpmn:incoming>F1f</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:textAnnotation id="Ann1">
+      <bpmn:text>ERRORE: Gateway AND invia token su ENTRAMBI i rami simultaneamente. La richiesta viene contemporaneamente Approvata e Rifiutata!</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc1" sourceRef="Ann1" targetRef="GW1" />
+    <bpmn:sequenceFlow id="F1a" sourceRef="S1" targetRef="T1a" />
+    <bpmn:sequenceFlow id="F1b" sourceRef="T1a" targetRef="GW1" />
+    <bpmn:sequenceFlow id="F1c" name="Sì" sourceRef="GW1" targetRef="T1b" />
+    <bpmn:sequenceFlow id="F1d" name="No" sourceRef="GW1" targetRef="T1c" />
+    <bpmn:sequenceFlow id="F1e" sourceRef="T1b" targetRef="E1a" />
+    <bpmn:sequenceFlow id="F1f" sourceRef="T1c" targetRef="E1b" />
+  </bpmn:process>
+
+  <!-- ============================================================ -->
+  <!-- ANTI-PATTERN B: Exclusive Gateway used instead of Parallel   -->
+  <!-- Three mandatory tasks: only ONE gets executed                -->
+  <!-- ============================================================ -->
+  <bpmn:process id="Process_2" isExecutable="false">
+    <bpmn:startEvent id="S2" name="Ordine Confermato">
+      <bpmn:outgoing>F2a</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="T2a" name="Registra Ordine">
+      <bpmn:incoming>F2a</bpmn:incoming>
+      <bpmn:outgoing>F2b</bpmn:outgoing>
+    </bpmn:task>
+    <!-- WRONG: exclusiveGateway here only routes to ONE branch -->
+    <bpmn:exclusiveGateway id="GW2" name="XOR (sbagliato)">
+      <bpmn:incoming>F2b</bpmn:incoming>
+      <bpmn:outgoing>F2c</bpmn:outgoing>
+      <bpmn:outgoing>F2d</bpmn:outgoing>
+      <bpmn:outgoing>F2e</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T2b" name="Aggiorna Magazzino">
+      <bpmn:incoming>F2c</bpmn:incoming>
+      <bpmn:outgoing>F2f</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T2c" name="Emetti Fattura">
+      <bpmn:incoming>F2d</bpmn:incoming>
+      <bpmn:outgoing>F2g</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T2d" name="Notifica Cliente">
+      <bpmn:incoming>F2e</bpmn:incoming>
+      <bpmn:outgoing>F2h</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="E2a" name="Magazzino Aggiornato">
+      <bpmn:incoming>F2f</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="E2b" name="Fattura Emessa">
+      <bpmn:incoming>F2g</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="E2c" name="Cliente Notificato">
+      <bpmn:incoming>F2h</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:textAnnotation id="Ann2">
+      <bpmn:text>ERRORE: Gateway XOR sceglie solo UNA attività su tre. Magazzino, Fattura e Notifica devono essere eseguiti TUTTI e TRE!</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc2" sourceRef="Ann2" targetRef="GW2" />
+    <bpmn:sequenceFlow id="F2a" sourceRef="S2" targetRef="T2a" />
+    <bpmn:sequenceFlow id="F2b" sourceRef="T2a" targetRef="GW2" />
+    <bpmn:sequenceFlow id="F2c" sourceRef="GW2" targetRef="T2b" />
+    <bpmn:sequenceFlow id="F2d" sourceRef="GW2" targetRef="T2c" />
+    <bpmn:sequenceFlow id="F2e" sourceRef="GW2" targetRef="T2d" />
+    <bpmn:sequenceFlow id="F2f" sourceRef="T2b" targetRef="E2a" />
+    <bpmn:sequenceFlow id="F2g" sourceRef="T2c" targetRef="E2b" />
+    <bpmn:sequenceFlow id="F2h" sourceRef="T2d" targetRef="E2c" />
+  </bpmn:process>
+
+  <!-- ============================================================ -->
+  <!-- ANTI-PATTERN C: AND split + XOR join mismatch               -->
+  <!-- XOR join does not wait: downstream task runs twice           -->
+  <!-- ============================================================ -->
+  <bpmn:process id="Process_3" isExecutable="false">
+    <bpmn:startEvent id="S3" name="Ordine Ricevuto">
+      <bpmn:outgoing>F3a</bpmn:outgoing>
+    </bpmn:startEvent>
+    <!-- Correct AND split: creates 2 parallel tokens -->
+    <bpmn:parallelGateway id="GW3a" name="AND split (corretto)">
+      <bpmn:incoming>F3a</bpmn:incoming>
+      <bpmn:outgoing>F3b</bpmn:outgoing>
+      <bpmn:outgoing>F3c</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:task id="T3a" name="Verifica Credito">
+      <bpmn:incoming>F3b</bpmn:incoming>
+      <bpmn:outgoing>F3d</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T3b" name="Verifica Disponibilità">
+      <bpmn:incoming>F3c</bpmn:incoming>
+      <bpmn:outgoing>F3e</bpmn:outgoing>
+    </bpmn:task>
+    <!-- WRONG: exclusiveGateway join lets each token through immediately -->
+    <bpmn:exclusiveGateway id="GW3b" name="XOR join (sbagliato)">
+      <bpmn:incoming>F3d</bpmn:incoming>
+      <bpmn:incoming>F3e</bpmn:incoming>
+      <bpmn:outgoing>F3f</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T3c" name="Approva Ordine">
+      <bpmn:incoming>F3f</bpmn:incoming>
+      <bpmn:outgoing>F3g</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="E3" name="Ordine Approvato">
+      <bpmn:incoming>F3g</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:textAnnotation id="Ann3">
+      <bpmn:text>ERRORE: XOR join non aspetta entrambi i token. Ogni token passa immediatamente. "Approva Ordine" viene eseguito DUE VOLTE!</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc3" sourceRef="Ann3" targetRef="GW3b" />
+    <bpmn:sequenceFlow id="F3a" sourceRef="S3" targetRef="GW3a" />
+    <bpmn:sequenceFlow id="F3b" sourceRef="GW3a" targetRef="T3a" />
+    <bpmn:sequenceFlow id="F3c" sourceRef="GW3a" targetRef="T3b" />
+    <bpmn:sequenceFlow id="F3d" sourceRef="T3a" targetRef="GW3b" />
+    <bpmn:sequenceFlow id="F3e" sourceRef="T3b" targetRef="GW3b" />
+    <bpmn:sequenceFlow id="F3f" sourceRef="GW3b" targetRef="T3c" />
+    <bpmn:sequenceFlow id="F3g" sourceRef="T3c" targetRef="E3" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_GatewayAntiPattern">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_GatewayAntiPattern">
+
+      <!-- ===== POOL 1: AND instead of XOR ===== -->
+      <bpmndi:BPMNShape id="Pool_1_di" bpmnElement="Pool_1" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="960" height="260" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="S1_di" bpmnElement="S1">
+        <dc:Bounds x="222" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="200" y="235" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T1a_di" bpmnElement="T1a">
+        <dc:Bounds x="310" y="170" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="GW1_di" bpmnElement="GW1"
+          bioc:stroke="#c0392b" color:border-color="#c0392b"
+          bioc:fill="#fadbd8" color:background-color="#fadbd8">
+        <dc:Bounds x="490" y="185" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="470" y="242" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T1b_di" bpmnElement="T1b">
+        <dc:Bounds x="600" y="115" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T1c_di" bpmnElement="T1c">
+        <dc:Bounds x="600" y="225" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="E1a_di" bpmnElement="E1a">
+        <dc:Bounds x="790" y="137" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="764" y="180" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="E1b_di" bpmnElement="E1b">
+        <dc:Bounds x="790" y="247" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="764" y="290" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Ann1_di" bpmnElement="Ann1">
+        <dc:Bounds x="556" y="84" width="384" height="68" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="F1a_di" bpmnElement="F1a">
+        <di:waypoint x="258" y="210" />
+        <di:waypoint x="310" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F1b_di" bpmnElement="F1b">
+        <di:waypoint x="430" y="210" />
+        <di:waypoint x="490" y="210" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F1c_di" bpmnElement="F1c">
+        <di:waypoint x="515" y="185" />
+        <di:waypoint x="515" y="155" />
+        <di:waypoint x="600" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="532" y="162" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F1d_di" bpmnElement="F1d">
+        <di:waypoint x="515" y="235" />
+        <di:waypoint x="515" y="265" />
+        <di:waypoint x="600" y="265" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="528" y="248" width="16" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F1e_di" bpmnElement="F1e">
+        <di:waypoint x="720" y="155" />
+        <di:waypoint x="790" y="155" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F1f_di" bpmnElement="F1f">
+        <di:waypoint x="720" y="265" />
+        <di:waypoint x="790" y="265" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Assoc1_di" bpmnElement="Assoc1">
+        <di:waypoint x="556" y="152" />
+        <di:waypoint x="515" y="185" />
+      </bpmndi:BPMNEdge>
+
+      <!-- ===== POOL 2: XOR instead of AND ===== -->
+      <bpmndi:BPMNShape id="Pool_2_di" bpmnElement="Pool_2" isHorizontal="true">
+        <dc:Bounds x="160" y="360" width="960" height="310" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="S2_di" bpmnElement="S2">
+        <dc:Bounds x="222" y="497" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="196" y="540" width="87" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T2a_di" bpmnElement="T2a">
+        <dc:Bounds x="310" y="475" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="GW2_di" bpmnElement="GW2" isMarkerVisible="true"
+          bioc:stroke="#c0392b" color:border-color="#c0392b"
+          bioc:fill="#fadbd8" color:background-color="#fadbd8">
+        <dc:Bounds x="490" y="490" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="472" y="547" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T2b_di" bpmnElement="T2b">
+        <dc:Bounds x="600" y="395" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T2c_di" bpmnElement="T2c">
+        <dc:Bounds x="600" y="475" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T2d_di" bpmnElement="T2d">
+        <dc:Bounds x="600" y="555" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="E2a_di" bpmnElement="E2a">
+        <dc:Bounds x="790" y="417" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="762" y="460" width="92" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="E2b_di" bpmnElement="E2b">
+        <dc:Bounds x="790" y="497" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="768" y="540" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="E2c_di" bpmnElement="E2c">
+        <dc:Bounds x="790" y="577" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="764" y="620" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Ann2_di" bpmnElement="Ann2">
+        <dc:Bounds x="556" y="364" width="384" height="68" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="F2a_di" bpmnElement="F2a">
+        <di:waypoint x="258" y="515" />
+        <di:waypoint x="310" y="515" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F2b_di" bpmnElement="F2b">
+        <di:waypoint x="430" y="515" />
+        <di:waypoint x="490" y="515" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F2c_di" bpmnElement="F2c">
+        <di:waypoint x="515" y="490" />
+        <di:waypoint x="515" y="435" />
+        <di:waypoint x="600" y="435" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F2d_di" bpmnElement="F2d">
+        <di:waypoint x="540" y="515" />
+        <di:waypoint x="600" y="515" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F2e_di" bpmnElement="F2e">
+        <di:waypoint x="515" y="540" />
+        <di:waypoint x="515" y="595" />
+        <di:waypoint x="600" y="595" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F2f_di" bpmnElement="F2f">
+        <di:waypoint x="720" y="435" />
+        <di:waypoint x="790" y="435" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F2g_di" bpmnElement="F2g">
+        <di:waypoint x="720" y="515" />
+        <di:waypoint x="790" y="515" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F2h_di" bpmnElement="F2h">
+        <di:waypoint x="720" y="595" />
+        <di:waypoint x="790" y="595" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Assoc2_di" bpmnElement="Assoc2">
+        <di:waypoint x="556" y="432" />
+        <di:waypoint x="515" y="490" />
+      </bpmndi:BPMNEdge>
+
+      <!-- ===== POOL 3: AND split + XOR join ===== -->
+      <bpmndi:BPMNShape id="Pool_3_di" bpmnElement="Pool_3" isHorizontal="true">
+        <dc:Bounds x="160" y="690" width="960" height="270" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="S3_di" bpmnElement="S3">
+        <dc:Bounds x="222" y="807" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="197" y="850" width="87" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="GW3a_di" bpmnElement="GW3a"
+          bioc:stroke="#27ae60" color:border-color="#27ae60"
+          bioc:fill="#eafaf1" color:background-color="#eafaf1">
+        <dc:Bounds x="310" y="800" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="286" y="857" width="98" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T3a_di" bpmnElement="T3a">
+        <dc:Bounds x="420" y="750" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T3b_di" bpmnElement="T3b">
+        <dc:Bounds x="420" y="830" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="GW3b_di" bpmnElement="GW3b" isMarkerVisible="true"
+          bioc:stroke="#c0392b" color:border-color="#c0392b"
+          bioc:fill="#fadbd8" color:background-color="#fadbd8">
+        <dc:Bounds x="600" y="800" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="572" y="857" width="107" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T3c_di" bpmnElement="T3c">
+        <dc:Bounds x="710" y="785" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="E3_di" bpmnElement="E3">
+        <dc:Bounds x="890" y="807" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="863" y="850" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Ann3_di" bpmnElement="Ann3">
+        <dc:Bounds x="660" y="693" width="384" height="68" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="F3a_di" bpmnElement="F3a">
+        <di:waypoint x="258" y="825" />
+        <di:waypoint x="310" y="825" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F3b_di" bpmnElement="F3b">
+        <di:waypoint x="335" y="800" />
+        <di:waypoint x="335" y="790" />
+        <di:waypoint x="420" y="790" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F3c_di" bpmnElement="F3c">
+        <di:waypoint x="335" y="850" />
+        <di:waypoint x="335" y="870" />
+        <di:waypoint x="420" y="870" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F3d_di" bpmnElement="F3d">
+        <di:waypoint x="540" y="790" />
+        <di:waypoint x="570" y="790" />
+        <di:waypoint x="570" y="815" />
+        <di:waypoint x="600" y="815" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F3e_di" bpmnElement="F3e">
+        <di:waypoint x="540" y="870" />
+        <di:waypoint x="570" y="870" />
+        <di:waypoint x="570" y="835" />
+        <di:waypoint x="600" y="835" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F3f_di" bpmnElement="F3f">
+        <di:waypoint x="650" y="825" />
+        <di:waypoint x="710" y="825" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F3g_di" bpmnElement="F3g">
+        <di:waypoint x="830" y="825" />
+        <di:waypoint x="890" y="825" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Assoc3_di" bpmnElement="Assoc3">
+        <di:waypoint x="660" y="761" />
+        <di:waypoint x="625" y="800" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

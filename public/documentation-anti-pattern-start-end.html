@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPMN Cyber Lab — Anti-Pattern: Start/End Events Errati</title>
+  <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>    .dropdown-header {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #adb5bd;
+      padding: 0.1rem 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .navbar .dropdown-divider {
+      margin: 0.15rem 0;
+    }    body {
+      padding-top: 48px;
+      font-family: sans-serif;
+    }
+    .navbar {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      min-height: 48px;
+    }
+    .navbar-brand {
+      font-size: 1.1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .navbar-nav .nav-link {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .doc-header {
+      background: linear-gradient(135deg, #c0392b 0%, #922b21 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .doc-section {
+      padding: 2rem 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .doc-section:last-child {
+      border-bottom: none;
+    }
+    .doc-section h2 {
+      color: #c0392b;
+      margin-bottom: 1.5rem;
+    }
+    .doc-section h3 {
+      color: #922b21;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .antipattern-card {
+      background: #fdf2f2;
+      border-left: 4px solid #c0392b;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .antipattern-card h4 {
+      color: #c0392b;
+      margin-bottom: 1rem;
+    }
+    .correct-card {
+      background: #edfaf1;
+      border-left: 4px solid #27ae60;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .correct-card h4 {
+      color: #27ae60;
+      margin-bottom: 1rem;
+    }
+    .example-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .tip-box {
+      background: #d1ecf1;
+      border-left: 4px solid #0dcaf0;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .danger-box {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .back-link {
+      margin-bottom: 2rem;
+    }
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+    }
+    @media (min-width: 1200px) {
+      .container {
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
+    }
+    .comparison-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 767px) {
+      .comparison-block { grid-template-columns: 1fr; }
+    }
+    .bpmn-code {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      margin: 0.75rem 0;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .badge-wrong {
+      background: #c0392b;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .badge-ok {
+      background: #27ae60;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .rule-list {
+      counter-reset: rule-counter;
+      list-style: none;
+      padding-left: 0;
+    }
+    .rule-list li {
+      counter-increment: rule-counter;
+      position: relative;
+      padding-left: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .rule-list li::before {
+      content: counter(rule-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: #c0392b;
+      color: white;
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="navbar-brand me-3" href="index.html">BPMN Cyber Lab</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="simulation.html">Simulation</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-current="page">
+              Documentation
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="documentation.html">📚 Panoramica</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header">Guide</h6></li>
+              <li><a class="dropdown-item" href="documentation-modeler.html">✏️ Modeler</a></li>
+              <li><a class="dropdown-item" href="documentation-simulation.html">▶️ Simulation</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header">Esempi</h6></li>
+              <li><a class="dropdown-item" href="documentation-gateway-comparison.html">🔀 Gateway Comparison</a></li>
+              <li><a class="dropdown-item" href="documentation-message-events.html">✉️ Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
+              <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
+              <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-start-end.html">🚫 Anti-Pattern Start/End</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-gateway.html">❌ Anti-Pattern Gateway</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-message-events.html">📨 Anti-Pattern Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-loop.html">🔁 Anti-Pattern Loop</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-header">
+    <div class="container">
+      <h1 class="display-5 fw-bold mb-2">Anti-Pattern: Start/End Events Errati</h1>
+      <p class="lead">Errori comuni nella definizione di eventi di inizio e fine processo — e come correggerli</p>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <div class="back-link">
+      <a href="documentation.html" class="btn btn-outline-danger">
+        ← Torna all'indice della documentazione
+      </a>
+    </div>
+
+    <!-- Introduzione -->
+    <div class="doc-section">
+      <h2>🚫 Cosa sono gli Anti-Pattern BPMN?</h2>
+      <p>
+        Un <strong>anti-pattern</strong> è una soluzione apparentemente ragionevole a un problema ricorrente che in realtà 
+        introduce ambiguità, errori logici o problemi di manutenibilità. In BPMN, gli anti-pattern più frequenti riguardano 
+        proprio gli <strong>eventi di start e di end</strong>, i confini semantici del processo.
+      </p>
+
+      <div class="danger-box">
+        <h5>⚠️ Perché gli anti-pattern degli eventi sono pericolosi</h5>
+        <ul class="mb-0">
+          <li>Il <strong>motore BPMN</strong> non sa quando istanziare il processo né quando liberare le risorse</li>
+          <li>Il <strong>team di analisi</strong> non può capire le condizioni di avvio e i possibili esiti</li>
+          <li>La <strong>documentazione generata</strong> automaticamente dal diagramma è inutilizzabile</li>
+          <li>In contesti di <strong>sicurezza e compliance</strong>, l'ambiguità può generare audit trail errati</li>
+        </ul>
+      </div>
+
+      <div class="tip-box">
+        <h5>💡 Come usare questo esempio</h5>
+        <ol class="mb-0">
+          <li>Carica <code>anti-pattern-start-end.bpmn</code> dal menu <strong>File</strong></li>
+          <li>Osserva i tre pool: ciascuno illustra un anti-pattern distinto (elementi in rosso/arancio)</li>
+          <li>Nota le <strong>annotazioni testuali</strong> collegate agli elementi problematici</li>
+          <li>Passa alla <strong>Simulation</strong> per vedere il comportamento anomalo in azione</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Anti-Pattern A -->
+    <div class="doc-section">
+      <h2>🔴 Anti-Pattern A — Start Events Multipli Ambigui</h2>
+
+      <div class="antipattern-card">
+        <h4><span class="badge-wrong">SBAGLIATO</span> Due None Start Event identici</h4>
+        <p>
+          Due o più <strong>Start Event di tipo None</strong> (cerchio semplice) convergono sullo stesso task 
+          senza alcuna distinzione basata su condizione, messaggio o timer. Il diagramma non fornisce alcuna 
+          informazione su <em>quando</em> usare l'uno e quando l'altro.
+        </p>
+        <div class="bpmn-code">&lt;!-- ❌ SBAGLIATO: due None Start Event identici --&gt;
+&lt;startEvent id="Start_Manuale" name="Avvio Manuale"&gt;
+  &lt;outgoing&gt;Flow_a&lt;/outgoing&gt;
+&lt;/startEvent&gt;
+
+&lt;startEvent id="Start_Auto" name="Avvio Automatico"&gt;
+  &lt;outgoing&gt;Flow_b&lt;/outgoing&gt;
+&lt;/startEvent&gt;
+
+&lt;!-- Entrambi puntano allo stesso task: il lettore non sa quale scegliere --&gt;
+&lt;task id="Task_Elabora" name="Elabora Richiesta"&gt;
+  &lt;incoming&gt;Flow_a&lt;/incoming&gt;
+  &lt;incoming&gt;Flow_b&lt;/incoming&gt;
+&lt;/task&gt;</div>
+        <p><strong>Problema concreto durante la simulazione:</strong> entrambi gli start event risultano 
+        cliccabili. Attivarne uno produce un token; attivarne entrambi produce due token concorrenti sullo 
+        stesso task — comportamento mai voluto e non documentato.</p>
+      </div>
+
+      <h3>Come simularlo</h3>
+      <div class="example-box">
+        <ol>
+          <li>Apri il pool <em>"Anti-Pattern A"</em> nella Simulation</li>
+          <li>Clicca su <strong>"Avvio Manuale"</strong>: parte un token</li>
+          <li>Riavvia e clicca su <strong>"Avvio Automatico"</strong>: parte un altro token identico</li>
+          <li>Oppure clicca su entrambi senza riavviare: <strong>due token indipendenti</strong> 
+          sullo stesso processo — impossibile nella realtà</li>
+        </ol>
+      </div>
+
+      <div class="comparison-block">
+        <div class="correct-card">
+          <h4><span class="badge-ok">CORRETTO</span> Opzione 1: Tipi diversi</h4>
+          <p>Differenziare il tipo semantico di ciascun start event:</p>
+          <div class="bpmn-code">&lt;!-- ✅ None: avvio manuale --&gt;
+&lt;startEvent name="Richiesta Manuale" /&gt;
+
+&lt;!-- ✅ Message: email da cliente --&gt;
+&lt;startEvent name="Email Ricevuta"&gt;
+  &lt;messageEventDefinition
+    messageRef="Msg_Email" /&gt;
+&lt;/startEvent&gt;
+
+&lt;!-- ✅ Timer: ogni lunedì mattina --&gt;
+&lt;startEvent name="Schedulato"&gt;
+  &lt;timerEventDefinition&gt;
+    &lt;timeCycle&gt;0 9 * * 1&lt;/timeCycle&gt;
+  &lt;/timerEventDefinition&gt;
+&lt;/startEvent&gt;</div>
+        </div>
+        <div class="correct-card">
+          <h4><span class="badge-ok">CORRETTO</span> Opzione 2: Start unico + Gateway</h4>
+          <p>Un solo start event, poi un gateway discrimina il percorso:</p>
+          <div class="bpmn-code">&lt;!-- ✅ Un solo punto di ingresso --&gt;
+&lt;startEvent name="Ricevi Richiesta" /&gt;
+
+&lt;exclusiveGateway
+  name="Tipo di avvio?" /&gt;
+
+&lt;!-- Uscite etichettate chiaramente --&gt;
+&lt;sequenceFlow name="Manuale"
+  sourceRef="GW" targetRef="T_Manual" /&gt;
+&lt;sequenceFlow name="Automatico"
+  sourceRef="GW" targetRef="T_Auto" /&gt;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Anti-Pattern B -->
+    <div class="doc-section">
+      <h2>🟠 Anti-Pattern B — Processo Senza End Event</h2>
+
+      <div class="antipattern-card">
+        <h4><span class="badge-wrong">SBAGLIATO</span> Il flusso termina su un Task</h4>
+        <p>
+          Il flusso di sequenza si chiude su un <strong>Task privo di outgoing</strong>, senza un End Event esplicito.
+          Formalmente il BPMN è parzialmente valido (un task senza outgoing è un implicit end), ma è ambiguo e 
+          contro le linee guida BPMN 2.0.
+        </p>
+        <div class="bpmn-code">&lt;!-- ❌ SBAGLIATO: il processo "muore" dentro un task --&gt;
+&lt;startEvent id="Start" name="Avvia" /&gt;
+
+&lt;task id="T1" name="Ricevi Input"&gt;
+  &lt;incoming&gt;F1&lt;/incoming&gt;
+  &lt;outgoing&gt;F2&lt;/outgoing&gt;
+&lt;/task&gt;
+
+&lt;task id="T2" name="Elabora Dati"&gt;
+  &lt;incoming&gt;F2&lt;/incoming&gt;
+  &lt;outgoing&gt;F3&lt;/outgoing&gt;
+&lt;/task&gt;
+
+&lt;task id="T3" name="Salva Risultato"&gt;
+  &lt;incoming&gt;F3&lt;/incoming&gt;
+  &lt;!-- nessun outgoing = nessun End Event --&gt;
+&lt;/task&gt;</div>
+        <p><strong>Problema concreto:</strong> il motore BPMN mantiene l'istanza del processo 
+        in stato <em>"running"</em> indefinitamente. Nella simulazione, il token si ferma su 
+        "Salva Risultato" senza mai concludersi — impossibile verificare se il processo è terminato.</p>
+      </div>
+
+      <h3>Come simularlo</h3>
+      <div class="example-box">
+        <ol>
+          <li>Apri il pool <em>"Anti-Pattern B"</em> nella Simulation</li>
+          <li>Avvia il processo: il token percorre tutti e tre i task</li>
+          <li>Dopo "Salva Risultato" il token <strong>rimane lì</strong> — nessuna fine</li>
+          <li>Il processo resulta ancora "attivo" nel simulatore: risorse non liberate</li>
+        </ol>
+      </div>
+
+      <div class="correct-card">
+        <h4><span class="badge-ok">CORRETTO</span> Terminare sempre con End Event</h4>
+        <p>Aggiungere sempre un End Event esplicito e, se ci sono esiti diversi, usare End Event con nomi significativi:</p>
+        <div class="bpmn-code">&lt;!-- ✅ Fine esplicita --&gt;
+&lt;task id="T3" name="Salva Risultato"&gt;
+  &lt;incoming&gt;F3&lt;/incoming&gt;
+  &lt;outgoing&gt;F4&lt;/outgoing&gt;
+&lt;/task&gt;
+
+&lt;endEvent id="End" name="Dati Salvati con Successo" /&gt;
+
+&lt;!-- Se può fallire, End Event con Error --&gt;
+&lt;endEvent id="End_Err" name="Errore Salvataggio"&gt;
+  &lt;errorEventDefinition errorRef="Err_Save" /&gt;
+&lt;/endEvent&gt;</div>
+      </div>
+    </div>
+
+    <!-- Anti-Pattern C -->
+    <div class="doc-section">
+      <h2>🔴 Anti-Pattern C — End Events Indistinguibili</h2>
+
+      <div class="antipattern-card">
+        <h4><span class="badge-wrong">SBAGLIATO</span> Gateway senza condizioni, End Events identici</h4>
+        <p>
+          Un <strong>Exclusive Gateway</strong> non ha nome e le sue uscite non hanno etichette.
+          Entrambi i rami terminano su End Event con lo stesso nome generico <em>"Fine"</em>.
+          È impossibile ricostruire la logica del processo solo dal diagramma.
+        </p>
+        <div class="bpmn-code">&lt;!-- ❌ SBAGLIATO: gateway vuoto, flussi senza nome, end identici --&gt;
+&lt;exclusiveGateway id="GW" name=""&gt;
+  &lt;outgoing&gt;Flow_c&lt;/outgoing&gt;
+  &lt;outgoing&gt;Flow_d&lt;/outgoing&gt;
+&lt;/exclusiveGateway&gt;
+
+&lt;!-- uscite senza name/condizione --&gt;
+&lt;sequenceFlow id="Flow_c" sourceRef="GW" targetRef="End_A" /&gt;
+&lt;sequenceFlow id="Flow_d" sourceRef="GW" targetRef="End_B" /&gt;
+
+&lt;endEvent id="End_A" name="Fine" /&gt;  &lt;!-- ❓ quale esito? --&gt;
+&lt;endEvent id="End_B" name="Fine" /&gt;  &lt;!-- ❓ quale esito? --&gt;</div>
+        <p><strong>Problema concreto:</strong> nella simulazione il token arriva al gateway e il simulatore 
+        chiede <em>"quale ramo seguire?"</em> — ma le opzioni mostrate sono entrambe senza nome.
+        Il modellatore non sa cosa scegliere.</p>
+      </div>
+
+      <h3>Come simularlo</h3>
+      <div class="example-box">
+        <ol>
+          <li>Apri il pool <em>"Anti-Pattern C"</em> nella Simulation</li>
+          <li>Avvia il processo e completa il task "Valuta Richiesta"</li>
+          <li>Il simulatore mostra il gateway con <strong>due opzioni di uscita anonime</strong></li>
+          <li>Qualsiasi choice porti a un End Event chiamato "Fine": impossibile distinguere il risultato</li>
+        </ol>
+      </div>
+
+      <div class="correct-card">
+        <h4><span class="badge-ok">CORRETTO</span> Nominare tutto: gateway, flussi, end event</h4>
+        <div class="bpmn-code">&lt;!-- ✅ Gateway con nome chiaro --&gt;
+&lt;exclusiveGateway id="GW"
+  name="Esito Valutazione?" /&gt;
+
+&lt;!-- Flussi etichettati con la condizione --&gt;
+&lt;sequenceFlow id="Flow_c" name="Approvata"
+  sourceRef="GW" targetRef="End_OK" /&gt;
+&lt;sequenceFlow id="Flow_d" name="Rifiutata"
+  sourceRef="GW" targetRef="End_KO" /&gt;
+
+&lt;!-- End Event con esiti distinguibili --&gt;
+&lt;endEvent id="End_OK"
+  name="Richiesta Approvata" /&gt;
+&lt;endEvent id="End_KO"
+  name="Richiesta Rifiutata" /&gt;</div>
+      </div>
+    </div>
+
+    <!-- Regole d'oro -->
+    <div class="doc-section">
+      <h2>✅ Regole d'Oro per Start/End Events</h2>
+      <ol class="rule-list">
+        <li>
+          <strong>Ogni processo ha esattamente uno start event</strong> — oppure più start event 
+          di <em>tipo semanticamente diverso</em> (None, Message, Timer, Signal) ciascuno con uno scopo documentato.
+        </li>
+        <li>
+          <strong>Ogni percorso di flusso termina con un End Event</strong> — nessun task deve essere 
+          l'ultimo elemento di un flusso senza un end event esplicito.
+        </li>
+        <li>
+          <strong>Ogni End Event ha un nome che descrive l'esito</strong> — non "Fine" ma 
+          "Ordine Evaso", "Richiesta Rifiutata", "Errore Pagamento", ecc.
+        </li>
+        <li>
+          <strong>Ogni Exclusive Gateway ha un nome che definisce la condizione</strong> — es. 
+          "Credito Sufficiente?", "Tipo Richiesta?".
+        </li>
+        <li>
+          <strong>Ogni uscita di gateway ha un'etichetta con la condizione</strong> — es. 
+          "Sì / No", "Approvato / Rifiutato / Da Rivedere".
+        </li>
+        <li>
+          <strong>Usa End Event tipizzati quando appropriato</strong> — Error End, Message End, 
+          Terminate End per comunicare chiaramente la natura della terminazione.
+        </li>
+      </ol>
+
+      <div class="tip-box mt-4">
+        <h5>🎯 Test di autodiagnosi per i tuoi diagrammi</h5>
+        <p>Fai queste domande ad ogni processo che modelli:</p>
+        <ul class="mb-0">
+          <li>"Se ho due start event, so spiegare in una frase la differenza tra i due?"</li>
+          <li>"Ogni ramo del mio processo arriva a un End Event?"</li>
+          <li>"Guardando solo il nome degli End Event, capisco quali sono i possibili esiti del processo?"</li>
+          <li>"Le uscite dei miei gateway hanno etichette comprensibili anche per chi non conosce il dominio?"</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tabella riepilogativa -->
+    <div class="doc-section">
+      <h2>📊 Riepilogo Anti-Pattern e Correzioni</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead class="table-danger">
+            <tr>
+              <th>Anti-Pattern</th>
+              <th>Cosa c'è di sbagliato</th>
+              <th>Impatto</th>
+              <th>Correzione</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>A — Start Multipli None</strong></td>
+              <td>Due start event identici senza distinzione semantica</td>
+              <td>Ambiguità su quale trigger usare; possibilità di token doppi</td>
+              <td>Usa tipi diversi (Message, Timer) oppure un gateway dopo un singolo start</td>
+            </tr>
+            <tr>
+              <td><strong>B — Nessun End Event</strong></td>
+              <td>Il flusso termina su un task</td>
+              <td>Processo "zombi" in stato running; risorse non liberate</td>
+              <td>Aggiungi sempre un End Event esplicito con nome significativo</td>
+            </tr>
+            <tr>
+              <td><strong>C — End Identici</strong></td>
+              <td>Gateway senza nome, flussi senza etichette, end event tutti "Fine"</td>
+              <td>Impossibile capire gli esiti; documentazione inutilizzabile</td>
+              <td>Nomina gateway, etichetta ogni flusso, differenzia i nomi degli end event</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <a href="documentation.html" class="btn btn-outline-danger">
+        ← Torna all'indice della documentazione
+      </a>
+    </div>
+  </div>
+
+  <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

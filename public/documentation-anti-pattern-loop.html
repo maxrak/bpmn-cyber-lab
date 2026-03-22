@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPMN Cyber Lab — Anti-Pattern: Loop senza Condizione di Uscita</title>
+  <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .dropdown-header {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #adb5bd;
+      padding: 0.1rem 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .navbar .dropdown-divider {
+      margin: 0.15rem 0;
+    }
+    body {
+      padding-top: 48px;
+      font-family: sans-serif;
+    }
+    .navbar {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      min-height: 48px;
+    }
+    .navbar-brand {
+      font-size: 1.1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .navbar-nav .nav-link {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .doc-header {
+      background: linear-gradient(135deg, #16a085 0%, #0e6655 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .doc-section {
+      padding: 2rem 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .doc-section:last-child {
+      border-bottom: none;
+    }
+    .doc-section h2 {
+      color: #16a085;
+      margin-bottom: 1.5rem;
+    }
+    .doc-section h3 {
+      color: #0e6655;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .antipattern-card {
+      background: #fdf2f2;
+      border-left: 4px solid #c0392b;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .antipattern-card h4 {
+      color: #c0392b;
+      margin-bottom: 1rem;
+    }
+    .correct-card {
+      background: #edfaf1;
+      border-left: 4px solid #27ae60;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .correct-card h4 {
+      color: #27ae60;
+      margin-bottom: 1rem;
+    }
+    .example-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .tip-box {
+      background: #d1ecf1;
+      border-left: 4px solid #0dcaf0;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .danger-box {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .info-box {
+      background: #e8f8f5;
+      border-left: 4px solid #16a085;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .back-link {
+      margin-bottom: 2rem;
+    }
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+    }
+    @media (min-width: 1200px) {
+      .container {
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
+    }
+    .comparison-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 767px) {
+      .comparison-block { grid-template-columns: 1fr; }
+    }
+    .bpmn-code {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      margin: 0.75rem 0;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .badge-wrong {
+      background: #c0392b;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .badge-ok {
+      background: #27ae60;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .rule-list {
+      counter-reset: rule-counter;
+      list-style: none;
+      padding-left: 0;
+    }
+    .rule-list li {
+      counter-increment: rule-counter;
+      position: relative;
+      padding-left: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .rule-list li::before {
+      content: counter(rule-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: #16a085;
+      color: white;
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .flow-diagram {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.9;
+    }
+    .flow-diagram .node-bad {
+      color: #c0392b;
+      font-weight: 600;
+    }
+    .flow-diagram .node-ok {
+      color: #27ae60;
+      font-weight: 600;
+    }
+    .flow-diagram .node-stuck {
+      color: #c0392b;
+      background: #fdf2f2;
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+    .loop-counter {
+      display: inline-block;
+      background: #16a085;
+      color: white;
+      font-weight: 700;
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-size: 0.78rem;
+    }
+    .variants-table th {
+      background: #16a085;
+      color: white;
+    }
+    .variants-table td, .variants-table th {
+      padding: 0.65rem 1rem;
+      border: 1px solid #dee2e6;
+      vertical-align: middle;
+    }
+    .variants-table .cell-wrong {
+      background: #fdf2f2;
+      color: #c0392b;
+      font-weight: 600;
+    }
+    .variants-table .cell-ok {
+      background: #edfaf1;
+      color: #27ae60;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="navbar-brand me-3" href="index.html">BPMN Cyber Lab</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="simulation.html">Simulation</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-current="page">
+              Documentation
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="documentation.html">📚 Panoramica</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header">Guide</h6></li>
+              <li><a class="dropdown-item" href="documentation-modeler.html">✏️ Modeler</a></li>
+              <li><a class="dropdown-item" href="documentation-simulation.html">▶️ Simulation</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header">Esempi</h6></li>
+              <li><a class="dropdown-item" href="documentation-gateway-comparison.html">🔀 Gateway Comparison</a></li>
+              <li><a class="dropdown-item" href="documentation-message-events.html">✉️ Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
+              <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
+              <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-start-end.html">🚫 Anti-Pattern Start/End</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-gateway.html">❌ Anti-Pattern Gateway</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-message-events.html">📨 Anti-Pattern Message Events</a></li>
+              <li><a class="dropdown-item active" href="documentation-anti-pattern-loop.html">🔁 Anti-Pattern Loop</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-header">
+    <div class="container">
+      <h1 class="display-5 fw-bold mb-2">Anti-Pattern: Loop senza Condizione di Uscita</h1>
+      <p class="lead">Un processo che riprova all'infinito — e non termina mai</p>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <div class="back-link">
+      <a href="documentation.html" class="btn btn-outline-secondary" style="border-color: #16a085; color: #16a085;">
+        ← Torna all'indice della documentazione
+      </a>
+    </div>
+
+    <!-- Introduzione -->
+    <div class="doc-section">
+      <h2>🔁 Il problema: retry senza limite</h2>
+      <p>
+        I <strong>loop di retry</strong> sono un pattern legittimo e comune in BPMN: se un'operazione 
+        fallisce, si riprova. Il problema nasce quando il loop non ha una <strong>condizione di uscita 
+        esplicita</strong> — nessun contatore, nessun timer, nessun numero massimo di tentativi. 
+        In questo caso, se la condizione di successo non viene mai soddisfatta, il token entra in un 
+        ciclo infinito che non converge mai verso un End Event.
+      </p>
+
+      <div class="danger-box">
+        <h5>⚠️ Perché questo anti-pattern è insidioso</h5>
+        <ul class="mb-0">
+          <li>Il diagramma <strong>sembra corretto</strong> a prima vista: c'è un gateway con due uscite, una va avanti e una riprova</li>
+          <li>Il problema è invisibile finché la condizione di successo non viene raggiunta — il modello non mostra la casistica di fallimento continuo</li>
+          <li>In produzione, un processo bloccato in un loop infinito consuma risorse e non può essere ripreso normalmente</li>
+          <li>In un contesto di <strong>sicurezza</strong>, un attaccante che controlla le condizioni di ingresso potrebbe forzare il loop per esaurire le risorse (Denial of Process)</li>
+        </ul>
+      </div>
+
+      <div class="tip-box">
+        <h5>💡 Come usare questo esempio</h5>
+        <ol class="mb-0">
+          <li>Carica <code>anti-pattern-loop.bpmn</code> dal menu <strong>File</strong></li>
+          <li>Avvia la <strong>Simulation</strong> sul pool in alto (<em>Anti-Pattern</em>)</li>
+          <li>Al gateway in rosso, scegli sempre il ramo <strong>"No / Riprova"</strong>: il token torna al task iniziale</li>
+          <li>Ripeti: puoi continuare a scegliere "No" senza limite — il processo non termina mai</li>
+          <li>Poi apri il pool in basso (<em>Corretto</em>) e segui la stessa sequenza: dopo 3 "No" il processo si chiude su un End Event di errore</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Anti-Pattern spiegato -->
+    <div class="doc-section">
+      <h2>🔴 Anti-Pattern — Loop infinito</h2>
+
+      <p>
+        <strong>Scenario:</strong> il sistema tenta di elaborare una richiesta. Se l'elaborazione 
+        non va a buon fine, riprova. Non esistono limite di tentativi né percorso alternativo di uscita.
+      </p>
+
+      <div class="flow-diagram">
+Start → Elabora Richiesta → [XOR: <span class="node-bad">Elaborazione OK?</span>]
+                                   │
+                    Sì ────────────┘──────────────→ End ✅
+                                   │
+                    No / Riprova ──┘
+                         │
+                         └──→ <span class="node-stuck">Elabora Richiesta (di nuovo)</span>
+                                   │
+                              [loop infinito ♻️]</div>
+
+      <div class="antipattern-card">
+        <h4><span class="badge-wrong">SBAGLIATO</span> XOR gateway senza uscita di errore</h4>
+        <p>
+          Il gateway ha solo <strong>due uscite</strong>: "Sì" (processo completato) e "No" 
+          (riprova). Il ramo "No" riporta direttamente al task precedente senza alcun controllo 
+          sul numero di iterazioni. Se "Sì" non viene mai scelto, il token cicla per sempre.
+        </p>
+        <div class="bpmn-code">&lt;!-- ❌ ANTI-PATTERN: XOR senza limite di tentativi --&gt;
+&lt;exclusiveGateway id="GW1" name="Elaborazione OK?"&gt;
+  &lt;incoming&gt;F1b&lt;/incoming&gt;
+  &lt;outgoing&gt;F1c&lt;/outgoing&gt;  &lt;!-- Sì → End          --&gt;
+  &lt;outgoing&gt;F1d&lt;/outgoing&gt;  &lt;!-- No → torna al task --&gt;
+&lt;/exclusiveGateway&gt;
+
+&lt;!-- Il ramo "No" loop back direttamente —
+     nessun contatore, nessun limite, nessun exit --&gt;
+&lt;sequenceFlow id="F1d" name="No / Riprova"
+  sourceRef="GW1" targetRef="T1_Elabora" /&gt;</div>
+        <p>
+          <strong>Visibile nel simulatore:</strong> ogni volta che si sceglie "No / Riprova" al 
+          gateway rosso, il token ritorna a "Elabora Richiesta". Si può cliccare 
+          decine di volte — il processo non converge mai.
+        </p>
+      </div>
+
+      <h3>Come simulare il loop infinito</h3>
+      <div class="example-box">
+        <ol>
+          <li>Clicca <strong>Start</strong> nel pool Anti-Pattern</li>
+          <li>Completa <strong>Elabora Richiesta</strong></li>
+          <li>Al gateway rosso, scegli <strong>"No / Riprova"</strong>: il token torna al task</li>
+          <li>Completa <strong>Elabora Richiesta</strong> di nuovo</li>
+          <li>Scegli nuovo <strong>"No / Riprova"</strong> — puoi ripetere questo ciclo illimitatamente</li>
+          <li>Il processo <strong>non ha modo di terminare</strong> finché non scegli "Sì"</li>
+          <li>Nota: in un processo reale le condizioni potrebbero non permettere mai "Sì" (es. sistema downstream irraggiungibile)</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- La soluzione corretta -->
+    <div class="doc-section">
+      <h2>✅ La soluzione: Loop con contatore e End Event di errore</h2>
+
+      <p>
+        Il pattern corretto aggiunge tre elementi: un <strong>task per incrementare un contatore</strong>, 
+        un <strong>secondo gateway</strong> che verifica se il limite è stato raggiunto, 
+        e un <strong>End Event di errore</strong> esplicito come uscita alternativa.
+      </p>
+
+      <div class="flow-diagram">
+Start → Elabora Richiesta → [XOR: Elaborazione OK?]
+                                   │
+                    Sì ────────────┘──────────────→ End ✅
+                                   │
+                    No ────────────┘
+                         │
+                         ↓
+               Incrementa Contatore Tentativi
+                         │
+                         ↓
+              [XOR: <span class="node-ok">Tentativi &lt; 3?</span>]
+                   │           │
+                  Sì          No
+                   │           │
+                   │           ↓
+                   │    End (Tentativi Esauriti ✖)
+                   │
+                   └──→ Elabora Richiesta (loop limitato)</div>
+
+      <div class="correct-card">
+        <h4><span class="badge-ok">CORRETTO</span> Contatore + gateway di limite + End Event di errore</h4>
+        <p>
+          Il secondo gateway (in verde nel diagramma) verifica il valore del contatore <em>prima</em> 
+          di ritornare al task. Quando il limite viene raggiunto, il flusso devia verso un End Event 
+          di errore esplicito — garantendo che il processo <strong>termini sempre</strong>, 
+          sia in caso di successo che di fallimento ripetuto.
+        </p>
+        <div class="bpmn-code">&lt;!-- ✅ CORRETTO: Aggiungere contatore + limite + exit --&gt;
+
+&lt;!-- Dopo il gateway "Elaborazione OK?" ramo No: --&gt;
+&lt;task id="T2_Counter"
+      name="Incrementa Contatore Tentativi"&gt;
+  &lt;incoming&gt;F2d&lt;/incoming&gt;
+  &lt;outgoing&gt;F2e&lt;/outgoing&gt;
+&lt;/task&gt;
+
+&lt;!-- Gateway di controllo limite (verde nel diagramma) --&gt;
+&lt;exclusiveGateway id="GW2b"
+                  name="Tentativi &amp;lt; 3?"&gt;
+  &lt;incoming&gt;F2e&lt;/incoming&gt;
+  &lt;outgoing&gt;F2f&lt;/outgoing&gt;  &lt;!-- No → esci con errore --&gt;
+  &lt;outgoing&gt;F2g&lt;/outgoing&gt;  &lt;!-- Sì → riprova        --&gt;
+&lt;/exclusiveGateway&gt;
+
+&lt;!-- End Event di errore esplicito: il processo converge sempre --&gt;
+&lt;endEvent id="E2_Error" name="Tentativi Esauriti"&gt;
+  &lt;incoming&gt;F2f&lt;/incoming&gt;
+  &lt;errorEventDefinition /&gt;
+&lt;/endEvent&gt;</div>
+      </div>
+
+      <h3>Come simulare il loop con limite</h3>
+      <div class="example-box">
+        <ol>
+          <li>Clicca <strong>Start</strong> nel pool Corretto (pool in basso)</li>
+          <li>Completa <strong>Elabora Richiesta</strong> → al primo gateway scegli <strong>No</strong></li>
+          <li>Completa <strong>Incrementa Contatore Tentativi</strong> → al gateway verde scegli <strong>Sì</strong> (tentativi &lt; 3)</li>
+          <li>Ripeti ancora due volte (2° e 3° tentativo): ogni volta il contatore aumenta</li>
+          <li>Al 3° fallimento: il gateway verde riceve "Tentativi ≥ 3" → scegli <strong>No</strong></li>
+          <li>Il token raggiunge <strong>"Tentativi Esauriti"</strong> (End Event con simbolo ✖) — processo chiuso</li>
+          <li>Alternativa: in qualsiasi tentativo scegli <strong>Sì</strong> al primo gateway → End "Richiesta Completata"</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Varianti del pattern corretto -->
+    <div class="doc-section">
+      <h2>🛠️ Varianti del pattern di loop corretto</h2>
+      <p>Il contatore numerico non è l'unico modo per garantire la convergenza di un loop. Ecco le alternative comuni:</p>
+
+      <table class="table variants-table mt-2">
+        <thead>
+          <tr>
+            <th>Meccanismo di uscita</th>
+            <th>Quando usarlo</th>
+            <th>Elemento BPMN</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Contatore numerico</strong></td>
+            <td>Numero max di tentativi noto (es. 3 retry)</td>
+            <td class="cell-ok">Task + exclusiveGateway su contatore</td>
+          </tr>
+          <tr>
+            <td><strong>Timer boundary event</strong></td>
+            <td>Timeout assoluto sul task (es. "entro 30 minuti")</td>
+            <td class="cell-ok">timerBoundaryEvent sul task in loop</td>
+          </tr>
+          <tr>
+            <td><strong>Error boundary event</strong></td>
+            <td>Il sistema downstream lancia un'eccezione al Nth fallimento</td>
+            <td class="cell-ok">errorBoundaryEvent sul task</td>
+          </tr>
+          <tr>
+            <td><strong>Nessuna uscita</strong></td>
+            <td>Mai — ogni loop deve convergere</td>
+            <td class="cell-wrong">∅ — Anti-Pattern</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="comparison-block">
+        <div class="correct-card" style="margin-top:0;">
+          <h4><span class="badge-ok">VARIANTE</span> Timer Boundary Event</h4>
+          <p>Aggiungere un timer boundary sul task in loop garantisce che, 
+          indipendentemente dal numero di esecuzioni, il processo termina dopo un timeout:</p>
+          <div class="bpmn-code">&lt;task id="T_Elabora"
+      name="Elabora Richiesta"&gt;
+  &lt;incoming&gt;F_loop&lt;/incoming&gt;
+  &lt;outgoing&gt;F_next&lt;/outgoing&gt;
+&lt;/task&gt;
+
+&lt;!-- Boundary: se il task dura più
+     di 5 minuti, esci con timeout --&gt;
+&lt;boundaryEvent
+  attachedToRef="T_Elabora"
+  cancelActivity="true"&gt;
+  &lt;timerEventDefinition&gt;
+    &lt;timeDuration&gt;PT5M&lt;/timeDuration&gt;
+  &lt;/timerEventDefinition&gt;
+&lt;/boundaryEvent&gt;</div>
+        </div>
+        <div class="info-box" style="margin-top:0; padding: 1.5rem;">
+          <h4 style="color:#0e6655; margin-bottom:1rem;">💡 Nota sul simulatore bpmn-js</h4>
+          <p>
+            Nel simulatore <strong>bpmn-js</strong> il timer boundary event non 
+            scatta automaticamente — il tempo simulato non avanza. Per testare 
+            il timeout è necessario cliccare manualmente sull'evento boundary.
+          </p>
+          <p class="mb-0">
+            Il <strong>contatore numerico</strong> (come in <code>anti-pattern-loop.bpmn</code>) 
+            è quindi la variante più adatta a una dimostrazione interattiva nel simulatore: 
+            l'utente sceglie esplicitamente il ramo "No" e la convergenza è visibile dopo 
+            il 3° tentativo.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Regole pratiche -->
+    <div class="doc-section">
+      <h2>📋 Regole pratiche per i loop in BPMN</h2>
+
+      <ol class="rule-list">
+        <li>
+          <strong>Ogni loop deve avere almeno un'uscita garantita.</strong>
+          Identifica la condizione che impedisce il successo e modella esplicitamente 
+          il percorso alternativo verso un End Event (anche di errore).
+        </li>
+        <li>
+          <strong>Usa un task "Incrementa Contatore" prima del gateway di limite.</strong>
+          Questo rende il contatore visibile nel diagramma — aumenta la leggibilità e 
+          documenta automaticamente il meccanismo di retry.
+        </li>
+        <li>
+          <strong>Etichetta sempre i rami del gateway di limite con valori chiari.</strong>
+          "Tentativi &lt; 3" / "Tentativi ≥ 3" è inequivocabile. "Sì / No" senza nome 
+          sul gateway è un anti-pattern di leggibilità.
+        </li>
+        <li>
+          <strong>Usa un End Event di errore (simbolo ✖) per indicare il fallimento definitivo.</strong>
+          Un None End Event su percorso di errore è ambiguo: sembra un successo. 
+          <code>errorEventDefinition</code> comunica chiaramente che il processo 
+          è terminato in uno stato anomalo.
+        </li>
+        <li>
+          <strong>Valuta se un Timer Boundary Event è più appropriato di un contatore.</strong>
+          Per operazioni di integrazione con sistemi esterni, un timeout assoluto (es. 30 minuti) 
+          è spesso più robusto di un numero fisso di retry — protegge anche da loop lenti.
+        </li>
+      </ol>
+    </div>
+
+  </div>
+
+  <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPMN Cyber Lab — Anti-Pattern: Gateway Usati Male</title>
+  <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .dropdown-header {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #adb5bd;
+      padding: 0.1rem 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .navbar .dropdown-divider {
+      margin: 0.15rem 0;
+    }
+    body {
+      padding-top: 48px;
+      font-family: sans-serif;
+    }
+    .navbar {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      min-height: 48px;
+    }
+    .navbar-brand {
+      font-size: 1.1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .navbar-nav .nav-link {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .doc-header {
+      background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .doc-section {
+      padding: 2rem 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .doc-section:last-child {
+      border-bottom: none;
+    }
+    .doc-section h2 {
+      color: #d35400;
+      margin-bottom: 1.5rem;
+    }
+    .doc-section h3 {
+      color: #b7460a;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .antipattern-card {
+      background: #fdf2f2;
+      border-left: 4px solid #c0392b;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .antipattern-card h4 {
+      color: #c0392b;
+      margin-bottom: 1rem;
+    }
+    .correct-card {
+      background: #edfaf1;
+      border-left: 4px solid #27ae60;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .correct-card h4 {
+      color: #27ae60;
+      margin-bottom: 1rem;
+    }
+    .example-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .tip-box {
+      background: #d1ecf1;
+      border-left: 4px solid #0dcaf0;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .danger-box {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .back-link {
+      margin-bottom: 2rem;
+    }
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+    }
+    @media (min-width: 1200px) {
+      .container {
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
+    }
+    .comparison-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 767px) {
+      .comparison-block { grid-template-columns: 1fr; }
+    }
+    .bpmn-code {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      margin: 0.75rem 0;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .badge-wrong {
+      background: #c0392b;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .badge-ok {
+      background: #27ae60;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .rule-list {
+      counter-reset: rule-counter;
+      list-style: none;
+      padding-left: 0;
+    }
+    .rule-list li {
+      counter-increment: rule-counter;
+      position: relative;
+      padding-left: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .rule-list li::before {
+      content: counter(rule-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: #d35400;
+      color: white;
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .gw-table th {
+      background: #d35400;
+      color: white;
+    }
+    .gw-table td, .gw-table th {
+      padding: 0.65rem 1rem;
+      border: 1px solid #dee2e6;
+      vertical-align: middle;
+    }
+    .gw-table .cell-wrong {
+      background: #fdf2f2;
+      color: #c0392b;
+      font-weight: 600;
+    }
+    .gw-table .cell-ok {
+      background: #edfaf1;
+      color: #27ae60;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="navbar-brand me-3" href="index.html">BPMN Cyber Lab</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="simulation.html">Simulation</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-current="page">
+              Documentation
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="documentation.html">📚 Panoramica</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header">Guide</h6></li>
+              <li><a class="dropdown-item" href="documentation-modeler.html">✏️ Modeler</a></li>
+              <li><a class="dropdown-item" href="documentation-simulation.html">▶️ Simulation</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header">Esempi</h6></li>
+              <li><a class="dropdown-item" href="documentation-gateway-comparison.html">🔀 Gateway Comparison</a></li>
+              <li><a class="dropdown-item" href="documentation-message-events.html">✉️ Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
+              <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
+              <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-start-end.html">🚫 Anti-Pattern Start/End</a></li>
+              <li><a class="dropdown-item active" href="documentation-anti-pattern-gateway.html">❌ Anti-Pattern Gateway</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-message-events.html">📨 Anti-Pattern Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-loop.html">🔁 Anti-Pattern Loop</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-header">
+    <div class="container">
+      <h1 class="display-5 fw-bold mb-2">Anti-Pattern: Gateway Usati Male</h1>
+      <p class="lead">XOR vs AND: errori concreti durante la simulazione e come correggerli</p>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <div class="back-link">
+      <a href="documentation.html" class="btn btn-outline-warning">
+        ← Torna all'indice della documentazione
+      </a>
+    </div>
+
+    <!-- Introduzione -->
+    <div class="doc-section">
+      <h2>🔀 Gateway BPMN: basi prima di tutto</h2>
+      <p>
+        I <strong>gateway</strong> controllano come il flusso di token si divide e si riunisce all'interno di un 
+        processo. Confondere il tipo sbagliato è uno degli errori più frequenti in BPMN e produce comportamenti 
+        <em>silenziosamente errati</em> — il diagramma "sembra" corretto ma il simulatore (e il motore di esecuzione) 
+        si comporta in modo completamente diverso da quanto atteso.
+      </p>
+
+      <table class="table gw-table mt-3">
+        <thead>
+          <tr>
+            <th>Gateway</th>
+            <th>Simbolo</th>
+            <th>Comportamento allo split</th>
+            <th>Comportamento al join</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Exclusive — XOR</strong></td>
+            <td>Rombo con × o vuoto</td>
+            <td>Passa token su <strong>uno solo</strong> dei rami uscenti</td>
+            <td>Lascia passare <strong>ogni token immediatamente</strong> (non aspetta)</td>
+          </tr>
+          <tr>
+            <td><strong>Parallel — AND</strong></td>
+            <td>Rombo con +</td>
+            <td>Invia token su <strong>tutti</strong> i rami uscenti simultaneamente</td>
+            <td>Aspetta <strong>tutti</strong> i token in entrata prima di procedere</td>
+          </tr>
+          <tr>
+            <td><strong>Inclusive — OR</strong></td>
+            <td>Rombo con ○</td>
+            <td>Invia token su <strong>uno o più</strong> rami (in base a condizioni)</td>
+            <td>Aspetta tutti i token <strong>che erano stati inviati</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="danger-box">
+        <h5>⚠️ Perché l'errore AND/XOR è critico</h5>
+        <ul class="mb-0">
+          <li>Un <strong>AND usato al posto di XOR</strong> esegue attività contraddittorie in parallelo (approva e rifiuta insieme)</li>
+          <li>Un <strong>XOR usato al posto di AND</strong> salta attività obbligatorie (magazzino, fattura, notifica: ne esegue solo una)</li>
+          <li>Un <strong>XOR join dopo un AND split</strong> non sincronizza i token: il task finale viene eseguito più volte</li>
+          <li>In un contesto reale questi errori causano <strong>duplicazione di record, ordini non evasi, doppia approvazione</strong></li>
+        </ul>
+      </div>
+
+      <div class="tip-box">
+        <h5>💡 Come usare questo esempio</h5>
+        <ol class="mb-0">
+          <li>Carica <code>anti-pattern-gateway.bpmn</code> dal menu <strong>File</strong></li>
+          <li>Osserva i tre pool: i gateway in <span style="color:#c0392b;font-weight:600;">rosso</span> sono sbagliati, quello in <span style="color:#27ae60;font-weight:600;">verde</span> è corretto</li>
+          <li>Nota le <strong>annotazioni testuali</strong> collegate a ciascun gateway errato</li>
+          <li>Passa alla <strong>Simulation</strong> e segui i passi descritti sotto per ogni pool</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Anti-Pattern A -->
+    <div class="doc-section">
+      <h2>🔴 Anti-Pattern A — AND al posto di XOR (decisione esclusiva)</h2>
+
+      <p>
+        <strong>Scenario:</strong> dopo aver valutato una richiesta, il processo deve fare una 
+        <em>scelta esclusiva</em>: o approvare, o rifiutare. Viene usato erroneamente un 
+        <strong>gateway Parallel (AND)</strong>.
+      </p>
+
+      <div class="antipattern-card">
+        <h4><span class="badge-wrong">SBAGLIATO</span> parallelGateway come gateway di decisione</h4>
+        <p>
+          Il gateway AND <strong>non esegue alcuna scelta</strong>: invia sempre un token su 
+          <em>tutti</em> i rami uscenti contemporaneamente. Il processo approva E rifiuta la stessa 
+          richiesta nello stesso momento — un risultato contraddittorio e impossibile nella realtà.
+        </p>
+        <div class="bpmn-code">&lt;!-- ❌ SBAGLIATO: parallelGateway per una scelta esclusiva --&gt;
+&lt;parallelGateway id="GW1" name="AND (sbagliato)"&gt;
+  &lt;incoming&gt;F1b&lt;/incoming&gt;
+  &lt;outgoing&gt;F1c&lt;/outgoing&gt;  &lt;!-- → Approva Richiesta --&gt;
+  &lt;outgoing&gt;F1d&lt;/outgoing&gt;  &lt;!-- → Rifiuta Richiesta --&gt;
+&lt;/parallelGateway&gt;
+
+&lt;!-- Entrambi i task verranno eseguiti CONTEMPORANEAMENTE --&gt;
+&lt;task id="T1b" name="Approva Richiesta" /&gt;
+&lt;task id="T1c" name="Rifiuta Richiesta" /&gt;</div>
+        <p>
+          <strong>Errore visibile nel simulatore:</strong> dopo "Valuta Richiesta", compare un token 
+          sia su "Approva Richiesta" che su "Rifiuta Richiesta". Entrambi raggiungeranno il loro 
+          End Event — il processo termina due volte con esiti opposti.
+        </p>
+      </div>
+
+      <h3>Come simularlo</h3>
+      <div class="example-box">
+        <ol>
+          <li>Nella Simulation, avvia il processo dal pool <em>"Anti-Pattern A"</em></li>
+          <li>Clicca per completare "Valuta Richiesta"</li>
+          <li>Osserva: il token si divide immediatamente su <strong>entrambi</strong> i rami</li>
+          <li>"Approva Richiesta" e "Rifiuta Richiesta" diventano attivi <strong>nello stesso momento</strong></li>
+          <li>Completali entrambi: il processo raggiunge due End Event contraddittori ("Richiesta Approvata" e "Richiesta Rifiutata")</li>
+        </ol>
+      </div>
+
+      <div class="comparison-block">
+        <div class="correct-card">
+          <h4><span class="badge-ok">CORRETTO</span> exclusiveGateway (XOR)</h4>
+          <p>
+            L'<strong>exclusiveGateway</strong> valuta le condizioni e invia il token 
+            su <em>uno solo</em> dei rami uscenti. L'esito è mutuamente esclusivo.
+          </p>
+          <div class="bpmn-code">&lt;!-- ✅ CORRETTO: exclusiveGateway --&gt;
+&lt;exclusiveGateway id="GW1"
+   name="Approvare?"&gt;
+  &lt;incoming&gt;F1b&lt;/incoming&gt;
+  &lt;outgoing&gt;F1c&lt;/outgoing&gt;
+  &lt;outgoing&gt;F1d&lt;/outgoing&gt;
+&lt;/exclusiveGateway&gt;
+
+&lt;sequenceFlow id="F1c"
+  name="Sì" ... /&gt;
+&lt;sequenceFlow id="F1d"
+  name="No" ... /&gt;
+
+&lt;!-- Solo UNO dei due task verrà eseguito --&gt;</div>
+        </div>
+        <div class="correct-card">
+          <h4><span class="badge-ok">REGOLA</span> Quando usare XOR</h4>
+          <ul>
+            <li>Ci sono <strong>due o più percorsi alternativi</strong></li>
+            <li>Solo <strong>uno</strong> di essi deve essere eseguito</li>
+            <li>I percorsi sono <strong>mutuamente esclusivi</strong> (o uno o l'altro)</li>
+            <li>Esempi: approvare/rifiutare, cliente VIP/standard, errore/successo</li>
+          </ul>
+          <p class="mb-0"><strong>Simbolo:</strong> rombo con × interno (o rombo vuoto)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Anti-Pattern B -->
+    <div class="doc-section">
+      <h2>🟠 Anti-Pattern B — XOR al posto di AND (esecuzione parallela)</h2>
+
+      <p>
+        <strong>Scenario:</strong> dopo aver registrato un ordine, il sistema deve eseguire 
+        <em>obbligatoriamente tutte e tre</em> queste attività: aggiornare il magazzino, emettere la fattura, 
+        notificare il cliente. Viene usato erroneamente un <strong>gateway Exclusive (XOR)</strong>.
+      </p>
+
+      <div class="antipattern-card">
+        <h4><span class="badge-wrong">SBAGLIATO</span> exclusiveGateway dove servono tutti i rami</h4>
+        <p>
+          Il gateway XOR <strong>instrada il token su uno solo</strong> dei tre rami. In assenza di condizioni 
+          definite, il simulatore chiede all'utente di scegliere quale attività eseguire. Le altre due 
+          <em>non vengono mai eseguite</em>: l'ordine viene registrato parzialmente.
+        </p>
+        <div class="bpmn-code">&lt;!-- ❌ SBAGLIATO: exclusiveGateway per attività tutte obbligatorie --&gt;
+&lt;exclusiveGateway id="GW2" name="XOR (sbagliato)"&gt;
+  &lt;incoming&gt;F2b&lt;/incoming&gt;
+  &lt;outgoing&gt;F2c&lt;/outgoing&gt;  &lt;!-- → Aggiorna Magazzino --&gt;
+  &lt;outgoing&gt;F2d&lt;/outgoing&gt;  &lt;!-- → Emetti Fattura    --&gt;
+  &lt;outgoing&gt;F2e&lt;/outgoing&gt;  &lt;!-- → Notifica Cliente  --&gt;
+&lt;/exclusiveGateway&gt;
+
+&lt;!-- Solo UNA delle tre attività verrà eseguita. 
+     Le altre due vengono silenziosamente saltate! --&gt;</div>
+        <p>
+          <strong>Errore visibile nel simulatore:</strong> al gateway XOR, il simulatore presenta 
+          i tre rami come scelte alternative. Selezionandone uno, un solo task viene eseguito. 
+          Gli altri due (e i loro End Event) non vengono mai raggiunti.
+        </p>
+      </div>
+
+      <h3>Come simularlo</h3>
+      <div class="example-box">
+        <ol>
+          <li>Nella Simulation, avvia il processo dal pool <em>"Anti-Pattern B"</em></li>
+          <li>Completa "Registra Ordine": il token arriva al gateway XOR</li>
+          <li>Il simulatore ti permette di scegliere <strong>uno solo</strong> dei tre rami</li>
+          <li>Clicca su "Aggiorna Magazzino": solo questo task viene eseguito</li>
+          <li>Il processo termina con "Magazzino Aggiornato" — ma fattura e notifica cliente <strong>non esistono</strong></li>
+          <li>Riavvia e scegli "Emetti Fattura": magazzino e cliente vengono saltati. Ogni esecuzione è incompleta.</li>
+        </ol>
+      </div>
+
+      <div class="comparison-block">
+        <div class="correct-card">
+          <h4><span class="badge-ok">CORRETTO</span> parallelGateway (AND)</h4>
+          <p>
+            Il <strong>parallelGateway</strong> invia token su <em>tutti</em> i rami uscenti 
+            simultaneamente. Tutte e tre le attività vengono eseguite in parallelo.
+          </p>
+          <div class="bpmn-code">&lt;!-- ✅ CORRETTO: parallelGateway --&gt;
+&lt;parallelGateway id="GW2"
+   name="Gestisci Ordine"&gt;
+  &lt;incoming&gt;F2b&lt;/incoming&gt;
+  &lt;outgoing&gt;F2c&lt;/outgoing&gt;
+  &lt;outgoing&gt;F2d&lt;/outgoing&gt;
+  &lt;outgoing&gt;F2e&lt;/outgoing&gt;
+&lt;/parallelGateway&gt;
+
+&lt;!-- Tutte e tre le attività vengono
+     eseguite contemporaneamente --&gt;</div>
+        </div>
+        <div class="correct-card">
+          <h4><span class="badge-ok">REGOLA</span> Quando usare AND</h4>
+          <ul>
+            <li>Tutte le attività devono essere eseguite <strong>senza eccezioni</strong></li>
+            <li>Le attività possono essere eseguite <strong>in parallelo</strong> (non c'è dipendenza tra loro)</li>
+            <li>Al join, è necessario <strong>attendere tutti</strong> i branch prima di procedere</li>
+            <li>Esempi: preparazione spedizione + fatturazione + notifica; controllo credito + disponibilità</li>
+          </ul>
+          <p class="mb-0"><strong>Simbolo:</strong> rombo con + interno</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Anti-Pattern C -->
+    <div class="doc-section">
+      <h2>🟡 Anti-Pattern C — AND split + XOR join (token non sincronizzati)</h2>
+
+      <p>
+        <strong>Scenario:</strong> un AND split crea due token paralleli per "Verifica Credito" e 
+        "Verifica Disponibilità". Dopo entrambe le verifiche, si vuole approvare l'ordine una volta sola. 
+        Viene usato erroneamente un <strong>XOR join</strong> invece di un AND join.
+      </p>
+
+      <div class="antipattern-card">
+        <h4><span class="badge-wrong">SBAGLIATO</span> exclusiveGateway come join dopo un AND split</h4>
+        <p>
+          Il XOR join <strong>non aspetta</strong> che tutti i token siano arrivati: ogni token che giunge 
+          al gateway viene fatto passare immediatamente. Con due token in ingresso (creati dall'AND split), 
+          il task successivo viene attivato <strong>due volte</strong>.
+        </p>
+        <div class="bpmn-code">&lt;!-- AND split: crea DUE token simultanei --&gt;
+&lt;parallelGateway id="GW3a" name="AND split (corretto)"&gt;
+  &lt;incoming&gt;F3a&lt;/incoming&gt;
+  &lt;outgoing&gt;F3b&lt;/outgoing&gt;  &lt;!-- token 1 → Verifica Credito      --&gt;
+  &lt;outgoing&gt;F3c&lt;/outgoing&gt;  &lt;!-- token 2 → Verifica Disponibilità --&gt;
+&lt;/parallelGateway&gt;
+
+&lt;!-- ❌ SBAGLIATO: XOR join lascia passare ogni token immediatamente --&gt;
+&lt;exclusiveGateway id="GW3b" name="XOR join (sbagliato)"&gt;
+  &lt;incoming&gt;F3d&lt;/incoming&gt;  &lt;!-- token 1 arriva: passa ORA  --&gt;
+  &lt;incoming&gt;F3e&lt;/incoming&gt;  &lt;!-- token 2 arriva: passa ORA  --&gt;
+  &lt;outgoing&gt;F3f&lt;/outgoing&gt;
+&lt;/exclusiveGateway&gt;
+
+&lt;!-- "Approva Ordine" viene eseguito DUE VOLTE! --&gt;
+&lt;task id="T3c" name="Approva Ordine" /&gt;</div>
+        <p>
+          <strong>Errore visibile nel simulatore:</strong> dopo l'AND split, entrambe le verifiche 
+          vengono completate. Ogni token giunge al XOR join e viene fatto passare separatamente. 
+          "Approva Ordine" compare come task attivo due volte consecutive — l'ordine viene approvato due volte.
+        </p>
+      </div>
+
+      <h3>Come simularlo</h3>
+      <div class="example-box">
+        <ol>
+          <li>Nella Simulation, avvia il processo dal pool <em>"Anti-Pattern C"</em></li>
+          <li>L'AND split crea immediatamente due token: "Verifica Credito" e "Verifica Disponibilità" diventano entrambi attivi</li>
+          <li>Completa "Verifica Credito": il token 1 arriva al XOR join e <strong>passa subito</strong> → "Approva Ordine" diventa attivo (prima volta)</li>
+          <li>Completa "Approva Ordine" (prima esecuzione): raggiunge l'End Event</li>
+          <li>Completa ora "Verifica Disponibilità": il token 2 arriva al XOR join e <strong>passa anche lui</strong> → "Approva Ordine" diventa attivo una <strong>seconda volta</strong>!</li>
+          <li>Il processo termina con <strong>due istanze di "Approva Ordine"</strong> e due End Event raggiunti</li>
+        </ol>
+      </div>
+
+      <div class="comparison-block">
+        <div class="correct-card">
+          <h4><span class="badge-ok">CORRETTO</span> parallelGateway come join</h4>
+          <p>
+            Il <strong>parallelGateway usato come join</strong> accumula tutti i token in ingresso 
+            e aspetta che <em>tutti</em> siano arrivati. Solo allora invia un unico token in uscita.
+          </p>
+          <div class="bpmn-code">&lt;!-- ✅ CORRETTO: AND join sincronizza i token --&gt;
+&lt;parallelGateway id="GW3b"
+   name="AND join (corretto)"&gt;
+  &lt;incoming&gt;F3d&lt;/incoming&gt;
+  &lt;incoming&gt;F3e&lt;/incoming&gt;
+  &lt;outgoing&gt;F3f&lt;/outgoing&gt;
+&lt;/parallelGateway&gt;
+
+&lt;!-- Aspetta token 1 E token 2.
+     "Approva Ordine" eseguito UNA sola volta --&gt;</div>
+        </div>
+        <div class="correct-card">
+          <h4><span class="badge-ok">REGOLA</span> Split e join devono essere simmetrici</h4>
+          <ul>
+            <li>Un <strong>AND split</strong> deve essere bilanciato da un <strong>AND join</strong></li>
+            <li>Un <strong>XOR split</strong> deve essere bilanciato da un <strong>XOR join</strong></li>
+            <li>Mescolare AND split con XOR join lascia token "in sospeso" o duplica esecuzioni downstream</li>
+            <li>Conta sempre: <em>quanti token entrano</em> nel join == <em>quanti rami escono</em> dallo split corrispondente</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Riepilogo -->
+    <div class="doc-section">
+      <h2>📋 Riepilogo: come scegliere il gateway giusto</h2>
+
+      <table class="table gw-table mt-2">
+        <thead>
+          <tr>
+            <th>Domanda da porsi</th>
+            <th>Gateway corretto</th>
+            <th>Errore da evitare</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Devo scegliere <strong>uno solo</strong> tra più percorsi alternativi?</td>
+            <td class="cell-ok">XOR / exclusiveGateway</td>
+            <td class="cell-wrong">AND → esegue tutti i rami!</td>
+          </tr>
+          <tr>
+            <td>Devo eseguire <strong>tutti</strong> i percorsi in parallelo?</td>
+            <td class="cell-ok">AND / parallelGateway</td>
+            <td class="cell-wrong">XOR → ne esegue solo uno!</td>
+          </tr>
+          <tr>
+            <td>Devo <strong>attendere tutti</strong> i rami paralleli prima di proseguire?</td>
+            <td class="cell-ok">AND join / parallelGateway</td>
+            <td class="cell-wrong">XOR join → esegue N volte!</td>
+          </tr>
+          <tr>
+            <td>Devo eseguire <strong>uno o più</strong> percorsi in base a condizioni?</td>
+            <td class="cell-ok">OR / inclusiveGateway</td>
+            <td class="cell-wrong">XOR → solo uno; AND → tutti sempre</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Regole pratiche</h3>
+      <ol class="rule-list">
+        <li>Usa <strong>XOR (exclusiveGateway)</strong> quando il flusso dipende da una condizione o da una scelta tra alternative mutuamente esclusive — approvato/rifiutato, cliente VIP/standard, errore/successo.</li>
+        <li>Usa <strong>AND (parallelGateway)</strong> quando tutte le attività devono essere eseguite senza eccezioni e possono andare in parallelo — magazzino + fattura + notifica.</li>
+        <li>Un <strong>AND split deve avere un AND join corrispondente</strong>: il numero di incoming del join deve corrispondere al numero di outgoing dello split.</li>
+        <li>Etichetta <strong>sempre i percorsi uscenti da un XOR</strong> con il nome della condizione (es. "Sì / No", "Approvato / Rifiutato") — un XOR senza etichette è un anti-pattern di leggibilità.</li>
+        <li>Se ti trovi con un <strong>XOR join che ha più di un incoming</strong> proveniente da percorsi paralleli, fermati: probabilmente hai bisogno di un AND join.</li>
+      </ol>
+    </div>
+
+  </div>
+
+  <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

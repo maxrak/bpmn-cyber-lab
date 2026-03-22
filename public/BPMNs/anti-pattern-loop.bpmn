@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" id="Definitions_LoopAntiPattern" targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <bpmn:collaboration id="Collaboration_LoopAntiPattern">
+    <bpmn:participant id="Pool_1" name="Anti-Pattern: Loop senza condizione di uscita — il token gira all'infinito" processRef="Process_1" />
+    <bpmn:participant id="Pool_2" name="Corretto: Loop con contatore — massimo 3 tentativi, poi End Event di errore esplicito" processRef="Process_2" />
+  </bpmn:collaboration>
+
+  <!-- ============================================================ -->
+  <!-- POOL 1: Anti-Pattern — infinite loop, no exit condition      -->
+  <!-- ============================================================ -->
+  <bpmn:process id="Process_1" isExecutable="false">
+    <bpmn:startEvent id="S1" name="Avvia Processo">
+      <bpmn:outgoing>F1a</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:task id="T1_Elabora" name="Elabora Richiesta">
+      <bpmn:incoming>F1a</bpmn:incoming>
+      <bpmn:incoming>F1d</bpmn:incoming>
+      <bpmn:outgoing>F1b</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- WRONG: XOR gateway with no exit limit — "No" loops back forever -->
+    <bpmn:exclusiveGateway id="GW1" name="Elaborazione OK?">
+      <bpmn:incoming>F1b</bpmn:incoming>
+      <bpmn:outgoing>F1c</bpmn:outgoing>
+      <bpmn:outgoing>F1d</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:endEvent id="E1_OK" name="Richiesta Completata">
+      <bpmn:incoming>F1c</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:textAnnotation id="Ann1">
+      <bpmn:text>ERRORE: il ramo "Riprova" non ha limite né condizione di uscita. Se l'elaborazione fallisce ripetutamente, il token entra in un loop infinito senza mai raggiungere un End Event.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc1" sourceRef="Ann1" targetRef="GW1" />
+
+    <bpmn:sequenceFlow id="F1a" sourceRef="S1" targetRef="T1_Elabora" />
+    <bpmn:sequenceFlow id="F1b" sourceRef="T1_Elabora" targetRef="GW1" />
+    <bpmn:sequenceFlow id="F1c" name="Sì" sourceRef="GW1" targetRef="E1_OK" />
+    <bpmn:sequenceFlow id="F1d" name="No / Riprova" sourceRef="GW1" targetRef="T1_Elabora" />
+  </bpmn:process>
+
+  <!-- ============================================================ -->
+  <!-- POOL 2: Correct — loop with counter and error end event      -->
+  <!-- ============================================================ -->
+  <bpmn:process id="Process_2" isExecutable="false">
+    <bpmn:startEvent id="S2" name="Avvia Processo">
+      <bpmn:outgoing>F2a</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:task id="T2_Elabora" name="Elabora Richiesta">
+      <bpmn:incoming>F2a</bpmn:incoming>
+      <bpmn:incoming>F2g</bpmn:incoming>
+      <bpmn:outgoing>F2b</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="GW2a" name="Elaborazione OK?">
+      <bpmn:incoming>F2b</bpmn:incoming>
+      <bpmn:outgoing>F2c</bpmn:outgoing>
+      <bpmn:outgoing>F2d</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:endEvent id="E2_OK" name="Richiesta Completata">
+      <bpmn:incoming>F2c</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:task id="T2_Counter" name="Incrementa Contatore Tentativi">
+      <bpmn:incoming>F2d</bpmn:incoming>
+      <bpmn:outgoing>F2e</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- CORRECT: limit check gateway — enforces a maximum retry count -->
+    <bpmn:exclusiveGateway id="GW2b" name="Tentativi &lt; 3?">
+      <bpmn:incoming>F2e</bpmn:incoming>
+      <bpmn:outgoing>F2f</bpmn:outgoing>
+      <bpmn:outgoing>F2g</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:endEvent id="E2_Error" name="Tentativi Esauriti">
+      <bpmn:incoming>F2f</bpmn:incoming>
+      <bpmn:errorEventDefinition id="ErrDef_1" />
+    </bpmn:endEvent>
+
+    <bpmn:textAnnotation id="Ann2">
+      <bpmn:text>CORRETTO: GW2b controlla il contatore. Dopo 3 fallimenti il flusso devia verso un End Event di errore esplicito — il processo converge sempre.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc2" sourceRef="Ann2" targetRef="GW2b" />
+
+    <bpmn:sequenceFlow id="F2a" sourceRef="S2" targetRef="T2_Elabora" />
+    <bpmn:sequenceFlow id="F2b" sourceRef="T2_Elabora" targetRef="GW2a" />
+    <bpmn:sequenceFlow id="F2c" name="Sì" sourceRef="GW2a" targetRef="E2_OK" />
+    <bpmn:sequenceFlow id="F2d" name="No" sourceRef="GW2a" targetRef="T2_Counter" />
+    <bpmn:sequenceFlow id="F2e" sourceRef="T2_Counter" targetRef="GW2b" />
+    <bpmn:sequenceFlow id="F2f" name="No" sourceRef="GW2b" targetRef="E2_Error" />
+    <bpmn:sequenceFlow id="F2g" name="Sì" sourceRef="GW2b" targetRef="T2_Elabora" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_LoopAntiPattern">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_LoopAntiPattern">
+
+      <!-- ===== POOL 1: Anti-Pattern ===== -->
+      <bpmndi:BPMNShape id="Pool_1_di" bpmnElement="Pool_1" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="900" height="220" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="S1_di" bpmnElement="S1">
+        <dc:Bounds x="222" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="196" y="205" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T1_Elabora_di" bpmnElement="T1_Elabora">
+        <dc:Bounds x="310" y="148" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="GW1_di" bpmnElement="GW1" isMarkerVisible="true"
+          bioc:stroke="#c0392b" color:border-color="#c0392b"
+          bioc:fill="#fadbd8" color:background-color="#fadbd8">
+        <dc:Bounds x="500" y="163" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="474" y="133" width="102" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="E1_OK_di" bpmnElement="E1_OK">
+        <dc:Bounds x="632" y="170" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="606" y="213" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Ann1_di" bpmnElement="Ann1">
+        <dc:Bounds x="555" y="84" width="390" height="68" />
+      </bpmndi:BPMNShape>
+
+      <!-- Flows Pool 1 -->
+      <bpmndi:BPMNEdge id="F1a_di" bpmnElement="F1a">
+        <di:waypoint x="258" y="180" />
+        <di:waypoint x="310" y="180" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F1b_di" bpmnElement="F1b">
+        <di:waypoint x="440" y="188" />
+        <di:waypoint x="500" y="188" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F1c_di" bpmnElement="F1c">
+        <di:waypoint x="550" y="188" />
+        <di:waypoint x="632" y="188" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="581" y="170" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <!-- Loop back: GW1 bottom → below pool → left → T1_Elabora bottom -->
+      <bpmndi:BPMNEdge id="F1d_di" bpmnElement="F1d">
+        <di:waypoint x="525" y="213" />
+        <di:waypoint x="525" y="250" />
+        <di:waypoint x="375" y="250" />
+        <di:waypoint x="375" y="228" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="428" y="253" width="67" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Assoc1_di" bpmnElement="Assoc1">
+        <di:waypoint x="555" y="152" />
+        <di:waypoint x="525" y="163" />
+      </bpmndi:BPMNEdge>
+
+      <!-- ===== POOL 2: Correct ===== -->
+      <bpmndi:BPMNShape id="Pool_2_di" bpmnElement="Pool_2" isHorizontal="true">
+        <dc:Bounds x="160" y="320" width="900" height="320" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="S2_di" bpmnElement="S2">
+        <dc:Bounds x="222" y="452" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="196" y="495" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T2_Elabora_di" bpmnElement="T2_Elabora">
+        <dc:Bounds x="310" y="438" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="GW2a_di" bpmnElement="GW2a" isMarkerVisible="true">
+        <dc:Bounds x="500" y="453" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="474" y="423" width="102" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="E2_OK_di" bpmnElement="E2_OK">
+        <dc:Bounds x="632" y="460" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="606" y="503" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="T2_Counter_di" bpmnElement="T2_Counter">
+        <dc:Bounds x="330" y="540" width="150" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="GW2b_di" bpmnElement="GW2b" isMarkerVisible="true"
+          bioc:stroke="#27ae60" color:border-color="#27ae60"
+          bioc:fill="#eafaf1" color:background-color="#eafaf1">
+        <dc:Bounds x="540" y="555" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="514" y="612" width="102" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="E2_Error_di" bpmnElement="E2_Error">
+        <dc:Bounds x="662" y="562" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="636" y="605" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Ann2_di" bpmnElement="Ann2">
+        <dc:Bounds x="555" y="324" width="390" height="68" />
+      </bpmndi:BPMNShape>
+
+      <!-- Flows Pool 2 -->
+      <bpmndi:BPMNEdge id="F2a_di" bpmnElement="F2a">
+        <di:waypoint x="258" y="470" />
+        <di:waypoint x="310" y="470" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F2b_di" bpmnElement="F2b">
+        <di:waypoint x="440" y="478" />
+        <di:waypoint x="500" y="478" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F2c_di" bpmnElement="F2c">
+        <di:waypoint x="550" y="478" />
+        <di:waypoint x="632" y="478" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="581" y="460" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <!-- No → T2_Counter: GW2a bottom → down-left → T2_Counter top -->
+      <bpmndi:BPMNEdge id="F2d_di" bpmnElement="F2d">
+        <di:waypoint x="525" y="503" />
+        <di:waypoint x="525" y="522" />
+        <di:waypoint x="405" y="522" />
+        <di:waypoint x="405" y="540" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="531" y="510" width="16" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F2e_di" bpmnElement="F2e">
+        <di:waypoint x="480" y="580" />
+        <di:waypoint x="540" y="580" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="F2f_di" bpmnElement="F2f">
+        <di:waypoint x="590" y="580" />
+        <di:waypoint x="662" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="616" y="562" width="16" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <!-- Loop back: GW2b bottom → below elements → far left → T2_Elabora left -->
+      <bpmndi:BPMNEdge id="F2g_di" bpmnElement="F2g">
+        <di:waypoint x="565" y="605" />
+        <di:waypoint x="565" y="635" />
+        <di:waypoint x="200" y="635" />
+        <di:waypoint x="200" y="478" />
+        <di:waypoint x="310" y="478" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="356" y="638" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Assoc2_di" bpmnElement="Assoc2">
+        <di:waypoint x="555" y="392" />
+        <di:waypoint x="565" y="555" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
