@@ -3,6 +3,7 @@
   "anti-pattern-loop.bpmn",
   "anti-pattern-message-events-example.bpmn",
   "anti-pattern-start-end.bpmn",
+  "cyber-extension-example.bpmn",
   "error-events-example.bpmn",
   "gateway-comparison.bpmn",
   "iam_lifecycle_as_is_modeled.bpmn",

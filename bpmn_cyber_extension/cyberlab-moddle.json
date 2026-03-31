@@ -1,0 +1,45 @@
+{
+  "name": "CyberLab",
+  "uri": "http://example.org/schema/bpmn/cyberlab",
+  "prefix": "cyber",
+  "xml": {
+    "tagAlias": "lowerCase"
+  },
+  "types": [
+    {
+      "name": "TaskAssessment",
+      "superClass": [
+        "Element"
+      ],
+      "properties": [
+        {
+          "name": "stride",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "mitre",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "riskScore",
+          "type": "Integer",
+          "isAttr": true
+        },
+        {
+          "name": "auditLevel",
+          "type": "String",
+          "isAttr": true,
+          "default": "NONE"
+        },
+        {
+          "name": "singlePointOfFailure",
+          "type": "Boolean",
+          "isAttr": true,
+          "default": false
+        }
+      ]
+    }
+  ]
+}

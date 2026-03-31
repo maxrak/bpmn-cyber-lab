@@ -96,9 +96,19 @@ export default class CustomPaletteProvider {
         'bpmn:StartEvent', 'event', 'bpmn-icon-start-event-none',
         translate('Create StartEvent')
       ),
+      'create.start-event-timer': createAction(
+        'bpmn:StartEvent', 'event', 'bpmn-icon-start-event-timer',
+        translate('Create Timer Start Event'),
+        { eventDefinitionType: 'bpmn:TimerEventDefinition' }
+      ),
       'create.intermediate-event': createAction(
         'bpmn:IntermediateThrowEvent', 'event', 'bpmn-icon-intermediate-event-none',
         translate('Create Intermediate/Boundary Event')
+      ),
+      'create.intermediate-event-catch-timer': createAction(
+        'bpmn:IntermediateCatchEvent', 'event', 'bpmn-icon-intermediate-event-catch-timer',
+        translate('Create Timer Intermediate Catch Event'),
+        { eventDefinitionType: 'bpmn:TimerEventDefinition' }
       ),
       'create.end-event': createAction(
         'bpmn:EndEvent', 'event', 'bpmn-icon-end-event-none',

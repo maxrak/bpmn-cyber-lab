@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  xmlns:cyber="http://example.org/schema/bpmn/cyberlab"
+  id="Definitions_CyberExtension"
+  targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <bpmn:process id="Process_CyberLab" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_1" name="Start" />
+
+    <bpmn:userTask id="Task_ReviewAccess" name="Review access request">
+      <bpmn:extensionElements>
+        <cyber:taskAssessment
+          stride="Spoofing, Tampering"
+          mitre="T1078 Valid Accounts"
+          riskScore="72"
+          auditLevel="DETAILED"
+          singlePointOfFailure="true" />
+      </bpmn:extensionElements>
+    </bpmn:userTask>
+
+    <bpmn:serviceTask id="Task_CreateAccount" name="Create account">
+      <bpmn:extensionElements>
+        <cyber:taskAssessment
+          stride="Elevation of Privilege"
+          mitre="T1136 Create Account"
+          riskScore="45"
+          auditLevel="BASIC"
+          singlePointOfFailure="false" />
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="EndEvent_1" name="Completed" />
+
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_ReviewAccess" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_ReviewAccess" targetRef="Task_CreateAccount" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_CreateAccount" targetRef="EndEvent_1" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_CyberLab">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="180" y="140" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReviewAccess_di" bpmnElement="Task_ReviewAccess">
+        <dc:Bounds x="270" y="118" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateAccount_di" bpmnElement="Task_CreateAccount">
+        <dc:Bounds x="470" y="118" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="670" y="140" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="216" y="158" />
+        <di:waypoint x="270" y="158" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="410" y="158" />
+        <di:waypoint x="470" y="158" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="610" y="158" />
+        <di:waypoint x="670" y="158" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

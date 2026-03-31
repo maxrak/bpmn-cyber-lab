@@ -6,9 +6,17 @@ import {
   CamundaPlatformPropertiesProviderModule
 } from 'bpmn-js-properties-panel';
 
+
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 
+
+//import cyberModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
+
+import cyberModdleDescriptor from './extensions/cyberlab-moddle.json';
+import CyberExtensionPropertiesProvider from './cyberExtensionPropertiesProvider';
+
 import CyberPropertiesProvider from './cyberPropertiesProvider';
+
 import RiskColorBehavior from './riskColorBehavior';
 import CustomPaletteProvider from './customPaletteProvider';
 import CustomContextPadProvider from './customContextPadProvider';
@@ -38,13 +46,15 @@ const modeler = new BpmnModeler({
     BpmnPropertiesPanelModule,
     BpmnPropertiesProviderModule,
     CamundaPlatformPropertiesProviderModule,
-    CyberPropertiesProvider,
+    //CyberPropertiesProvider,
+    CyberExtensionPropertiesProvider,
     RiskColorBehavior,
     { __init__: ['customPaletteProvider'], customPaletteProvider: ['type', CustomPaletteProvider] },
     { __init__: ['customContextPadProvider'], customContextPadProvider: ['type', CustomContextPadProvider] }
   ],
   moddleExtensions: {
-    camunda: camundaModdleDescriptor
+    camunda: camundaModdleDescriptor,
+    cyber: cyberModdleDescriptor 
   }
 });
 window._modeler = modeler;
