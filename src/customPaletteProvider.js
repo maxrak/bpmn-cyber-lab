@@ -114,6 +114,21 @@ export default class CustomPaletteProvider {
         'bpmn:EndEvent', 'event', 'bpmn-icon-end-event-none',
         translate('Create EndEvent')
       ),
+      'create.start-event-error': createAction(
+        'bpmn:StartEvent', 'event', 'bpmn-icon-start-event-error',
+        translate('Create Error Start Event'),
+        { eventDefinitionType: 'bpmn:ErrorEventDefinition' }
+      ),
+      'create.intermediate-event-catch-error': createAction(
+        'bpmn:BoundaryEvent', 'event', 'bpmn-icon-intermediate-event-catch-error',
+        translate('Create Error Boundary Event'),
+        { eventDefinitionType: 'bpmn:ErrorEventDefinition' }
+      ),
+      'create.end-event-error': createAction(
+        'bpmn:EndEvent', 'event', 'bpmn-icon-end-event-error',
+        translate('Create Error End Event'),
+        { eventDefinitionType: 'bpmn:ErrorEventDefinition' }
+      ),
       'event-separator': {
         group: 'event',
         separator: true

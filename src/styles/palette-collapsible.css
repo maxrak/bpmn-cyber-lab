@@ -1,0 +1,45 @@
+/* ─── Palette collassabile ─────────────────────────────────────────────── */
+
+/* Larghezza leggermente aumentata per evitare overflow del testo */
+.djs-palette {
+  width: 64px !important;
+}
+
+.djs-palette .entry,
+.djs-palette .djs-palette-toggle {
+  width: 54px !important;
+}
+
+.djs-palette.two-column.open {
+  width: 110px !important;
+}
+
+
+.palette-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px 3px 8px;
+  cursor: pointer;
+  user-select: none;
+  background: #f0f0f0;
+  border-top: 1px solid #ccc;
+  margin: 0 -4px;
+}
+
+.palette-group-header:hover {
+  background: #e2e2e2;
+}
+
+.palette-group-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #555;
+}
+
+.palette-group-arrow {
+  font-size: 9px;
+  color: #888;
+}

@@ -20,6 +20,7 @@ import CyberPropertiesProvider from './cyberPropertiesProvider';
 import RiskColorBehavior from './riskColorBehavior';
 import CustomPaletteProvider from './customPaletteProvider';
 import CustomContextPadProvider from './customContextPadProvider';
+import CollapsiblePalette from './collapsiblePalette';
 import { setupFileHandlers, loadSampleDiagram } from './fileHandlers';
 import { getCurrentBpmn, updateFilenameUI } from './globalBpmnState';
 import { initializeBpmnFileMenu } from './bpmnFileMenu';
@@ -33,6 +34,7 @@ import './styles/properties-panel.css';
 import './styles/properties-accordion.css';
 import './styles/list-group.css';
 import './styles/form-controls.css';
+import './styles/palette-collapsible.css';
 
 // mark mode
 window.appMode = 'modeler';
@@ -50,7 +52,8 @@ const modeler = new BpmnModeler({
     CyberExtensionPropertiesProvider,
     RiskColorBehavior,
     { __init__: ['customPaletteProvider'], customPaletteProvider: ['type', CustomPaletteProvider] },
-    { __init__: ['customContextPadProvider'], customContextPadProvider: ['type', CustomContextPadProvider] }
+    { __init__: ['customContextPadProvider'], customContextPadProvider: ['type', CustomContextPadProvider] },
+    { __init__: ['collapsiblePalette'], collapsiblePalette: ['type', CollapsiblePalette] }
   ],
   moddleExtensions: {
     camunda: camundaModdleDescriptor,
