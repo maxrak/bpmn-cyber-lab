@@ -7,6 +7,12 @@ import {
   CamundaPlatformPropertiesProviderModule
 } from 'bpmn-js-properties-panel';
 
+import {
+  SecureBpmnModule,
+  secureBpmnModdle,
+  SecureBpmnPropertiesProvider,
+} from './secure-bpmn/index.js';
+
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 
 import CyberPropertiesProvider from './cyberPropertiesProvider';
@@ -32,10 +38,12 @@ const modeler = new BpmnModeler({
     BpmnPropertiesProviderModule,
     CamundaPlatformPropertiesProviderModule,
     CyberPropertiesProvider,
-    RiskColorBehavior
+    RiskColorBehavior,
+    SecureBpmnModule
   ],
   moddleExtensions: {
-    camunda: camundaModdleDescriptor
+    camunda: camundaModdleDescriptor,
+    sb:secureBpmnModdle
   }
 });
 window._modeler = modeler;

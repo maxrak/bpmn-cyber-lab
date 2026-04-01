@@ -1,0 +1,90 @@
+{
+  "name": "SecureBPMN",
+  "uri": "http://example.com/schema/bpmn/securebpmn",
+  "prefix": "sb",
+  "xml": {
+    "tagAlias": "lowerCase"
+  },
+  "types": [
+    {
+      "name": "SecurityRequirement",
+      "superClass": [ "Element" ],
+      "properties": [
+        {
+          "name": "requirementType",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "audit",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "protectDegree",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "privacyType",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "notes",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "roles",
+          "type": "sb:SecurityRole",
+          "isMany": true
+        },
+        {
+          "name": "permissions",
+          "type": "sb:SecurityPermission",
+          "isMany": true
+        }
+      ]
+    },
+    {
+      "name": "SecurityRole",
+      "superClass": [ "Element" ],
+      "properties": [
+        {
+          "name": "roleName",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "description",
+          "type": "String",
+          "isAttr": true
+        }
+      ]
+    },
+    {
+      "name": "SecurityPermission",
+      "superClass": [ "Element" ],
+      "properties": [
+        {
+          "name": "objectRef",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "operations",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "description",
+          "type": "String",
+          "isAttr": true
+        }
+      ]
+    }
+  ],
+  "emumerations": [],
+  "associations": []
+}

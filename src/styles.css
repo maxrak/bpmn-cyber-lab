@@ -18,6 +18,30 @@ html, body {
 /* ensure properties panel uses box-sizing and spacing */
 #properties * { box-sizing: border-box; }
 
+/* ── SecureBPMN overlay badge ────────────────────────────── */
+.sb-security-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: #fff;
+  border: 1.5px solid #333;
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 9px;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  color: #222;
+  pointer-events: none;
+  white-space: nowrap;
+  line-height: 14px;
+}
+
+.sb-security-badge .sb-lock {
+  font-size: 9px;
+  line-height: 1;
+}
+
+
 /* Context pad popup menu styles */
 .djs-popup .entry {
   padding: 8px 12px;

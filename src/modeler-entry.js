@@ -15,6 +15,9 @@ import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 import cyberModdleDescriptor from './extensions/cyberlab-moddle.json';
 import CyberExtensionPropertiesProvider from './cyberExtensionPropertiesProvider';
 
+import SecureBpmnModule from './securebpmn/SecureBpmnModule.js';
+import secureBpmnModdle from './securebpmn/securebpmn.json';
+
 import CyberPropertiesProvider from './cyberPropertiesProvider';
 
 import RiskColorBehavior from './riskColorBehavior';
@@ -53,11 +56,13 @@ const modeler = new BpmnModeler({
     RiskColorBehavior,
     { __init__: ['customPaletteProvider'], customPaletteProvider: ['type', CustomPaletteProvider] },
     { __init__: ['customContextPadProvider'], customContextPadProvider: ['type', CustomContextPadProvider] },
-    { __init__: ['collapsiblePalette'], collapsiblePalette: ['type', CollapsiblePalette] }
+    { __init__: ['collapsiblePalette'], collapsiblePalette: ['type', CollapsiblePalette] },
+    SecureBpmnModule
   ],
   moddleExtensions: {
     camunda: camundaModdleDescriptor,
-    cyber: cyberModdleDescriptor 
+    cyber: cyberModdleDescriptor,
+    sb: secureBpmnModdle
   }
 });
 window._modeler = modeler;

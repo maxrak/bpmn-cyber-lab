@@ -3,134 +3,201 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BPMN Cyber Lab</title>
+  <title>BPMN Cyber Lab - Home</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
   <link href="/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
+    .dropdown-header {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #adb5bd;
+      padding: 0.1rem 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .navbar .dropdown-divider {
+      margin: 0.15rem 0;
+    }
+    .navbar-nav {
+      align-items: center;
+    }
+    body {
+      padding-top: 96px;
       font-family: sans-serif;
     }
-    .content {
-      display: flex;
-      height: calc(100% - 56px);
-      margin-top: 56px;
+    .hero-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 4rem 2rem;
+      text-align: center;
     }
-    #canvas {
-      flex: 3;
-      border-right: 1px solid #dee2e6;
-    }
-    #properties {
-      flex: 1;
-      min-width: 320px;
-      max-width: 420px;
-      padding: 1rem;
+    .feature-card {
+      transition: transform 0.2s;
       height: 100%;
-      overflow-y: auto;
-      box-shadow: -4px 0 8px rgba(0,0,0,0.03);
     }
-    /* Spaziatura e layout migliori per etichette e campi nel pannello proprietà */
-    #properties .form-group,
-    #properties .pp-row,
-    #properties .pp-property {
-      margin-bottom: 0.75rem !important;
+    .feature-card:hover {
+      transform: translateY(-5px);
     }
-    #properties label,
-    #properties .pp-label,
-    #properties .form-label {
-      display: block;
-      margin-bottom: 0.25rem;
-      font-weight: 600;
-      font-size: .95rem;
-      color: #333;
+    /* Margini laterali per evitare testo schiacciato */
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
     }
-    #properties input[type="text"],
-    #properties input[type="number"],
-    #properties select,
-    #properties textarea,
-    #properties .form-control,
-    #properties .pp-input {
-      width: 100%;
-      padding: .375rem .5rem;
-      border: 1px solid #ced4da;
-      border-radius: .25rem;
-      background: #fff;
+    @media (min-width: 768px) {
+      .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
     }
-    #properties .help-text,
-    #properties .pp-description {
-      margin-top: .25rem;
-      margin-bottom: .5rem;
-      color: #6c757d;
-      font-size: .875rem;
+    @media (min-width: 1200px) {
+      .container {
+        padding-left: 3rem;
+        padding-right: 3rem;
+      }
     }
   </style>
 <script defer src="modeler.bundle.js"></script><script defer src="simulation.bundle.js"></script></head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">BPMN Cyber Lab</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="fileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">FILE</a>
-            <ul class="dropdown-menu" aria-labelledby="fileDropdown">
-              <li><button class="dropdown-item" id="btn-open">Open BPMN</button></li>
-              <li><button class="dropdown-item" id="btn-save">Save BPMN</button></li>
-            </ul>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+              <img src="/bpmn-cyber-lab.png" alt="BPMN Cyber Lab" height="64" style="width:auto;">
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="modeler.html">Modeler</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="simulation.html">Simulation</a>
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="bpmnsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">BPMNs</a>
-            <ul class="dropdown-menu" aria-labelledby="bpmnsDropdown" id="bpmns-menu">
-              <li class="dropdown-item text-muted small px-3">Loading...</li>
-            </ul>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="modeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Mode</a>
-            <ul class="dropdown-menu p-2" aria-labelledby="modeDropdown" id="mode-menu">
-              <li class="dropdown-item">
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="appMode" id="mode-modeler" value="modeler" checked>
-                  <label class="form-check-label ms-2" for="mode-modeler">Modeler</label>
-                </div>
-              </li>
-              <li class="dropdown-item">
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="appMode" id="mode-simulation" value="simulation">
-                  <label class="form-check-label ms-2" for="mode-simulation">Simulation</label>
-                </div>
-              </li>
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Documentation
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="documentation.html">📚 Panoramica</a></li>
+              <div class="dropdown-header"> Guide</div>
+              <!-- <li><h6 class="dropdown-header">Guide</h6></li> -->
+              <li><a class="dropdown-item" href="documentation-modeler.html">✏️ Modeler</a></li>
+              <li><a class="dropdown-item" href="documentation-simulation.html">▶️ Simulation</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <div class="dropdown-header"> Esempi</div>
+              <!-- <li><h6 class="dropdown-header">Esempi</h6></li> -->
+              <li><a class="dropdown-item" href="documentation-gateway-comparison.html">🔀 Gateway Comparison</a></li>
+              <li><a class="dropdown-item" href="documentation-message-events.html">✉️ Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-signal-events.html">📡 Signal Events</a></li>
+              <li><a class="dropdown-item" href="documentation-multiple-signals.html">🔗 Signal Events Multipli</a></li>
+              <li><a class="dropdown-item" href="documentation-error-events.html">⚠️ Error Events</a></li>
+              <div class="dropdown-header"> Anti-Patterns</div>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-start-end.html">🚫 Anti-Pattern Start/End</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-gateway.html">❌ Anti-Pattern Gateway</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-message-events.html">📨 Anti-Pattern Message Events</a></li>
+              <li><a class="dropdown-item" href="documentation-anti-pattern-loop.html">🔁 Anti-Pattern Loop</a></li>
             </ul>
           </li>
         </ul>
       </div>
     </div>
   </nav>
-  <div id="modeler-toolbar" class="container-fluid px-3 py-2 bg-white border-bottom">
-    <div class="d-flex gap-2 align-items-center">
-      <button id="btn-undo" class="btn btn-sm btn-outline-secondary">Undo</button>
-      <button id="btn-redo" class="btn btn-sm btn-outline-secondary">Redo</button>
-      <button id="btn-zoom-in" class="btn btn-sm btn-outline-secondary">Zoom +</button>
-      <button id="btn-zoom-out" class="btn btn-sm btn-outline-secondary">Zoom -</button>
-      <button id="btn-fit" class="btn btn-sm btn-outline-primary">Fit</button>
-      <div class="ms-auto">
-        <span id="app-mode-badge" class="badge bg-primary">Modeler</span>
+
+  <div class="hero-section">
+    <div class="container">
+      <img src="/bpmn-cyber-lab.png" alt="BPMN Cyber Lab Logo" class="mb-4" style="max-height:120px; width:auto;">
+      <h1 class="display-4 fw-bold mb-3">BPMN Cyber Lab</h1>
+      <p class="lead mb-4">Piattaforma integrata per la modellazione e simulazione di processi BPMN con focus sulla sicurezza informatica</p>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <div class="row mb-5">
+      <div class="col-lg-8 mx-auto">
+        <h2 class="text-center mb-4">Benvenuto in BPMN Cyber Lab</h2>
+        <p class="text-muted text-center">
+          BPMN Cyber Lab è un'applicazione web avanzata per la modellazione e simulazione di processi aziendali 
+          utilizzando lo standard BPMN 2.0. L'applicazione integra funzionalità di analisi dei rischi cyber 
+          e permette di visualizzare, modificare e simulare processi aziendali con particolare attenzione 
+          agli aspetti di sicurezza informatica.
+        </p>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card feature-card shadow-sm">
+          <div class="card-body p-4">
+            <div class="mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-diagram-3 text-primary" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zm-6 8A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm6 0A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm6 0a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5z"/>
+              </svg>
+            </div>
+            <h4 class="card-title">Modeler</h4>
+            <p class="card-text text-muted">
+              Crea e modifica diagrammi BPMN utilizzando un editor visuale intuitivo. 
+              Carica file BPMN esistenti, modifica elementi, aggiungi proprietà personalizzate 
+              per l'analisi dei rischi cyber e salva i tuoi progetti.
+            </p>
+            <a href="modeler.html" class="btn btn-primary">Apri Modeler</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card feature-card shadow-sm">
+          <div class="card-body p-4">
+            <div class="mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-play-circle text-success" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445"/>
+              </svg>
+            </div>
+            <h4 class="card-title">Simulation</h4>
+            <p class="card-text text-muted">
+              Simula l'esecuzione dei processi BPMN utilizzando token flow. 
+              Visualizza il flusso di esecuzione, identifica colli di bottiglia 
+              e comprendi meglio il comportamento dei tuoi processi aziendali.
+            </p>
+            <a href="simulation.html" class="btn btn-success">Apri Simulation</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-5">
+      <div class="col-lg-8 mx-auto">
+        <div class="card bg-light">
+          <div class="card-body p-4">
+            <h5 class="card-title mb-3">Funzionalità principali</h5>
+            <ul class="list-unstyled mt-3">
+              <li class="mb-2">✓ Modellazione BPMN 2.0 completa</li>
+              <li class="mb-2">✓ Proprietà personalizzate per analisi cyber security</li>
+              <li class="mb-2">✓ Simulazione con token flow</li>
+              <li class="mb-2">✓ Import/Export file BPMN</li>
+              <li class="mb-2">✓ Visualizzazione rischi e colorazione elementi</li>
+            </ul>
+            <div class="mt-4 text-center">
+              <a href="documentation.html" class="btn btn-outline-primary">
+                📖 Consulta la documentazione completa
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="content">
-    <div id="canvas-modeler" style="flex:3;"></div>
-    <div id="canvas-sim" style="flex:3; display:none;"></div>
-    <aside id="properties" class="bg-light border-start p-3">
-      <h5 class="mb-3">Proprietà</h5>
-      <!-- The BPMN properties panel will be injected inside this element -->
-    </aside>
-  </div>
-
-  <input type="file" id="file-input" accept=".bpmn" style="display:none">
+  <footer class="bg-dark text-white text-center py-3 mt-5">
+    <div class="container">
+      <p class="mb-0">&copy; 2026 BPMN Cyber Lab. Piattaforma per la modellazione e simulazione di processi con focus cyber security.</p>
+    </div>
+  </footer>
 
   <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
 </body>

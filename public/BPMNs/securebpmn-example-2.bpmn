@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  xmlns:sb="http://example.com/schema/bpmn/securebpmn"
+  id="Definitions_SecureBPMN_Simple"
+  targetNamespace="http://example.com/securebpmn/simple">
+
+  <bpmn:collaboration id="Collaboration_SimpleSecureFlow">
+
+    <bpmn:participant
+      id="Participant_Customer"
+      name="Customer"
+      processRef="Process_Customer">
+      <bpmn:extensionElements>
+        <sb:securityRequirement
+          requirementType="Privacy"
+          privacyType="confidentiality"
+          audit="ElementName,Date,Time"
+          notes="Protect customer identity and sensitive information">
+          <sb:securityRole
+            roleName="CustomerPrivacyOwner"
+            description="Responsible for customer privacy constraints"/>
+        </sb:securityRequirement>
+      </bpmn:extensionElements>
+    </bpmn:participant>
+
+    <bpmn:participant
+      id="Participant_BackOffice"
+      name="Back Office"
+      processRef="Process_BackOffice"/>
+
+    <bpmn:messageFlow
+      id="MessageFlow_Request"
+      name="Request"
+      sourceRef="Task_SendRequest"
+      targetRef="Task_ReviewRequest">
+      <bpmn:extensionElements>
+        <sb:securityRequirement
+          requirementType="NonRepudiation"
+          audit="SourceName,DestinationName,DateTimeSend,DateTimeReceive"
+          notes="Request transmission and reception cannot be denied"/>
+      </bpmn:extensionElements>
+    </bpmn:messageFlow>
+
+    <bpmn:messageFlow
+      id="MessageFlow_Confirmation"
+      name="Confirmation"
+      sourceRef="Task_SendConfirmation"
+      targetRef="Task_ReceiveConfirmation"/>
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_Customer" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_Customer" name="Start"/>
+
+    <bpmn:task
+      id="Task_SendRequest"
+      name="Send Request"/>
+
+    <bpmn:task
+      id="Task_ReceiveConfirmation"
+      name="Receive Confirmation"/>
+
+    <bpmn:endEvent id="EndEvent_Customer" name="End"/>
+
+    <bpmn:sequenceFlow
+      id="Flow_Customer_1"
+      sourceRef="StartEvent_Customer"
+      targetRef="Task_SendRequest"/>
+
+    <bpmn:sequenceFlow
+      id="Flow_Customer_2"
+      sourceRef="Task_SendRequest"
+      targetRef="Task_ReceiveConfirmation"/>
+
+    <bpmn:sequenceFlow
+      id="Flow_Customer_3"
+      sourceRef="Task_ReceiveConfirmation"
+      targetRef="EndEvent_Customer"/>
+  </bpmn:process>
+
+  <bpmn:process id="Process_BackOffice" isExecutable="false">
+
+    <bpmn:startEvent id="StartEvent_BackOffice" name="Received Request"/>
+
+    <bpmn:task
+      id="Task_ReviewRequest"
+      name="Review Request">
+      <bpmn:extensionElements>
+        <sb:securityRequirement
+          requirementType="AttackHarmDetection"
+          audit="ElementName,Date,Time"
+          notes="Attack attempts and successful attacks must be detected, registered and notified"/>
+      </bpmn:extensionElements>
+    </bpmn:task>
+
+    <bpmn:task
+      id="Task_ApproveRequest"
+      name="Approve Request">
+      <bpmn:extensionElements>
+        <sb:securityRequirement
+          requirementType="AccessControl"
+          audit="RoleName,Date,Time"
+          notes="Only authorized users may approve requests">
+          <sb:securityRole
+            roleName="Supervisor"
+            description="Authorized approver"/>
+          <sb:securityPermission
+            objectRef="Task_ApproveRequest"
+            operations="Execution,CheckExecution"
+            description="Supervisor may execute and verify approval"/>
+          <sb:securityPermission
+            objectRef="DataObject_OrderData"
+            operations="Read,Update"
+            description="Supervisor may read and update order data"/>
+        </sb:securityRequirement>
+      </bpmn:extensionElements>
+    </bpmn:task>
+
+    <bpmn:task
+      id="Task_SendConfirmation"
+      name="Send Confirmation"/>
+
+    <bpmn:dataObject
+      id="DataObject_OrderData_Base"
+      name="Order Data"/>
+
+    <bpmn:dataObjectReference
+      id="DataObject_OrderData"
+      name="Order Data"
+      dataObjectRef="DataObject_OrderData_Base">
+      <bpmn:extensionElements>
+        <sb:securityRequirement
+          requirementType="Integrity"
+          protectDegree="high"
+          audit="ElementName,Date,Time"
+          notes="Order data must be protected from unauthorized modification"/>
+      </bpmn:extensionElements>
+    </bpmn:dataObjectReference>
+
+    <bpmn:association
+      id="Association_OrderData_Approve"
+      sourceRef="Task_ApproveRequest"
+      targetRef="DataObject_OrderData"/>
+
+    <bpmn:endEvent id="EndEvent_BackOffice" name="Completed"/>
+
+    <bpmn:sequenceFlow
+      id="Flow_BackOffice_1"
+      sourceRef="StartEvent_BackOffice"
+      targetRef="Task_ReviewRequest"/>
+
+    <bpmn:sequenceFlow
+      id="Flow_BackOffice_2"
+      sourceRef="Task_ReviewRequest"
+      targetRef="Task_ApproveRequest"/>
+
+    <bpmn:sequenceFlow
+      id="Flow_BackOffice_3"
+      sourceRef="Task_ApproveRequest"
+      targetRef="Task_SendConfirmation"/>
+
+    <bpmn:sequenceFlow
+      id="Flow_BackOffice_4"
+      sourceRef="Task_SendConfirmation"
+      targetRef="EndEvent_BackOffice"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SimpleSecureFlow">
+    <bpmndi:BPMNPlane id="BPMNPlane_SimpleSecureFlow" bpmnElement="Collaboration_SimpleSecureFlow">
+
+      <bpmndi:BPMNShape
+        id="Participant_Customer_di"
+        bpmnElement="Participant_Customer"
+        isHorizontal="true">
+        <dc:Bounds x="120" y="80" width="820" height="180"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Participant_BackOffice_di"
+        bpmnElement="Participant_BackOffice"
+        isHorizontal="true">
+        <dc:Bounds x="120" y="320" width="820" height="220"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="StartEvent_Customer_di"
+        bpmnElement="StartEvent_Customer">
+        <dc:Bounds x="180" y="150" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Task_SendRequest_di"
+        bpmnElement="Task_SendRequest">
+        <dc:Bounds x="260" y="128" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Task_ReceiveConfirmation_di"
+        bpmnElement="Task_ReceiveConfirmation">
+        <dc:Bounds x="640" y="128" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="EndEvent_Customer_di"
+        bpmnElement="EndEvent_Customer">
+        <dc:Bounds x="830" y="150" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="StartEvent_BackOffice_di"
+        bpmnElement="StartEvent_BackOffice">
+        <dc:Bounds x="180" y="410" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Task_ReviewRequest_di"
+        bpmnElement="Task_ReviewRequest">
+        <dc:Bounds x="260" y="388" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Task_ApproveRequest_di"
+        bpmnElement="Task_ApproveRequest">
+        <dc:Bounds x="470" y="388" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="DataObject_OrderData_di"
+        bpmnElement="DataObject_OrderData">
+        <dc:Bounds x="520" y="500" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="Task_SendConfirmation_di"
+        bpmnElement="Task_SendConfirmation">
+        <dc:Bounds x="680" y="388" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape
+        id="EndEvent_BackOffice_di"
+        bpmnElement="EndEvent_BackOffice">
+        <dc:Bounds x="860" y="410" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge
+        id="Flow_Customer_1_di"
+        bpmnElement="Flow_Customer_1">
+        <di:waypoint x="216" y="168"/>
+        <di:waypoint x="260" y="168"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge
+        id="Flow_Customer_2_di"
+        bpmnElement="Flow_Customer_2">
+        <di:waypoint x="380" y="168"/>
+        <di:waypoint x="640" y="168"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge
+        id="Flow_Customer_3_di"
+        bpmnElement="Flow_Customer_3">
+        <di:waypoint x="780" y="168"/>
+        <di:waypoint x="830" y="168"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge
+        id="Flow_BackOffice_1_di"
+        bpmnElement="Flow_BackOffice_1">
+        <di:waypoint x="216" y="428"/>
+        <di:waypoint x="260" y="428"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge
+        id="Flow_BackOffice_2_di"
+        bpmnElement="Flow_BackOffice_2">
+        <di:waypoint x="400" y="428"/>
+        <di:waypoint x="470" y="428"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge
+        id="Flow_BackOffice_3_di"
+        bpmnElement="Flow_BackOffice_3">
+        <di:waypoint x="610" y="428"/>
+        <di:waypoint x="680" y="428"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge
+        id="Flow_BackOffice_4_di"
+        bpmnElement="Flow_BackOffice_4">
+        <di:waypoint x="820" y="428"/>
+        <di:waypoint x="860" y="428"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge
+        id="Association_OrderData_Approve_di"
+        bpmnElement="Association_OrderData_Approve">
+        <di:waypoint x="540" y="468"/>
+        <di:waypoint x="538" y="500"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge
+        id="MessageFlow_Request_di"
+        bpmnElement="MessageFlow_Request">
+        <di:waypoint x="320" y="208"/>
+        <di:waypoint x="320" y="388"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge
+        id="MessageFlow_Confirmation_di"
+        bpmnElement="MessageFlow_Confirmation">
+        <di:waypoint x="750" y="388"/>
+        <di:waypoint x="750" y="208"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

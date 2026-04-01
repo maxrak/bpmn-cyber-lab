@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  xmlns:sb="http://example.com/schema/bpmn/securebpmn"
+  id="Definitions_SecureBPMN_Example"
+  targetNamespace="http://example.com/securebpmn">
+
+  <!-- ========================================================= -->
+  <!-- COLLABORATION -->
+  <!-- ========================================================= -->
+
+  <bpmn:collaboration id="Collaboration_AdmissionProcess">
+
+    <!-- Patient pool -->
+    <bpmn:participant id="Participant_Patient"
+                      name="Patient"
+                      processRef="Process_Patient">
+      <bpmn:extensionElements>
+        <sb:securityRequirement
+          requirementType="Privacy"
+          privacyType="confidentiality"
+          audit="ElementName,Date,Time"
+          notes="Protect patient sensitive information">
+          <sb:securityRole
+            roleName="PatientPrivacyOwner"
+            description="Owner of patient privacy constraints"/>
+        </sb:securityRequirement>
+      </bpmn:extensionElements>
+    </bpmn:participant>
+
+    <!-- Administration Area pool -->
+    <bpmn:participant id="Participant_Admin"
+                      name="Administration Area"
+                      processRef="Process_Admin"/>
+
+    <!-- Medical Area pool -->
+    <bpmn:participant id="Participant_Medical"
+                      name="Medical Area"
+                      processRef="Process_Medical"/>
+
+    <!-- Message flow with NonRepudiation -->
+    <bpmn:messageFlow id="MessageFlow_AdmissionRequest"
+                      name="Admission Request"
+                      sourceRef="Task_FillOutAdmissionRequest"
+                      targetRef="Task_ReviewAdmissionRequest">
+      <bpmn:extensionElements>
+        <sb:securityRequirement
+          requirementType="NonRepudiation"
+          audit="SourceName,DestinationName,DateTimeSend,DateTimeReceive"
+          notes="The reception of the admission request cannot be denied"/>
+      </bpmn:extensionElements>
+    </bpmn:messageFlow>
+
+    <!-- Message flow back to patient -->
+    <bpmn:messageFlow id="MessageFlow_MedicalEvaluation"
+                      name="Medical Evaluation"
+                      sourceRef="Task_SendMedicalEvaluation"
+                      targetRef="Task_ReceiveMedicalEvaluation"/>
+  </bpmn:collaboration>
+
+  <!-- ========================================================= -->
+  <!-- PATIENT PROCESS -->
+  <!-- ========================================================= -->
+
+  <bpmn:process id="Process_Patient" isExecutable="false">
+
+    <bpmn:startEvent id="StartEvent_Patient" name="Start"/>
+
+    <bpmn:task id="Task_FillOutAdmissionRequest"
+               name="Fill out Admission Request"/>
+
+    <bpmn:dataObjectReference id="DataObject_AdmissionRequest"
+                              name="Admission Request"
+                              dataObjectRef="DataObject_AdmissionRequest_Base"/>
+
+    <bpmn:association id="Association_Patient_AdmissionRequest"
+                      sourceRef="Task_FillOutAdmissionRequest"
+                      targetRef="DataObject_AdmissionRequest"/>
+
+    <bpmn:task id="Task_ReceiveMedicalEvaluation"
+               name="Receive Medical Evaluation"/>
+
+    <bpmn:endEvent id="EndEvent_Patient" name="End"/>
+
+    <bpmn:sequenceFlow id="Flow_Patient_1"
+                       sourceRef="StartEvent_Patient"
+                       targetRef="Task_FillOutAdmissionRequest"/>
+
+    <bpmn:sequenceFlow id="Flow_Patient_2"
+                       sourceRef="Task_FillOutAdmissionRequest"
+                       targetRef="Task_ReceiveMedicalEvaluation"/>
+
+    <bpmn:sequenceFlow id="Flow_Patient_3"
+                       sourceRef="Task_ReceiveMedicalEvaluation"
+                       targetRef="EndEvent_Patient"/>
+  </bpmn:process>
+
+  <!-- ========================================================= -->
+  <!-- ADMINISTRATION AREA PROCESS -->
+  <!-- ========================================================= -->
+
+  <bpmn:process id="Process_Admin" isExecutable="false">
+
+    <bpmn:laneSet id="LaneSet_Admin">
+      <bpmn:lane id="Lane_Admission" name="Admission">
+        <bpmn:flowNodeRef>Task_ReviewAdmissionRequest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_AdminParallel</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CheckClinicalData</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CaptureInsuranceInformation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ClinicalExists</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CreateEmptyClinicalData</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_Accounting" name="Accounting">
+        <bpmn:flowNodeRef>Task_FillOutCostInformation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Admin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:task id="Task_ReviewAdmissionRequest"
+               name="Review Admission Request"/>
+
+    <bpmn:parallelGateway id="Gateway_AdminParallel" name="+"/>
+
+    <bpmn:task id="Task_CheckClinicalData"
+               name="Check Clinical Data"/>
+
+    <bpmn:task id="Task_CaptureInsuranceInformation"
+               name="Capture Insurance Information"/>
+
+    <bpmn:exclusiveGateway id="Gateway_ClinicalExists" name="Exist?"/>
+
+    <bpmn:task id="Task_CreateEmptyClinicalData"
+               name="Create Empty Clinical Data"/>
+
+    <bpmn:task id="Task_FillOutCostInformation"
+               name="Fill out Cost Information"/>
+
+    <bpmn:dataObjectReference id="DataObject_AccountingData"
+                              name="Accounting Data"
+                              dataObjectRef="DataObject_AccountingData_Base"/>
+
+    <bpmn:dataObjectReference id="DataObject_ClinicalInformation_Admin"
+                              name="Clinical Information"
+                              dataObjectRef="DataObject_ClinicalInformation_Base">
+      <bpmn:extensionElements>
+        <sb:securityRequirement
+          requirementType="Integrity"
+          protectDegree="high"
+          audit="ElementName,Date,Time"
+          notes="Clinical information must be protected against unauthorized corruption"/>
+      </bpmn:extensionElements>
+    </bpmn:dataObjectReference>
+
+    <bpmn:association id="Association_Admin_AccountingData"
+                      sourceRef="Task_FillOutCostInformation"
+                      targetRef="DataObject_AccountingData"/>
+
+    <bpmn:association id="Association_Admin_ClinicalInfo"
+                      sourceRef="Task_CreateEmptyClinicalData"
+                      targetRef="DataObject_ClinicalInformation_Admin"/>
+
+    <bpmn:endEvent id="EndEvent_Admin" name="Accounting Complete"/>
+
+    <bpmn:sequenceFlow id="Flow_Admin_1"
+                       sourceRef="Task_ReviewAdmissionRequest"
+                       targetRef="Gateway_AdminParallel"/>
+
+    <bpmn:sequenceFlow id="Flow_Admin_2"
+                       sourceRef="Gateway_AdminParallel"
+                       targetRef="Task_CheckClinicalData"/>
+
+    <bpmn:sequenceFlow id="Flow_Admin_3"
+                       sourceRef="Gateway_AdminParallel"
+                       targetRef="Task_CaptureInsuranceInformation"/>
+
+    <bpmn:sequenceFlow id="Flow_Admin_4"
+                       sourceRef="Task_CheckClinicalData"
+                       targetRef="Gateway_ClinicalExists"/>
+
+    <bpmn:sequenceFlow id="Flow_Admin_5"
+                       sourceRef="Gateway_ClinicalExists"
+                       targetRef="Task_CreateEmptyClinicalData"
+                       name="No"/>
+
+    <bpmn:sequenceFlow id="Flow_Admin_6"
+                       sourceRef="Task_CaptureInsuranceInformation"
+                       targetRef="Task_FillOutCostInformation"/>
+
+    <bpmn:sequenceFlow id="Flow_Admin_7"
+                       sourceRef="Task_FillOutCostInformation"
+                       targetRef="EndEvent_Admin"/>
+
+  </bpmn:process>
+
+  <!-- ========================================================= -->
+  <!-- MEDICAL AREA PROCESS -->
+  <!-- ========================================================= -->
+
+  <bpmn:process id="Process_Medical" isExecutable="false">
+
+    <bpmn:laneSet id="LaneSet_Medical">
+
+      <bpmn:lane id="Lane_MedicalEvaluation" name="Medical Evaluation">
+        <bpmn:flowNodeRef>Task_PreAdmissionTest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ExamsNeeded</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_EvaluatePatientExams</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FillOutClinicalData</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FillOutPatientInformation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SendMedicalEvaluation</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_Exams" name="Exams">
+        <bpmn:extensionElements>
+          <sb:securityRequirement
+            requirementType="AccessControl"
+            audit="RoleName,Date,Time"
+            notes="Only authorized staff may access or execute elements in Exams lane">
+            <sb:securityRole
+              roleName="Exams"
+              description="Derived role from AccessControl on Exams lane"/>
+            <sb:securityPermission
+              objectRef="Task_CompleteAccountingInformation"
+              operations="Execution"
+              description="Can execute complete accounting information"/>
+            <sb:securityPermission
+              objectRef="Task_MakeExams"
+              operations="CheckExecution"
+              description="Can verify exam execution"/>
+            <sb:securityPermission
+              objectRef="Task_CompleteClinicalInformation"
+              operations="Execution"
+              description="Can execute complete clinical information"/>
+            <sb:securityPermission
+              objectRef="DataObject_AccountingData"
+              operations="Update"
+              description="Can update accounting data"/>
+          </sb:securityRequirement>
+        </bpmn:extensionElements>
+
+        <bpmn:flowNodeRef>Task_CompleteAccountingInformation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_MakeExams</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ExamsJoin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CompleteClinicalInformation</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:task id="Task_PreAdmissionTest"
+               name="Pre Admission Test"/>
+
+    <bpmn:exclusiveGateway id="Gateway_ExamsNeeded"
+                           name="Exams?"/>
+
+    <bpmn:task id="Task_EvaluatePatientExams"
+               name="Evaluate Patient Exams">
+      <bpmn:extensionElements>
+        <sb:securityRequirement
+          requirementType="AttackHarmDetection"
+          audit="ElementName,Date,Time"
+          notes="All attack attempts or successful attacks must be detected, registered and notified"/>
+      </bpmn:extensionElements>
+    </bpmn:task>
+
+    <bpmn:task id="Task_FillOutClinicalData"
+               name="Fill out Clinical Data"/>
+
+    <bpmn:task id="Task_FillOutPatientInformation"
+               name="Fill out Patient Information"/>
+
+    <bpmn:task id="Task_CompleteAccountingInformation"
+               name="Complete Accounting Information"/>
+
+    <bpmn:task id="Task_MakeExams"
+               name="Make Exams"/>
+
+    <bpmn:parallelGateway id="Gateway_ExamsJoin" name="+"/>
+
+    <bpmn:task id="Task_CompleteClinicalInformation"
+               name="Complete Clinical Information"/>
+
+    <bpmn:task id="Task_SendMedicalEvaluation"
+               name="Send Medical Evaluation"/>
+
+    <bpmn:dataObjectReference id="DataObject_ClinicalInformation_Medical"
+                              name="Clinical Information"
+                              dataObjectRef="DataObject_ClinicalInformation_Base"/>
+
+    <bpmn:association id="Association_Medical_ClinicalInfo"
+                      sourceRef="Task_CompleteClinicalInformation"
+                      targetRef="DataObject_ClinicalInformation_Medical"/>
+
+    <bpmn:sequenceFlow id="Flow_Medical_1"
+                       sourceRef="Task_PreAdmissionTest"
+                       targetRef="Gateway_ExamsNeeded"/>
+
+    <bpmn:sequenceFlow id="Flow_Medical_2"
+                       sourceRef="Gateway_ExamsNeeded"
+                       targetRef="Task_EvaluatePatientExams"
+                       name="No"/>
+
+    <bpmn:sequenceFlow id="Flow_Medical_3"
+                       sourceRef="Gateway_ExamsNeeded"
+                       targetRef="Task_MakeExams"
+                       name="Yes"/>
+
+    <bpmn:sequenceFlow id="Flow_Medical_4"
+                       sourceRef="Task_MakeExams"
+                       targetRef="Gateway_ExamsJoin"/>
+
+    <bpmn:sequenceFlow id="Flow_Medical_5"
+                       sourceRef="Task_CompleteAccountingInformation"
+                       targetRef="Gateway_ExamsJoin"/>
+
+    <bpmn:sequenceFlow id="Flow_Medical_6"
+                       sourceRef="Gateway_ExamsJoin"
+                       targetRef="Task_CompleteClinicalInformation"/>
+
+    <bpmn:sequenceFlow id="Flow_Medical_7"
+                       sourceRef="Task_CompleteClinicalInformation"
+                       targetRef="Task_EvaluatePatientExams"/>
+
+    <bpmn:sequenceFlow id="Flow_Medical_8"
+                       sourceRef="Task_EvaluatePatientExams"
+                       targetRef="Task_FillOutClinicalData"/>
+
+    <bpmn:sequenceFlow id="Flow_Medical_9"
+                       sourceRef="Task_FillOutClinicalData"
+                       targetRef="Task_FillOutPatientInformation"/>
+
+    <bpmn:sequenceFlow id="Flow_Medical_10"
+                       sourceRef="Task_FillOutPatientInformation"
+                       targetRef="Task_SendMedicalEvaluation"/>
+
+  </bpmn:process>
+
+  <!-- ========================================================= -->
+  <!-- BASE DATA OBJECTS -->
+  <!-- ========================================================= -->
+
+  <bpmn:dataObject id="DataObject_AdmissionRequest_Base" name="Admission Request"/>
+  <bpmn:dataObject id="DataObject_AccountingData_Base" name="Accounting Data"/>
+  <bpmn:dataObject id="DataObject_ClinicalInformation_Base" name="Clinical Information"/>
+
+  <!-- ========================================================= -->
+  <!-- BPMN DI -->
+  <!-- ========================================================= -->
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_AdmissionSecure">
+    <bpmndi:BPMNPlane id="BPMNPlane_AdmissionSecure" bpmnElement="Collaboration_AdmissionProcess">
+
+      <!-- Pools (w=1200 each) -->
+      <bpmndi:BPMNShape id="Participant_Patient_di" bpmnElement="Participant_Patient" isHorizontal="true">
+        <dc:Bounds x="120" y="60" width="1200" height="110"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Participant_Admin_di" bpmnElement="Participant_Admin" isHorizontal="true">
+        <dc:Bounds x="120" y="190" width="1200" height="240"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Participant_Medical_di" bpmnElement="Participant_Medical" isHorizontal="true">
+        <dc:Bounds x="120" y="450" width="1200" height="280"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Admin lanes -->
+      <bpmndi:BPMNShape id="Lane_Admission_di" bpmnElement="Lane_Admission" isHorizontal="true">
+        <dc:Bounds x="150" y="190" width="1170" height="120"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_Accounting_di" bpmnElement="Lane_Accounting" isHorizontal="true">
+        <dc:Bounds x="150" y="310" width="1170" height="120"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Medical lanes -->
+      <bpmndi:BPMNShape id="Lane_MedicalEvaluation_di" bpmnElement="Lane_MedicalEvaluation" isHorizontal="true">
+        <dc:Bounds x="150" y="450" width="1170" height="140"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_Exams_di" bpmnElement="Lane_Exams" isHorizontal="true">
+        <dc:Bounds x="150" y="590" width="1170" height="140"/>
+      </bpmndi:BPMNShape>
+
+      <!-- ── Patient process (center y=115) ── -->
+      <bpmndi:BPMNShape id="StartEvent_Patient_di" bpmnElement="StartEvent_Patient">
+        <dc:Bounds x="195" y="97" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_FillOutAdmissionRequest_di" bpmnElement="Task_FillOutAdmissionRequest">
+        <dc:Bounds x="270" y="75" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="DataObject_AdmissionRequest_di" bpmnElement="DataObject_AdmissionRequest">
+        <dc:Bounds x="440" y="87" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_ReceiveMedicalEvaluation_di" bpmnElement="Task_ReceiveMedicalEvaluation">
+        <dc:Bounds x="1020" y="75" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_Patient_di" bpmnElement="EndEvent_Patient">
+        <dc:Bounds x="1195" y="97" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- ── Admin Admission lane (center y=250) ── -->
+      <bpmndi:BPMNShape id="Task_ReviewAdmissionRequest_di" bpmnElement="Task_ReviewAdmissionRequest">
+        <dc:Bounds x="270" y="210" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_AdminParallel_di" bpmnElement="Gateway_AdminParallel">
+        <dc:Bounds x="440" y="225" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_CheckClinicalData_di" bpmnElement="Task_CheckClinicalData">
+        <dc:Bounds x="545" y="210" width="130" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_ClinicalExists_di" bpmnElement="Gateway_ClinicalExists">
+        <dc:Bounds x="735" y="225" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_CreateEmptyClinicalData_di" bpmnElement="Task_CreateEmptyClinicalData">
+        <dc:Bounds x="845" y="210" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="DataObject_ClinicalInformation_Admin_di" bpmnElement="DataObject_ClinicalInformation_Admin">
+        <dc:Bounds x="1050" y="215" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- ── Admin Accounting lane (center y=370) ── -->
+      <bpmndi:BPMNShape id="Task_CaptureInsuranceInformation_di" bpmnElement="Task_CaptureInsuranceInformation">
+        <dc:Bounds x="545" y="330" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_FillOutCostInformation_di" bpmnElement="Task_FillOutCostInformation">
+        <dc:Bounds x="762" y="330" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="DataObject_AccountingData_di" bpmnElement="DataObject_AccountingData">
+        <dc:Bounds x="680" y="340" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_Admin_di" bpmnElement="EndEvent_Admin">
+        <dc:Bounds x="975" y="352" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- ── Medical Evaluation lane (center y=520) ── -->
+      <bpmndi:BPMNShape id="Task_PreAdmissionTest_di" bpmnElement="Task_PreAdmissionTest">
+        <dc:Bounds x="200" y="480" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_ExamsNeeded_di" bpmnElement="Gateway_ExamsNeeded">
+        <dc:Bounds x="375" y="495" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_EvaluatePatientExams_di" bpmnElement="Task_EvaluatePatientExams">
+        <dc:Bounds x="480" y="480" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_FillOutClinicalData_di" bpmnElement="Task_FillOutClinicalData">
+        <dc:Bounds x="690" y="480" width="130" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_FillOutPatientInformation_di" bpmnElement="Task_FillOutPatientInformation">
+        <dc:Bounds x="883" y="480" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_SendMedicalEvaluation_di" bpmnElement="Task_SendMedicalEvaluation">
+        <dc:Bounds x="1093" y="480" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- ── Exams lane (center y=660) ── -->
+      <bpmndi:BPMNShape id="Task_CompleteAccountingInformation_di" bpmnElement="Task_CompleteAccountingInformation">
+        <dc:Bounds x="200" y="620" width="160" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_MakeExams_di" bpmnElement="Task_MakeExams">
+        <dc:Bounds x="420" y="620" width="130" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_ExamsJoin_di" bpmnElement="Gateway_ExamsJoin">
+        <dc:Bounds x="610" y="635" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_CompleteClinicalInformation_di" bpmnElement="Task_CompleteClinicalInformation">
+        <dc:Bounds x="720" y="620" width="160" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="DataObject_ClinicalInformation_Medical_di" bpmnElement="DataObject_ClinicalInformation_Medical">
+        <dc:Bounds x="930" y="625" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- ── Associations ── -->
+      <bpmndi:BPMNEdge id="Association_Patient_AdmissionRequest_di" bpmnElement="Association_Patient_AdmissionRequest">
+        <di:waypoint x="390" y="115"/>
+        <di:waypoint x="440" y="112"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Association_Admin_AccountingData_di" bpmnElement="Association_Admin_AccountingData">
+        <di:waypoint x="762" y="370"/>
+        <di:waypoint x="716" y="365"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Association_Admin_ClinicalInfo_di" bpmnElement="Association_Admin_ClinicalInfo">
+        <di:waypoint x="995" y="250"/>
+        <di:waypoint x="1050" y="240"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Association_Medical_ClinicalInfo_di" bpmnElement="Association_Medical_ClinicalInfo">
+        <di:waypoint x="880" y="660"/>
+        <di:waypoint x="930" y="650"/>
+      </bpmndi:BPMNEdge>
+
+      <!-- ── Patient sequence flows ── -->
+      <bpmndi:BPMNEdge id="Flow_Patient_1_di" bpmnElement="Flow_Patient_1">
+        <di:waypoint x="231" y="115"/>
+        <di:waypoint x="270" y="115"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Patient_2_di" bpmnElement="Flow_Patient_2">
+        <di:waypoint x="390" y="115"/>
+        <di:waypoint x="1020" y="115"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Patient_3_di" bpmnElement="Flow_Patient_3">
+        <di:waypoint x="1160" y="115"/>
+        <di:waypoint x="1195" y="115"/>
+      </bpmndi:BPMNEdge>
+
+      <!-- ── Admin sequence flows ── -->
+      <bpmndi:BPMNEdge id="Flow_Admin_1_di" bpmnElement="Flow_Admin_1">
+        <di:waypoint x="390" y="250"/>
+        <di:waypoint x="440" y="250"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Admin_2_di" bpmnElement="Flow_Admin_2">
+        <di:waypoint x="490" y="250"/>
+        <di:waypoint x="545" y="250"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Admin_3_di" bpmnElement="Flow_Admin_3">
+        <di:waypoint x="465" y="275"/>
+        <di:waypoint x="465" y="370"/>
+        <di:waypoint x="545" y="370"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Admin_4_di" bpmnElement="Flow_Admin_4">
+        <di:waypoint x="675" y="250"/>
+        <di:waypoint x="735" y="250"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Admin_5_di" bpmnElement="Flow_Admin_5">
+        <di:waypoint x="785" y="250"/>
+        <di:waypoint x="845" y="250"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Admin_6_di" bpmnElement="Flow_Admin_6">
+        <di:waypoint x="695" y="370"/>
+        <di:waypoint x="762" y="370"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Admin_7_di" bpmnElement="Flow_Admin_7">
+        <di:waypoint x="912" y="370"/>
+        <di:waypoint x="975" y="370"/>
+      </bpmndi:BPMNEdge>
+
+      <!-- ── Medical sequence flows ── -->
+      <bpmndi:BPMNEdge id="Flow_Medical_1_di" bpmnElement="Flow_Medical_1">
+        <di:waypoint x="320" y="520"/>
+        <di:waypoint x="375" y="520"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Medical_2_di" bpmnElement="Flow_Medical_2">
+        <di:waypoint x="425" y="520"/>
+        <di:waypoint x="480" y="520"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Medical_3_di" bpmnElement="Flow_Medical_3">
+        <di:waypoint x="400" y="545"/>
+        <di:waypoint x="400" y="660"/>
+        <di:waypoint x="420" y="660"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Medical_4_di" bpmnElement="Flow_Medical_4">
+        <di:waypoint x="550" y="660"/>
+        <di:waypoint x="610" y="660"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Medical_5_di" bpmnElement="Flow_Medical_5">
+        <di:waypoint x="360" y="660"/>
+        <di:waypoint x="610" y="660"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Medical_6_di" bpmnElement="Flow_Medical_6">
+        <di:waypoint x="660" y="660"/>
+        <di:waypoint x="720" y="660"/>
+      </bpmndi:BPMNEdge>
+
+      <!-- backward loop: CompleteClinical → EvaluatePatientExams -->
+      <bpmndi:BPMNEdge id="Flow_Medical_7_di" bpmnElement="Flow_Medical_7">
+        <di:waypoint x="800" y="620"/>
+        <di:waypoint x="800" y="580"/>
+        <di:waypoint x="555" y="580"/>
+        <di:waypoint x="555" y="560"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Medical_8_di" bpmnElement="Flow_Medical_8">
+        <di:waypoint x="630" y="520"/>
+        <di:waypoint x="690" y="520"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Medical_9_di" bpmnElement="Flow_Medical_9">
+        <di:waypoint x="820" y="520"/>
+        <di:waypoint x="883" y="520"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Medical_10_di" bpmnElement="Flow_Medical_10">
+        <di:waypoint x="1033" y="520"/>
+        <di:waypoint x="1093" y="520"/>
+      </bpmndi:BPMNEdge>
+
+      <!-- ── Message flows ── -->
+      <bpmndi:BPMNEdge id="MessageFlow_AdmissionRequest_di" bpmnElement="MessageFlow_AdmissionRequest">
+        <di:waypoint x="330" y="155"/>
+        <di:waypoint x="330" y="210"/>
+      </bpmndi:BPMNEdge>
+
+      <!-- routes outside the right edge of pools to avoid Admin pool -->
+      <bpmndi:BPMNEdge id="MessageFlow_MedicalEvaluation_di" bpmnElement="MessageFlow_MedicalEvaluation">
+        <di:waypoint x="1243" y="520"/>
+        <di:waypoint x="1270" y="520"/>
+        <di:waypoint x="1270" y="115"/>
+        <di:waypoint x="1160" y="115"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>
