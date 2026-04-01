@@ -26,15 +26,7 @@ const DisableContextPadModule = {
   }]
 };
 
-const simModeler = new BpmnModeler({
-  container: '#canvas-sim',
-  additionalModules: [ 
-    TokenSim,
-    DisableContextPadModule 
-  ],
-  moddleExtensions: { camunda: camundaModdleDescriptor }
-});
-window._simModeler = simModeler;
+let simModeler;
 
 // Helper to get active modeler in simulation mode
 window.getActiveModeler = function() {
@@ -85,21 +77,37 @@ function clearLog() {
   logContainer.innerHTML = '<div class="text-muted small">In attesa di eventi di simulazione...</div>';
 }
 
-// Carica il BPMN dallo stato globale (o BPMN vuoto di default)
-const initialBpmn = getCurrentBpmn();
-simModeler.importXML(initialBpmn).then(() => {
-  try { 
-    simModeler.get('canvas').zoom('fit-viewport'); 
-  } catch (e) { 
-    console.warn('zoom failed', e); 
-  }
-  console.log('✅ Simulation inizializzata con BPMN dallo stato globale');
-}).catch(err => {
-  console.error('❌ Errore caricamento BPMN iniziale in simulation', err);
-});
-
 // Setup simulation controls
 document.addEventListener('DOMContentLoaded', () => {
+  // Se la pagina non contiene #canvas-sim questo bundle non deve fare nulla
+  if (!document.getElementById('canvas-sim')) {
+    return;
+  }
+
+  // Inizializza il modeler solo quando il DOM è pronto e #canvas-sim esiste
+  simModeler = new BpmnModeler({
+    container: '#canvas-sim',
+    additionalModules: [
+      TokenSim,
+      DisableContextPadModule
+    ],
+    moddleExtensions: { camunda: camundaModdleDescriptor }
+  });
+  window._simModeler = simModeler;
+
+  // Carica il BPMN dallo stato globale (o BPMN vuoto di default)
+  const initialBpmn = getCurrentBpmn();
+  simModeler.importXML(initialBpmn).then(() => {
+    try {
+      simModeler.get('canvas').zoom('fit-viewport');
+    } catch (e) {
+      console.warn('zoom failed', e);
+    }
+    console.log('✅ Simulation inizializzata con BPMN dallo stato globale');
+  }).catch(err => {
+    console.error('❌ Errore caricamento BPMN iniziale in simulation', err);
+  });
+
   // Wire file handlers to use the sim modeler (must be after DOM is ready)
   try {
     setupFileHandlers(simModeler);

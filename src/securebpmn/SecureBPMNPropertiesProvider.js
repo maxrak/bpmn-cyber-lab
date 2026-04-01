@@ -52,30 +52,59 @@ const PRIVACY_OPTIONS = [
 export default class SecureBpmnPropertiesProvider {
   constructor(propertiesPanel, injector) {
     this._injector = injector;
-    propertiesPanel.registerProvider(500, this);
-  }
 
-  getGroups(element) {
-    return (groups) => {
-      if (!isSecureBpmnTarget(element)) {
+    // Definizione diretta sul'istanza (non sul prototipo) per garantire
+    // che typeof this.getGroups === 'function' sia vero prima della
+    // registrazione, anche in webpack eval-mode dove la catena del
+    // prototipo può non essere ancora risolta.
+    const self = this;
+    this.getGroups = function getGroups(element) {
+      return (groups) => {
+        const isTarget = isSecureBpmnTarget(element);
+        const hasRequirements = !!getPrimarySecurityRequirement(element);
+
+        if (!isTarget && !hasRequirements) {
+          return groups;
+        }
+
+        groups.push(createSecureBpmnGroup(element, self._injector, isTarget));
+
         return groups;
-      }
-
-      groups.push(createSecureBpmnGroup(element, this._injector));
-
-      return groups;
+      };
     };
+
+    propertiesPanel.registerProvider(500, this);
   }
 }
 
 SecureBpmnPropertiesProvider.$inject = [ 'propertiesPanel', 'injector' ];
 
-function createSecureBpmnGroup(element, injector) {
+function createSecureBpmnGroup(element, injector, isTarget) {
   const translate = injector.get('translate');
+  const hasRequirement = !!getPrimarySecurityRequirement(element);
+
+  // Per elementi non supportati come target ma con requisiti già presenti,
+  // mostra un riepilogo read-only invece del form di editing.
+  if (!isTarget) {
+    return {
+      id: 'secure-bpmn',
+      label: translate('SecureBPMN'),
+      shouldOpen: true,
+      entries: [
+        {
+          id: 'sb-readonly-summary',
+          component: ReadOnlyRequirementsSummaryEntry,
+          element,
+          isEdited: () => false
+        }
+      ]
+    };
+  }
 
   return {
     id: 'secure-bpmn',
     label: translate('SecureBPMN'),
+    shouldOpen: hasRequirement,
     entries: [
       {
         id: 'sb-requirement-type',
@@ -85,47 +114,37 @@ function createSecureBpmnGroup(element, injector) {
       {
         id: 'sb-audit',
         component: AuditEntry,
-        element,
-        isHidden: (el) => !getRequirementType(el)
+        element
       },
       {
         id: 'sb-protect-degree',
         component: ProtectDegreeEntry,
-        element,
-        isHidden: (el) => getRequirementType(el) !== REQUIREMENT_TYPES.INTEGRITY
+        element
       },
       {
         id: 'sb-privacy-type',
         component: PrivacyTypeEntry,
-        element,
-        isHidden: (el) => getRequirementType(el) !== REQUIREMENT_TYPES.PRIVACY
+        element
       },
       {
         id: 'sb-notes',
         component: NotesEntry,
-        element,
-        isHidden: (el) => !getRequirementType(el)
+        element
       },
       {
         id: 'sb-roles',
         component: RolesEntry,
-        element,
-        isHidden: (el) => {
-          const t = getRequirementType(el);
-          return !(t === REQUIREMENT_TYPES.PRIVACY || t === REQUIREMENT_TYPES.ACCESS_CONTROL);
-        }
+        element
       },
       {
         id: 'sb-permissions',
         component: PermissionsEntry,
-        element,
-        isHidden: (el) => getRequirementType(el) !== REQUIREMENT_TYPES.ACCESS_CONTROL
+        element
       },
       {
         id: 'sb-validation',
         component: ValidationSummaryEntry,
-        element,
-        isHidden: (el) => !getRequirementType(el)
+        element
       }
     ]
   };
@@ -133,6 +152,44 @@ function createSecureBpmnGroup(element, injector) {
 
 function getRequirementType(element) {
   return getPrimarySecurityRequirement(element)?.requirementType || '';
+}
+
+function ReadOnlyRequirementsSummaryEntry(props) {
+  const { element } = props;
+  const req = getPrimarySecurityRequirement(element);
+
+  const div = document.createElement('div');
+  div.style.padding = '8px 4px';
+  div.style.fontSize = '12px';
+  div.style.lineHeight = '1.6';
+  div.style.color = '#444';
+
+  if (!req || !req.requirementType) {
+    div.innerHTML = '<em style="color:#888;">Nessun requisito di sicurezza associato.</em>';
+    return div;
+  }
+
+  const rows = [
+    [ 'Tipo',          req.requirementType || '-' ],
+    [ 'Audit',         req.audit           || '-' ],
+    [ 'Protect degree',req.protectDegree   || '-' ],
+    [ 'Privacy type',  req.privacyType     || '-' ],
+    [ 'Note',          req.notes           || '-' ]
+  ];
+
+  const roles = stringifyRoles(req.roles || []);
+  if (roles) rows.push([ 'Ruoli', roles ]);
+
+  const perms = stringifyPermissions(req.permissions || []);
+  if (perms) rows.push([ 'Permessi', perms ]);
+
+  div.innerHTML = rows
+    .map(([ label, value ]) =>
+      `<div><strong>${escapeHtml(label)}:</strong> ${escapeHtml(String(value))}</div>`
+    )
+    .join('');
+
+  return div;
 }
 
 function RequirementTypeEntry(props) {
@@ -194,6 +251,8 @@ function AuditEntry(props) {
   const debounce = useService('debounceInput');
   const translate = useService('translate');
 
+  if (!getRequirementType(element)) return null;
+
   return TextFieldEntry({
     element,
     id: 'sb-audit',
@@ -213,6 +272,8 @@ function ProtectDegreeEntry(props) {
   const moddle = useService('moddle');
   const debounce = useService('debounceInput');
   const translate = useService('translate');
+
+  if (getRequirementType(element) !== REQUIREMENT_TYPES.INTEGRITY) return null;
 
   return SelectEntry({
     element,
@@ -239,6 +300,8 @@ function PrivacyTypeEntry(props) {
   const debounce = useService('debounceInput');
   const translate = useService('translate');
 
+  if (getRequirementType(element) !== REQUIREMENT_TYPES.PRIVACY) return null;
+
   return SelectEntry({
     element,
     id: 'sb-privacy-type',
@@ -264,6 +327,8 @@ function NotesEntry(props) {
   const debounce = useService('debounceInput');
   const translate = useService('translate');
 
+  if (!getRequirementType(element)) return null;
+
   return TextAreaEntry({
     element,
     id: 'sb-notes',
@@ -282,6 +347,9 @@ function RolesEntry(props) {
   const moddle = useService('moddle');
   const debounce = useService('debounceInput');
   const translate = useService('translate');
+
+  const t = getRequirementType(element);
+  if (!(t === REQUIREMENT_TYPES.PRIVACY || t === REQUIREMENT_TYPES.ACCESS_CONTROL)) return null;
 
   return TextAreaEntry({
     element,
@@ -311,6 +379,8 @@ function PermissionsEntry(props) {
   const debounce = useService('debounceInput');
   const translate = useService('translate');
 
+  if (getRequirementType(element) !== REQUIREMENT_TYPES.ACCESS_CONTROL) return null;
+
   return TextAreaEntry({
     element,
     id: 'sb-permissions',
@@ -335,6 +405,8 @@ function PermissionsEntry(props) {
 function ValidationSummaryEntry(props) {
   const { element } = props;
   const translate = useService('translate');
+
+  if (!getRequirementType(element)) return null;
 
   const req = getPrimarySecurityRequirement(element);
   const result = validateSecureBpmnRequirement(element, req);

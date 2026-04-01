@@ -13,5 +13,7 @@
   "multiple-signals-example.bpmn",
   "sample-empty.bpmn",
   "sample-iam-as-is.bpmn",
+  "securebpmn-example-2.bpmn",
+  "securebpmn-example.bpmn",
   "signal-events-example.bpmn"
 ]
