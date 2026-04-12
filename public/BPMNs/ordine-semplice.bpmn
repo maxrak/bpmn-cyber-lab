@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_OrdineSemplice"
+                  targetNamespace="http://example.com/bpmn">
+
+  <bpmn:process id="Process_OrdineSemplice" name="Processo ordine semplice" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_OrdineRicevuto" name="Ordine ricevuto">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:serviceTask id="Task_ValidaOrdine" name="Valida ordine">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:exclusiveGateway id="Gateway_OrdineValido" name="Ordine valido?">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:serviceTask id="Task_PreparaSpedizione" name="Prepara spedizione">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="EndEvent_Completato" name="Ordine completato">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:serviceTask id="Task_NotificaErrore" name="Notifica errore ordine">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="EndEvent_Rifiutato" name="Ordine rifiutato">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_OrdineRicevuto" targetRef="Task_ValidaOrdine" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_ValidaOrdine" targetRef="Gateway_OrdineValido" />
+    <bpmn:sequenceFlow id="Flow_3" name="Sì" sourceRef="Gateway_OrdineValido" targetRef="Task_PreparaSpedizione">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[${ordineValido == true}]]></bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_4" name="No" sourceRef="Gateway_OrdineValido" targetRef="Task_NotificaErrore">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[${ordineValido == false}]]></bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_PreparaSpedizione" targetRef="EndEvent_Completato" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_NotificaErrore" targetRef="EndEvent_Rifiutato" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_OrdineSemplice">
+      <bpmndi:BPMNShape id="Shape_StartEvent" bpmnElement="StartEvent_OrdineRicevuto">
+        <dc:Bounds x="100" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_ValidaOrdine" bpmnElement="Task_ValidaOrdine">
+        <dc:Bounds x="180" y="78" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_OrdineValido" bpmnElement="Gateway_OrdineValido" isMarkerVisible="true">
+        <dc:Bounds x="340" y="93" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_PreparaSpedizione" bpmnElement="Task_PreparaSpedizione">
+        <dc:Bounds x="450" y="40" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_NotificaErrore" bpmnElement="Task_NotificaErrore">
+        <dc:Bounds x="450" y="150" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Completato" bpmnElement="EndEvent_Completato">
+        <dc:Bounds x="650" y="62" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Rifiutato" bpmnElement="EndEvent_Rifiutato">
+        <dc:Bounds x="650" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Edge_Flow_1" bpmnElement="Flow_1">
+        <di:waypoint x="136" y="118" />
+        <di:waypoint x="180" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_2" bpmnElement="Flow_2">
+        <di:waypoint x="290" y="118" />
+        <di:waypoint x="340" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_3" bpmnElement="Flow_3">
+        <di:waypoint x="390" y="118" />
+        <di:waypoint x="450" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_4" bpmnElement="Flow_4">
+        <di:waypoint x="390" y="118" />
+        <di:waypoint x="450" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_5" bpmnElement="Flow_5">
+        <di:waypoint x="580" y="80" />
+        <di:waypoint x="650" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_6" bpmnElement="Flow_6">
+        <di:waypoint x="580" y="190" />
+        <di:waypoint x="650" y="190" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

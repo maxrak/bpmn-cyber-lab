@@ -1,0 +1,37 @@
+name: Processo Ordine Semplice
+
+on:
+  workflow_dispatch:
+    inputs:
+      ordine_valido:
+        description: "true se l'ordine e valido"
+        required: true
+        default: "true"
+
+jobs:
+  valida_ordine:
+    runs-on: ubuntu-latest
+    outputs:
+      ordine_valido: ${{ steps.esito.outputs.ordine_valido }}
+    steps:
+      - name: Simula validazione ordine
+        id: esito
+        run: |
+          echo "Validazione ordine in corso"
+          echo "ordine_valido=${{ github.event.inputs.ordine_valido }}" >> "$GITHUB_OUTPUT"
+
+  prepara_spedizione:
+    runs-on: ubuntu-latest
+    needs: valida_ordine
+    if: ${{ needs.valida_ordine.outputs.ordine_valido == 'true' }}
+    steps:
+      - name: Prepara spedizione
+        run: echo "Ordine valido: preparo la spedizione"
+
+  notifica_errore:
+    runs-on: ubuntu-latest
+    needs: valida_ordine
+    if: ${{ needs.valida_ordine.outputs.ordine_valido != 'true' }}
+    steps:
+      - name: Notifica errore ordine
+        run: echo "Ordine non valido: invio notifica di errore"
