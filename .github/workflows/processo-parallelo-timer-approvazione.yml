@@ -1,0 +1,52 @@
+name: Build Test Deploy con attesa e approvazione
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 1-5"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build applicazione
+        run: |
+          echo "Compilazione in corso"
+          sleep 5
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Esegui test automatici
+        run: |
+          echo "Test in corso"
+          sleep 5
+
+  wait_timer:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - test
+    steps:
+      - name: Attendi 2 minuti
+        run: |
+          echo "Attesa di 2 minuti prima della richiesta di approvazione"
+          sleep 120
+
+  approval_gate:
+    runs-on: ubuntu-latest
+    needs: wait_timer
+    environment:
+      name: produzione
+    steps:
+      - name: Approvazione ottenuta
+        run: |
+          echo "Il job e stato approvato manualmente tramite environment protection rules"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: approval_gate
+    steps:
+      - name: Deploy in produzione
+        run: |
+          echo "Deploy in produzione"
