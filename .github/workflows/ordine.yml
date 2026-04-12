@@ -26,7 +26,7 @@ jobs:
     if: ${{ needs.valida_ordine.outputs.ordine_valido == 'true' }}
     steps:
       - name: Prepara spedizione
-        run: echo "Ordine valido: preparo la spedizione"
+        run: echo "Ordine valido ->preparo la spedizione"
 
   notifica_errore:
     runs-on: ubuntu-latest
@@ -34,4 +34,4 @@ jobs:
     if: ${{ needs.valida_ordine.outputs.ordine_valido != 'true' }}
     steps:
       - name: Notifica errore ordine
-        run: echo "Ordine non valido: invio notifica di errore"
+        run: echo "Ordine non valido -> invio notifica di errore"
