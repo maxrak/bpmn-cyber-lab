@@ -31,7 +31,7 @@ jobs:
       - name: Attendi 2 minuti
         run: |
           echo "Attesa di 2 minuti prima della richiesta di approvazione"
-          sleep 120
+          sleep 12
 
   approval_gate:
     runs-on: ubuntu-latest
