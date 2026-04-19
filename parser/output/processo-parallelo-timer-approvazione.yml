@@ -1,0 +1,38 @@
+name: Build, test paralleli, attesa e approvazione manuale
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build applicazione
+        run: echo "Esecuzione Build applicazione"
+    needs: codepushed
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Esegui test automatici
+        run: echo "Esecuzione Esegui test automatici"
+    needs: codepushed
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy in produzione
+        run: echo "Esecuzione Deploy in produzione"
+    needs: manualapproval
+  wait:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Attendi 2 minuti
+        run: sleep 12
+    needs:
+      - build
+      - test
+  manualapproval:
+    runs-on: ubuntu-latest
+    environment:
+      name: produzione
+    steps:
+      - name: Approvazione manuale deploy
+        run: echo "Approvazione manuale completata"
+    needs: wait
+on:
+  workflow_dispatch: {}

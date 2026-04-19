@@ -12,6 +12,7 @@
   "message-events-example.bpmn",
   "multiple-signals-example.bpmn",
   "ordine-semplice.bpmn",
+  "processo-parallelo-timer-approvazione.bpmn",
   "sample-empty.bpmn",
   "sample-iam-as-is.bpmn",
   "securebpmn-example-2.bpmn",

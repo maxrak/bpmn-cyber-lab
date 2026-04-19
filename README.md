@@ -157,6 +157,10 @@ bpmn-cyber-lab/
 │   └── risktemplate.csv             # Template analisi rischi
 ├── scripts/
 │   └── generate-bpmn-list.js        # Genera list.json
+├── parser/                           # CLI Parser BPMN -> GitHub Actions
+│   ├── bpmn2github.js                # Modulo core di parsing e mapping regole
+│   ├── index.js                      # Entry point riga di comando
+│   └── output/                       # File .yml generati automaticamente
 ├── bpmn_demo/                        # Demo didattica v1 con backend mock
 ├── bpmn_demo_pratica_v2/             # Demo didattica v2 semplificata
 ├── webpack.config.js

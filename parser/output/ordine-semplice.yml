@@ -1,0 +1,27 @@
+name: Processo ordine semplice
+jobs:
+  validaordine:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Valida ordine
+        run: echo "ordine_valido=true" >> "$GITHUB_OUTPUT"
+        id: esito
+    outputs:
+      ordine_valido: ${{ steps.esito.outputs.ordine_valido }}
+    needs: ordinericevuto
+  preparaspedizione:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepara spedizione
+        run: echo "Esecuzione Prepara spedizione"
+    needs: validaordine
+    if: ${{ needs.valida_ordine.outputs.ordineValido == true}
+  notificaerrore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notifica errore ordine
+        run: echo "Esecuzione Notifica errore ordine"
+    needs: validaordine
+    if: ${{ needs.valida_ordine.outputs.ordineValido == false}
+on:
+  workflow_dispatch: {}
