@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  id="Definitions_OIDC_AuthCode"
+  targetNamespace="http://example.com/bpmn/oidc-auth-code">
+
+  <bpmn:collaboration id="Collaboration_OIDC">
+    <bpmn:participant id="Participant_User" name="Utente" processRef="Process_User"/>
+    <bpmn:participant id="Participant_Client" name="Client Application (Relying Party)" processRef="Process_Client"/>
+    <bpmn:participant id="Participant_OP" name="Authorization Server / OpenID Provider" processRef="Process_OP"/>
+
+    <bpmn:messageFlow id="MF_1" name="Richiesta accesso" sourceRef="Task_User_OpenApp" targetRef="Start_Client_Request"/>
+    <bpmn:messageFlow id="MF_2" name="Redirect a OP (authorization request: response_type=code, scope=openid, client_id, redirect_uri, state, nonce)" sourceRef="Task_Client_RedirectToOP" targetRef="Start_OP_AuthorizationRequest"/>
+    <bpmn:messageFlow id="MF_3" name="Login + consenso" sourceRef="Task_OP_RequestLoginConsent" targetRef="Task_User_LoginConsent"/>
+    <bpmn:messageFlow id="MF_4" name="Credenziali / conferma consenso" sourceRef="Task_User_SubmitCredentialsConsent" targetRef="Task_OP_AuthenticateUser"/>
+    <bpmn:messageFlow id="MF_5" name="Redirect con authorization code + state" sourceRef="Task_OP_ReturnCode" targetRef="Task_Client_HandleCallback"/>
+    <bpmn:messageFlow id="MF_6" name="Token request (authorization code)" sourceRef="Task_Client_RequestTokens" targetRef="Task_OP_ValidateAndIssueTokens"/>
+    <bpmn:messageFlow id="MF_7" name="ID Token + Access Token (+ Refresh Token opz.)" sourceRef="Task_OP_ReturnTokens" targetRef="Task_Client_ValidateTokens"/>
+    <bpmn:messageFlow id="MF_8" name="Accesso consentito" sourceRef="Task_Client_CreateSession" targetRef="Task_User_AccessGranted"/>
+    <bpmn:messageFlow id="MF_9" name="Errore autenticazione" sourceRef="Task_Client_DenyAccess" targetRef="Task_User_AccessDenied"/>
+    <bpmn:messageFlow id="MF_10" name="Errore login/consenso" sourceRef="Task_OP_RejectAuthorization" targetRef="Task_User_AccessDenied"/>
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_User" name="Processo Utente" isExecutable="false">
+    <bpmn:startEvent id="Start_User" name="Necessità di accesso">
+      <bpmn:outgoing>Flow_U1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_User_OpenApp" name="Accede alla client application">
+      <bpmn:incoming>Flow_U1</bpmn:incoming>
+      <bpmn:outgoing>Flow_U2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_User_LoginConsent" name="Inserisce credenziali e fornisce consenso">
+      <bpmn:incoming>Flow_U2</bpmn:incoming>
+      <bpmn:outgoing>Flow_U3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_User_SubmitCredentialsConsent" name="Invia credenziali / consenso">
+      <bpmn:incoming>Flow_U3</bpmn:incoming>
+      <bpmn:outgoing>Flow_U4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:eventBasedGateway id="Gateway_User_WaitResult" name="Attende esito">
+      <bpmn:incoming>Flow_U4</bpmn:incoming>
+      <bpmn:outgoing>Flow_U5</bpmn:outgoing>
+      <bpmn:outgoing>Flow_U6</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:receiveTask id="Task_User_AccessGranted" name="Riceve accesso alla applicazione">
+      <bpmn:incoming>Flow_U5</bpmn:incoming>
+      <bpmn:outgoing>Flow_U7</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:receiveTask id="Task_User_AccessDenied" name="Riceve errore di autenticazione">
+      <bpmn:incoming>Flow_U6</bpmn:incoming>
+      <bpmn:outgoing>Flow_U8</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:endEvent id="End_User_Success" name="Accesso completato">
+      <bpmn:incoming>Flow_U7</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="End_User_Failure" name="Accesso fallito">
+      <bpmn:incoming>Flow_U8</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_U1" sourceRef="Start_User" targetRef="Task_User_OpenApp"/>
+    <bpmn:sequenceFlow id="Flow_U2" sourceRef="Task_User_OpenApp" targetRef="Task_User_LoginConsent"/>
+    <bpmn:sequenceFlow id="Flow_U3" sourceRef="Task_User_LoginConsent" targetRef="Task_User_SubmitCredentialsConsent"/>
+    <bpmn:sequenceFlow id="Flow_U4" sourceRef="Task_User_SubmitCredentialsConsent" targetRef="Gateway_User_WaitResult"/>
+    <bpmn:sequenceFlow id="Flow_U5" sourceRef="Gateway_User_WaitResult" targetRef="Task_User_AccessGranted"/>
+    <bpmn:sequenceFlow id="Flow_U6" sourceRef="Gateway_User_WaitResult" targetRef="Task_User_AccessDenied"/>
+    <bpmn:sequenceFlow id="Flow_U7" sourceRef="Task_User_AccessGranted" targetRef="End_User_Success"/>
+    <bpmn:sequenceFlow id="Flow_U8" sourceRef="Task_User_AccessDenied" targetRef="End_User_Failure"/>
+  </bpmn:process>
+
+  <bpmn:process id="Process_Client" name="Processo Client Application" isExecutable="false">
+    <bpmn:startEvent id="Start_Client_Request" name="Richiesta ricevuta">
+      <bpmn:outgoing>Flow_C1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_Client_CheckSession" name="Verifica sessione locale">
+      <bpmn:incoming>Flow_C1</bpmn:incoming>
+      <bpmn:outgoing>Flow_C2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_Client_SessionExists" name="Sessione valida esistente?">
+      <bpmn:incoming>Flow_C2</bpmn:incoming>
+      <bpmn:outgoing>Flow_C3</bpmn:outgoing>
+      <bpmn:outgoing>Flow_C4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_Client_RedirectToOP" name="Costruisce authorization request e redirige a OP">
+      <bpmn:incoming>Flow_C4</bpmn:incoming>
+      <bpmn:outgoing>Flow_C5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Client_HandleCallback" name="Riceve callback con code e state">
+      <bpmn:incoming>Flow_C5</bpmn:incoming>
+      <bpmn:outgoing>Flow_C6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Client_RequestTokens" name="Invia token request al token endpoint">
+      <bpmn:incoming>Flow_C6</bpmn:incoming>
+      <bpmn:outgoing>Flow_C7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Client_ValidateTokens" name="Valida state, ID Token, nonce e claims">
+      <bpmn:incoming>Flow_C7</bpmn:incoming>
+      <bpmn:outgoing>Flow_C8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_Client_TokensValid" name="Token validi?">
+      <bpmn:incoming>Flow_C8</bpmn:incoming>
+      <bpmn:outgoing>Flow_C9</bpmn:outgoing>
+      <bpmn:outgoing>Flow_C10</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_Client_CreateSession" name="Crea sessione applicativa e concede accesso">
+      <bpmn:incoming>Flow_C3</bpmn:incoming>
+      <bpmn:incoming>Flow_C9</bpmn:incoming>
+      <bpmn:outgoing>Flow_C11</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Client_DenyAccess" name="Nega accesso e registra errore">
+      <bpmn:incoming>Flow_C10</bpmn:incoming>
+      <bpmn:outgoing>Flow_C12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_Client_Success" name="Accesso erogato">
+      <bpmn:incoming>Flow_C11</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="End_Client_Failure" name="Accesso rifiutato">
+      <bpmn:incoming>Flow_C12</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_C1" sourceRef="Start_Client_Request" targetRef="Task_Client_CheckSession"/>
+    <bpmn:sequenceFlow id="Flow_C2" sourceRef="Task_Client_CheckSession" targetRef="Gateway_Client_SessionExists"/>
+    <bpmn:sequenceFlow id="Flow_C3" name="Sì" sourceRef="Gateway_Client_SessionExists" targetRef="Task_Client_CreateSession"/>
+    <bpmn:sequenceFlow id="Flow_C4" name="No" sourceRef="Gateway_Client_SessionExists" targetRef="Task_Client_RedirectToOP"/>
+    <bpmn:sequenceFlow id="Flow_C5" sourceRef="Task_Client_RedirectToOP" targetRef="Task_Client_HandleCallback"/>
+    <bpmn:sequenceFlow id="Flow_C6" sourceRef="Task_Client_HandleCallback" targetRef="Task_Client_RequestTokens"/>
+    <bpmn:sequenceFlow id="Flow_C7" sourceRef="Task_Client_RequestTokens" targetRef="Task_Client_ValidateTokens"/>
+    <bpmn:sequenceFlow id="Flow_C8" sourceRef="Task_Client_ValidateTokens" targetRef="Gateway_Client_TokensValid"/>
+    <bpmn:sequenceFlow id="Flow_C9" name="Sì" sourceRef="Gateway_Client_TokensValid" targetRef="Task_Client_CreateSession"/>
+    <bpmn:sequenceFlow id="Flow_C10" name="No" sourceRef="Gateway_Client_TokensValid" targetRef="Task_Client_DenyAccess"/>
+    <bpmn:sequenceFlow id="Flow_C11" sourceRef="Task_Client_CreateSession" targetRef="End_Client_Success"/>
+    <bpmn:sequenceFlow id="Flow_C12" sourceRef="Task_Client_DenyAccess" targetRef="End_Client_Failure"/>
+  </bpmn:process>
+
+  <bpmn:process id="Process_OP" name="Processo Authorization Server / OpenID Provider" isExecutable="false">
+    <bpmn:startEvent id="Start_OP_AuthorizationRequest" name="Authorization request ricevuta">
+      <bpmn:outgoing>Flow_O1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_OP_ValidateAuthRequest" name="Valida client, redirect_uri, scope openid e parametri">
+      <bpmn:incoming>Flow_O1</bpmn:incoming>
+      <bpmn:outgoing>Flow_O2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_OP_RequestLoginConsent" name="Richiede login e consenso utente">
+      <bpmn:incoming>Flow_O2</bpmn:incoming>
+      <bpmn:outgoing>Flow_O3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_OP_AuthenticateUser" name="Autentica utente e verifica consenso">
+      <bpmn:incoming>Flow_O3</bpmn:incoming>
+      <bpmn:outgoing>Flow_O4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_OP_UserAuthenticated" name="Autenticazione e consenso validi?">
+      <bpmn:incoming>Flow_O4</bpmn:incoming>
+      <bpmn:outgoing>Flow_O5</bpmn:outgoing>
+      <bpmn:outgoing>Flow_O6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_OP_ReturnCode" name="Genera authorization code e redirige al client">
+      <bpmn:incoming>Flow_O5</bpmn:incoming>
+      <bpmn:outgoing>Flow_O7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_OP_ValidateAndIssueTokens" name="Valida code e client auth, poi genera ID/Access Token">
+      <bpmn:incoming>Flow_O7</bpmn:incoming>
+      <bpmn:outgoing>Flow_O8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_OP_ReturnTokens" name="Restituisce token response">
+      <bpmn:incoming>Flow_O8</bpmn:incoming>
+      <bpmn:outgoing>Flow_O9</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_OP_RejectAuthorization" name="Restituisce errore di autorizzazione">
+      <bpmn:incoming>Flow_O6</bpmn:incoming>
+      <bpmn:outgoing>Flow_O10</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_OP_Success" name="Token emessi">
+      <bpmn:incoming>Flow_O9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="End_OP_Failure" name="Autorizzazione fallita">
+      <bpmn:incoming>Flow_O10</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_O1" sourceRef="Start_OP_AuthorizationRequest" targetRef="Task_OP_ValidateAuthRequest"/>
+    <bpmn:sequenceFlow id="Flow_O2" sourceRef="Task_OP_ValidateAuthRequest" targetRef="Task_OP_RequestLoginConsent"/>
+    <bpmn:sequenceFlow id="Flow_O3" sourceRef="Task_OP_RequestLoginConsent" targetRef="Task_OP_AuthenticateUser"/>
+    <bpmn:sequenceFlow id="Flow_O4" sourceRef="Task_OP_AuthenticateUser" targetRef="Gateway_OP_UserAuthenticated"/>
+    <bpmn:sequenceFlow id="Flow_O5" name="Sì" sourceRef="Gateway_OP_UserAuthenticated" targetRef="Task_OP_ReturnCode"/>
+    <bpmn:sequenceFlow id="Flow_O6" name="No" sourceRef="Gateway_OP_UserAuthenticated" targetRef="Task_OP_RejectAuthorization"/>
+    <bpmn:sequenceFlow id="Flow_O7" sourceRef="Task_OP_ReturnCode" targetRef="Task_OP_ValidateAndIssueTokens"/>
+    <bpmn:sequenceFlow id="Flow_O8" sourceRef="Task_OP_ValidateAndIssueTokens" targetRef="Task_OP_ReturnTokens"/>
+    <bpmn:sequenceFlow id="Flow_O9" sourceRef="Task_OP_ReturnTokens" targetRef="End_OP_Success"/>
+    <bpmn:sequenceFlow id="Flow_O10" sourceRef="Task_OP_RejectAuthorization" targetRef="End_OP_Failure"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_OIDC">
+    <bpmndi:BPMNPlane id="BPMNPlane_OIDC" bpmnElement="Collaboration_OIDC">
+      <bpmndi:BPMNShape id="Participant_User_di" bpmnElement="Participant_User" isHorizontal="true">
+        <dc:Bounds x="100" y="80" width="2100" height="220"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_Client_di" bpmnElement="Participant_Client" isHorizontal="true">
+        <dc:Bounds x="100" y="340" width="2100" height="260"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_OP_di" bpmnElement="Participant_OP" isHorizontal="true">
+        <dc:Bounds x="100" y="640" width="2100" height="260"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Start_User_di" bpmnElement="Start_User">
+        <dc:Bounds x="150" y="170" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_User_OpenApp_di" bpmnElement="Task_User_OpenApp">
+        <dc:Bounds x="230" y="148" width="130" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_User_LoginConsent_di" bpmnElement="Task_User_LoginConsent">
+        <dc:Bounds x="760" y="148" width="180" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_User_SubmitCredentialsConsent_di" bpmnElement="Task_User_SubmitCredentialsConsent">
+        <dc:Bounds x="980" y="148" width="170" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_User_WaitResult_di" bpmnElement="Gateway_User_WaitResult" isMarkerVisible="true">
+        <dc:Bounds x="1200" y="163" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_User_AccessGranted_di" bpmnElement="Task_User_AccessGranted">
+        <dc:Bounds x="1460" y="110" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_User_AccessDenied_di" bpmnElement="Task_User_AccessDenied">
+        <dc:Bounds x="1460" y="210" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_User_Success_di" bpmnElement="End_User_Success">
+        <dc:Bounds x="1670" y="132" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_User_Failure_di" bpmnElement="End_User_Failure">
+        <dc:Bounds x="1670" y="232" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Start_Client_Request_di" bpmnElement="Start_Client_Request">
+        <dc:Bounds x="230" y="452" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Client_CheckSession_di" bpmnElement="Task_Client_CheckSession">
+        <dc:Bounds x="310" y="430" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Client_SessionExists_di" bpmnElement="Gateway_Client_SessionExists" isMarkerVisible="true">
+        <dc:Bounds x="510" y="445" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Client_RedirectToOP_di" bpmnElement="Task_Client_RedirectToOP">
+        <dc:Bounds x="620" y="430" width="180" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Client_HandleCallback_di" bpmnElement="Task_Client_HandleCallback">
+        <dc:Bounds x="1000" y="430" width="170" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Client_RequestTokens_di" bpmnElement="Task_Client_RequestTokens">
+        <dc:Bounds x="1230" y="430" width="170" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Client_ValidateTokens_di" bpmnElement="Task_Client_ValidateTokens">
+        <dc:Bounds x="1460" y="430" width="190" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Client_TokensValid_di" bpmnElement="Gateway_Client_TokensValid" isMarkerVisible="true">
+        <dc:Bounds x="1710" y="445" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Client_CreateSession_di" bpmnElement="Task_Client_CreateSession">
+        <dc:Bounds x="1830" y="370" width="180" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Client_DenyAccess_di" bpmnElement="Task_Client_DenyAccess">
+        <dc:Bounds x="1830" y="510" width="180" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Client_Success_di" bpmnElement="End_Client_Success">
+        <dc:Bounds x="2070" y="392" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Client_Failure_di" bpmnElement="End_Client_Failure">
+        <dc:Bounds x="2070" y="532" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Start_OP_AuthorizationRequest_di" bpmnElement="Start_OP_AuthorizationRequest">
+        <dc:Bounds x="650" y="752" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_OP_ValidateAuthRequest_di" bpmnElement="Task_OP_ValidateAuthRequest">
+        <dc:Bounds x="730" y="730" width="190" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_OP_RequestLoginConsent_di" bpmnElement="Task_OP_RequestLoginConsent">
+        <dc:Bounds x="970" y="730" width="180" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_OP_AuthenticateUser_di" bpmnElement="Task_OP_AuthenticateUser">
+        <dc:Bounds x="1190" y="730" width="180" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_OP_UserAuthenticated_di" bpmnElement="Gateway_OP_UserAuthenticated" isMarkerVisible="true">
+        <dc:Bounds x="1420" y="745" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_OP_ReturnCode_di" bpmnElement="Task_OP_ReturnCode">
+        <dc:Bounds x="1520" y="690" width="170" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_OP_RejectAuthorization_di" bpmnElement="Task_OP_RejectAuthorization">
+        <dc:Bounds x="1520" y="810" width="170" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_OP_ValidateAndIssueTokens_di" bpmnElement="Task_OP_ValidateAndIssueTokens">
+        <dc:Bounds x="1750" y="690" width="200" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_OP_ReturnTokens_di" bpmnElement="Task_OP_ReturnTokens">
+        <dc:Bounds x="2000" y="690" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_OP_Success_di" bpmnElement="End_OP_Success">
+        <dc:Bounds x="2170" y="712" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_OP_Failure_di" bpmnElement="End_OP_Failure">
+        <dc:Bounds x="1750" y="832" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_U1_di" bpmnElement="Flow_U1"><di:waypoint x="186" y="188"/><di:waypoint x="230" y="188"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_U2_di" bpmnElement="Flow_U2"><di:waypoint x="360" y="188"/><di:waypoint x="760" y="188"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_U3_di" bpmnElement="Flow_U3"><di:waypoint x="940" y="188"/><di:waypoint x="980" y="188"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_U4_di" bpmnElement="Flow_U4"><di:waypoint x="1150" y="188"/><di:waypoint x="1200" y="188"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_U5_di" bpmnElement="Flow_U5"><di:waypoint x="1250" y="188"/><di:waypoint x="1355" y="188"/><di:waypoint x="1355" y="150"/><di:waypoint x="1460" y="150"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_U6_di" bpmnElement="Flow_U6"><di:waypoint x="1250" y="188"/><di:waypoint x="1355" y="188"/><di:waypoint x="1355" y="250"/><di:waypoint x="1460" y="250"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_U7_di" bpmnElement="Flow_U7"><di:waypoint x="1610" y="150"/><di:waypoint x="1670" y="150"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_U8_di" bpmnElement="Flow_U8"><di:waypoint x="1610" y="250"/><di:waypoint x="1670" y="250"/></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_C1_di" bpmnElement="Flow_C1"><di:waypoint x="266" y="470"/><di:waypoint x="310" y="470"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C2_di" bpmnElement="Flow_C2"><di:waypoint x="460" y="470"/><di:waypoint x="510" y="470"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C3_di" bpmnElement="Flow_C3"><di:waypoint x="560" y="470"/><di:waypoint x="650" y="470"/><di:waypoint x="650" y="410"/><di:waypoint x="1830" y="410"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C4_di" bpmnElement="Flow_C4"><di:waypoint x="560" y="470"/><di:waypoint x="620" y="470"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C5_di" bpmnElement="Flow_C5"><di:waypoint x="800" y="470"/><di:waypoint x="1000" y="470"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C6_di" bpmnElement="Flow_C6"><di:waypoint x="1170" y="470"/><di:waypoint x="1230" y="470"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C7_di" bpmnElement="Flow_C7"><di:waypoint x="1400" y="470"/><di:waypoint x="1460" y="470"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C8_di" bpmnElement="Flow_C8"><di:waypoint x="1650" y="470"/><di:waypoint x="1710" y="470"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C9_di" bpmnElement="Flow_C9"><di:waypoint x="1760" y="470"/><di:waypoint x="1795" y="470"/><di:waypoint x="1795" y="410"/><di:waypoint x="1830" y="410"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C10_di" bpmnElement="Flow_C10"><di:waypoint x="1760" y="470"/><di:waypoint x="1795" y="470"/><di:waypoint x="1795" y="550"/><di:waypoint x="1830" y="550"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C11_di" bpmnElement="Flow_C11"><di:waypoint x="2010" y="410"/><di:waypoint x="2070" y="410"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_C12_di" bpmnElement="Flow_C12"><di:waypoint x="2010" y="550"/><di:waypoint x="2070" y="550"/></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_O1_di" bpmnElement="Flow_O1"><di:waypoint x="686" y="770"/><di:waypoint x="730" y="770"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_O2_di" bpmnElement="Flow_O2"><di:waypoint x="920" y="770"/><di:waypoint x="970" y="770"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_O3_di" bpmnElement="Flow_O3"><di:waypoint x="1150" y="770"/><di:waypoint x="1190" y="770"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_O4_di" bpmnElement="Flow_O4"><di:waypoint x="1370" y="770"/><di:waypoint x="1420" y="770"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_O5_di" bpmnElement="Flow_O5"><di:waypoint x="1470" y="770"/><di:waypoint x="1495" y="770"/><di:waypoint x="1495" y="730"/><di:waypoint x="1520" y="730"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_O6_di" bpmnElement="Flow_O6"><di:waypoint x="1470" y="770"/><di:waypoint x="1495" y="770"/><di:waypoint x="1495" y="850"/><di:waypoint x="1520" y="850"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_O7_di" bpmnElement="Flow_O7"><di:waypoint x="1690" y="730"/><di:waypoint x="1750" y="730"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_O8_di" bpmnElement="Flow_O8"><di:waypoint x="1950" y="730"/><di:waypoint x="2000" y="730"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_O9_di" bpmnElement="Flow_O9"><di:waypoint x="2150" y="730"/><di:waypoint x="2170" y="730"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_O10_di" bpmnElement="Flow_O10"><di:waypoint x="1690" y="850"/><di:waypoint x="1750" y="850"/></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="MF_1_di" bpmnElement="MF_1"><di:waypoint x="295" y="228"/><di:waypoint x="248" y="452"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_2_di" bpmnElement="MF_2"><di:waypoint x="710" y="510"/><di:waypoint x="668" y="752"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_3_di" bpmnElement="MF_3"><di:waypoint x="1060" y="730"/><di:waypoint x="850" y="228"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_4_di" bpmnElement="MF_4"><di:waypoint x="1065" y="228"/><di:waypoint x="1280" y="730"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_5_di" bpmnElement="MF_5"><di:waypoint x="1605" y="690"/><di:waypoint x="1085" y="510"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_6_di" bpmnElement="MF_6"><di:waypoint x="1315" y="510"/><di:waypoint x="1850" y="690"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_7_di" bpmnElement="MF_7"><di:waypoint x="2075" y="690"/><di:waypoint x="1555" y="510"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_8_di" bpmnElement="MF_8"><di:waypoint x="1920" y="370"/><di:waypoint x="1535" y="190"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_9_di" bpmnElement="MF_9"><di:waypoint x="1920" y="510"/><di:waypoint x="1535" y="210"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_10_di" bpmnElement="MF_10"><di:waypoint x="1605" y="810"/><di:waypoint x="1535" y="210"/></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

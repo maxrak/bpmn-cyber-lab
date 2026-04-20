@@ -1,10 +1,18 @@
 [
+  "IAM.bpmn",
+  "IAM_KDC.bpmn",
+  "IAM_challenge.bpmn",
+  "IAM_silo.bpmn",
+  "IAM_siloRemote.bpmn",
+  "IAM_simpleRequest.bpmn",
+  "SAML.bpmn",
   "anti-pattern-gateway.bpmn",
   "anti-pattern-loop.bpmn",
   "anti-pattern-message-events-example.bpmn",
   "anti-pattern-start-end.bpmn",
   "cyber-extension-example.bpmn",
   "error-events-example.bpmn",
+  "eudiwallet.bpmn",
   "gateway-comparison.bpmn",
   "iam_lifecycle_as_is_modeled.bpmn",
   "iam_lifecycle_risk_annotated.bpmn",
@@ -12,9 +20,11 @@
   "message-events-example.bpmn",
   "multiple-signals-example.bpmn",
   "ordine-semplice.bpmn",
+  "processo-parallelo-timer-approvazione.bpmn",
   "sample-empty.bpmn",
   "sample-iam-as-is.bpmn",
   "securebpmn-example-2.bpmn",
   "securebpmn-example.bpmn",
-  "signal-events-example.bpmn"
+  "signal-events-example.bpmn",
+  "xacml_auth_flow.bpmn"
 ]

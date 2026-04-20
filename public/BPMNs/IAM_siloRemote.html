@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <meta name="description" content="Create, view and edit BPMN 2.0 diagrams with bpmn-js (bpmn.io) tooling">
+  <meta name="keywords" content="toolkit, BPMN 2.0, BPMN Editor, BPMN Modeler, bpmn-js, business process model and notation, embed, model, editor, integrate, extend">
+  <meta name="author" content="https://bpmn.io">
+
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://ssgtm.bpmn.io/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PBXHZK9');</script>
+<!-- End Google Tag Manager -->
+
+  <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,500,700" rel='stylesheet' type='text/css'>
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="BPMN Editor | demo.bpmn.io">
+  <meta property="og:url" content="https://demo.bpmn.io/">
+  <meta property="og:image" content="https://demo.bpmn.io/bpmn/img/preview.png">
+  <meta property="og:image:width" content="920">
+  <meta property="og:image:height" content="484">
+
+  <title>BPMN Editor | bpmn-js modeler Demo | demo.bpmn.io</title>
+
+  <base href="/" />
+
+  <style>
+    body.preload {
+      opacity: 0;
+      overflow: hidden;
+    }
+  </style>
+
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+</head>
+<body class="preload">
+
+  <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://ssgtm.bpmn.io/ns.html?id=GTM-PBXHZK9"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <div class="content" id="js-drop-zone">
+
+    <div class="screen intro">
+      <div class="note">
+
+        <div class="project-logo">
+          <a href="http://bpmn.io">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 58 23"><path fill="currentColor" d="M7.75 3.8v.58c0 1.7-.52 2.78-1.67 3.32C7.46 8.24 8 9.5 8 11.24v1.34c0 2.54-1.35 3.9-3.93 3.9H0V0h3.91c2.68 0 3.84 1.25 3.84 3.8zM2.59 2.35V6.7H3.6c.97 0 1.56-.42 1.56-1.74v-.92c0-1.18-.4-1.7-1.32-1.7zm0 6.7v5.07h1.48c.87 0 1.34-.4 1.34-1.63v-1.43c0-1.53-.5-2-1.67-2H2.6zm14.65-4.98v2.14c0 2.64-1.27 4.08-3.87 4.08h-1.22v6.2H9.56V0h3.82c2.59 0 3.86 1.44 3.86 4.07zm-5.09-1.71v5.57h1.22c.83 0 1.28-.37 1.28-1.55V3.91c0-1.18-.45-1.56-1.28-1.56h-1.22zm11.89 9.34L25.81 0h3.6v16.48h-2.44V4.66l-1.8 11.82h-2.45L20.8 4.83v11.65h-2.26V0h3.6zm9.56-7.15v11.93h-2.33V0h3.25l2.66 9.87V0h2.31v16.48h-2.66zm10.25 9.44v2.5h-2.5v-2.5zM50 4.16C50 1.52 51.38.02 53.93.02c2.54 0 3.93 1.5 3.93 4.14v8.37c0 2.64-1.4 4.14-3.93 4.14-2.55 0-3.93-1.5-3.93-4.14zm2.58 8.53c0 1.18.52 1.63 1.35 1.63.82 0 1.34-.45 1.34-1.63V4c0-1.17-.52-1.62-1.34-1.62-.83 0-1.35.45-1.35 1.62zM0 18.7h57.86V23H0zM45.73 0h2.6v2.58h-2.6zm2.59 16.48V4.16h-2.59v12.32z"/></svg>
+          </a>
+        </div>
+
+        <div class="message">
+          <a href title="Open BPMN diagram from local file system" jsaction="click:bio.openLocal">Open</a> or <a href="/new" title="Create a new BPMN diagram" >create</a> a BPMN diagram.
+        </div>
+
+        <div class="samples">
+
+          <p>Use <a href="https://bpmn.io/toolkit/bpmn-js/">bpmn-js</a> to view, create and edit BPMN 2.0 diagrams in your browser.</p>
+
+          <a class="sample" href="/s/start">
+            <img class="img" src="/bpmn/img/screencast.gif">
+
+            <div class="caption">
+              What if you are hungry? Click the diagram and continue modeling.
+            </div>
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="screen loading">
+
+      <div class="note">
+        <div class="message">
+          <div class="spinner-border"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen error">
+      <div class="note">
+        <div class="message">
+          <p>
+            Ooops, we could not display that diagram.
+          </p>
+          <p>
+            <small>
+              You believe your input is valid <a href="http://www.omg.org/spec/BPMN/2.0/">BPMN 2.0 XML</a>?
+            </small>
+          </p>
+          <p>
+            <small>
+              Consult our <a href="https://forum.bpmn.io" target="_blank">forum</a> or
+              <a href="https://github.com/bpmn-io/bpmn-js/issues" target="_blank">file an issue</a>
+              with the details shown below.
+            </small>
+          </p>
+        </div>
+
+        <div class="details">
+          <span>Import Error Details</span>
+          <textarea class="error-log"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="canvas" id="js-canvas"></div>
+  </div>
+
+  <div class="io-import-export">
+
+    <ul class="io-import io-control io-control-list io-horizontal">
+      <li>
+        <button title="open BPMN diagram from local file system" jsaction="click:bio.openLocal">
+          <span class="icon-open"></span>
+        </button>
+      </li>
+      <li class="vr"></li>
+      <li>
+        <button title="create new BPMN diagram" jsaction="click:bio.createNew">
+          <span class="icon-plus-circled"></span>
+        </button>
+      </li>
+    </ul>
+
+    <ul class="io-export io-control io-control-list io-horizontal">
+      <li>
+        <a target="_blank" href class="download" title="Download as BPMN 2.0 file" jswidget="downloadDiagram" data-track="diagram:download-bpmn">
+          <span class="icon-download"></span>
+        </a>
+      </li>
+      <li>
+        <a target="_blank" href class="download" title="Download as SVG image" jswidget="downloadSVG" data-track="diagram:download-svg">
+          <span class="icon-picture"></span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="io-alerts">
+
+    <div class="io-control alert" jswidget="import-warnings-alert">
+      <div class="alert-message">
+        Diagram may not render correctly due to import warnings.
+
+        <a href jsaction="click:bio.showImportDetails">Show details</a>.
+      </div>
+
+      <a href class="close" aria-hidden="true" jsaction="click:bio.clearImportDetails">&times;</a>
+    </div>
+
+    <div class="io-control alert" jswidget="undo-redo-alert">
+      <div class="alert-message">
+        You edited the diagram.
+
+        <a href jsaction="click:bio.undo">Undo last change</a>.
+      </div>
+
+      <a href class="close" aria-hidden="true" jsaction="click:bio.hideUndoAlert">&times;</a>
+    </div>
+
+  </div>
+
+  <div class="io-about">
+
+    <ul class="io-control-list io-horizontal">
+      <li>
+        <a href="http://bpmn.io/legal/privacy.html" target="_blank" title="privacy policy">
+          privacy
+        </a>
+      </li>
+      <li>
+        <a href="http://bpmn.io/legal/terms.html" target="_blank" title="terms of use">
+          terms
+        </a>
+      </li>
+      <li>
+        <a href="http://bpmn.io/legal/imprint.html" target="_blank" title="imprint">
+          imprint
+        </a>
+      </li>
+      <li>
+        <a href="#" onclick="Osano.cm.showDrawer('osano-cm-dom-info-dialog-open')">
+          cookie preferences
+        </a>
+      </li>
+      <li>
+        <a title="more information about this demo" jsaction="click:bio.showAbout" data-track="help:open-about">
+          about
+        </a>
+      </li>
+      <li>
+        <a href="https://forum.bpmn.io/t/8" title="report an issue or suggest improvements" target="_blank" data-track="help:open-report">
+          give feedback
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="io-editing-tools" jswidget="editing-tools">
+    <ul class="io-control-list io-horizontal">
+      <li class="io-control">
+        <button title="Toggle keyboard shortcuts overlay"
+                jsaction="click:bio.showKeyboard">
+          <span class="icon-keyboard"> </span>
+        </button>
+      </li>
+      <li class="io-control">
+        <button title="Toggle Fullscreen"
+                jsaction="click:bio.toggleFullscreen">
+          <span class="icon-resize-full"> </span>
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <div class="io-zoom-controls">
+
+    <ul class="io-zoom-reset io-control io-control-list">
+      <li>
+        <button title="reset zoom" jsaction="click:bio.zoomReset">
+          <span class="icon-size-reset"></span>
+        </button>
+      </li>
+      <li>
+        <hr/>
+      </li>
+      <li>
+        <button title="zoom in" jsaction="click:bio.zoomIn">
+          <span class="icon-plus"></span>
+        </button>
+      </li>
+      <li>
+        <hr/>
+      </li>
+      <li>
+        <button href title="zoom out" jsaction="click:bio.zoomOut">
+          <span class="icon-minus"></span>
+        </button>
+      </li>
+    </ul>
+  </div>
+
+
+  <div class="io-dialog about" jswidget="about-dialog">
+
+    <div class="content">
+      <h1>About bpmn.io</h1>
+
+      <p>
+        bpmn.io offers tools to view, annotate and edit <a href="http://www.bpmn.org">BPMN 2.0</a>, CMMN and DMN diagrams on the web. Refer to our <a href="http://bpmn.io">project website</a> for more information.
+      </p>
+
+      <p>
+        This is a demo of <a href="https://github.com/bpmn-io/bpmn-js">bpmn-js</a>, the JavaScript toolkit that powers bpmn.io and Camunda.
+      </p>
+
+      <p>
+        For collaborative modeling with the ability to organize, save and invite teammates to collaborate, <a href="https://accounts.cloud.camunda.io/signup?uc=signup&utm_medium=referral&utm_source=bpmn.io">sign-up for a free Camunda account</a>.
+      <p>
+
+      <h2>Built with open-source software</h2>
+
+      <p>
+        <a href="https://github.com/bpmn-io/bpmn-js">bpmn-js</a> is built with the help of a number of open-source libraries:
+      </p>
+
+      <ul>
+        <li><a href="https://github.com/bpmn-io/bpmn-js">bpmn-js</a></li>
+        <li><a href="https://github.com/bpmn-io/diagram-js">diagram-js</a></li>
+        <li><a href="https://github.com/nikku/saxen">saxen</a></li>
+      </ul>
+
+      <p>
+        Icons are assembled using <a href="http://fontello.com">fontello</a> from the following icon fonts:
+      </p>
+
+      <ul>
+        <li><a href="http://fontello.com">Fontelico</a> crowdsourced, for Fontello project</li>
+        <li><a href="http://fortawesome.github.com/Font-Awesome/">Font Awesome</a> by Dave Gandy</li>
+        <li><a href="http://www.entypo.com">Entypo</a> by Daniel Bruce</li>
+        <li><a href="http://somerandomdude.com/work/iconic/">Iconic</a> by P.J. Onori</li>
+      </ul>
+
+      <a class="project-logo" href="http://bpmn.io">
+        <span class="icon-bpmn-io"></span>
+      </a>
+
+      <p>
+        You can find all bpmn.io related open-source projects on
+        <a href="https://github.com/bpmn-io">GitHub</a>.
+      </p>
+    </div>
+  </div>
+
+  <div class="io-dialog import-warnings" jswidget="import-warnings-dialog">
+
+    <div class="content">
+      <h1>Import Warnings</h1>
+
+      <p>
+        One or more problems have been identified when trying to import the BPMN 2.0 diagram:
+      </p>
+
+      <p>
+        <textarea class="error-log"></textarea>
+      <p>
+
+      <p>
+        This may have been caused by malformed input data.
+        As a result the diagram may not render correctly.
+      </p>
+
+      <h2>Need help on this?</h2>
+
+      <p>
+        File a report in <a href="https://forum.bpmn.io" target="_blank">our forum</a>.
+        Attach your diagram and the above error log.
+      </p>
+
+      <a class="project-logo" href="http://bpmn.io">
+        <span class="icon-bpmn-io"></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="io-dialog keybindings-dialog" jswidget="keybindings-dialog">
+
+    <div class="content bindings-mac">
+      <h1>Keyboard Shortcuts</h1>
+      <table>
+        <tbody>
+          <tr>
+            <td>Open diagram from local file system</td>
+            <td class="binding">⌘ + O</td>
+          </tr>
+          <tr>
+            <td>Download BPMN 2.0 diagram</td>
+            <td class="binding">⌘ + S</td>
+          </tr>
+          <tr>
+            <td>Undo</td>
+            <td class="binding">⌘ + Z</td>
+          </tr>
+          <tr>
+            <td>Redo</td>
+            <td class="binding">⌘ + ⇧ + Z</td>
+          </tr>
+          <tr>
+            <td>Select All</td>
+            <td class="binding">⌘ + A</td>
+          </tr>
+          <tr>
+            <td>Copy</td>
+            <td class="binding">⌘ + C</td>
+          </tr>
+          <tr>
+            <td>Paste</td>
+            <td class="binding">⌘ + V</td>
+          </tr>
+          <tr>
+            <td>Copy selection as image</td>
+            <td class="binding">⌘ + ⇧ + C</td>
+          </tr>
+          <tr>
+            <td>Scrolling (Vertical)</td>
+            <td class="binding">⌥ + Scrolling</td>
+          </tr>
+          <tr>
+            <td>Scrolling (Horizontal)</td>
+            <td class="binding">⌥ + ⇧ + Scrolling</td>
+          </tr>
+          <tr>
+            <td>Direct Editing</td>
+            <td class="binding">E</td>
+          </tr>
+          <tr>
+            <td>Hand Tool</td>
+            <td class="binding">H</td>
+          </tr>
+          <tr>
+            <td>Lasso Tool</td>
+            <td class="binding">L</td>
+          </tr>
+          <tr>
+            <td>Space Tool</td>
+            <td class="binding">S</td>
+          </tr>
+          <tr>
+            <td>Replace Tool</td>
+            <td class="binding">R</td>
+          </tr>
+          <tr>
+            <td>Append anything</td>
+            <td class="binding">A</td>
+          </tr>
+          <tr>
+            <td>Create anything</td>
+            <td class="binding">N</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="content bindings-default">
+      <h1>Keyboard Shortcuts</h1>
+      <table>
+        <tbody>
+          <tr>
+            <td>Open diagram from local file system</td>
+            <td class="binding"><code>ctrl + O</code></td>
+          </tr>
+          <tr>
+            <td>Download BPMN 2.0 diagram</td>
+            <td class="binding"><code>ctrl + S</code></td>
+          </tr>
+          <tr>
+            <td>Undo</td>
+            <td class="binding"><code>ctrl + Z</code></td>
+          </tr>
+          <tr>
+            <td>Redo</td>
+            <td class="binding"><code>ctrl + ⇧ + Z</code></td>
+          </tr>
+          <tr>
+            <td>Copy</td>
+            <td class="binding">ctrl + C</td>
+          </tr>
+          <tr>
+            <td>Paste</td>
+            <td class="binding">ctrl + V</td>
+          </tr>
+          <tr>
+            <td>Copy selection as image</td>
+            <td class="binding">ctrl + ⇧ + C</td>
+          </tr>
+          <tr>
+            <td>Select All</td>
+            <td class="binding"><code>ctrl + A</code></td>
+          </tr>
+          <tr>
+            <td>Scrolling (Vertical)</td>
+            <td class="binding"><code>ctrl + Scrolling</code></td>
+          </tr>
+          <tr>
+            <td>Scrolling (Horizontal)</td>
+            <td class="binding"><code>ctrl + ⇧ + Scrolling</code></td>
+          </tr>
+          <tr>
+            <td>Direct Editing</td>
+            <td class="binding"><code>E</code></td>
+          </tr>
+          <tr>
+            <td>Hand Tool</td>
+            <td class="binding"><code>H</code></td>
+          </tr>
+          <tr>
+            <td>Lasso Tool</td>
+            <td class="binding"><code>L</code></td>
+          </tr>
+          <tr>
+            <td>Space Tool</td>
+            <td class="binding"><code>S</code></td>
+          </tr>
+          <tr>
+            <td>Replace Tool</td>
+            <td class="binding">R</td>
+          </tr>
+          <tr>
+            <td>Append anything</td>
+            <td class="binding">A</td>
+          </tr>
+          <tr>
+            <td>Create anything</td>
+            <td class="binding">N</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="/assets/polyfills.js"></script>
+  <script src="/bpmn/app.js" async></script>
+  <script src="/assets/analytics.js" async></script>
+
+  <!-- 1ba222596209e5caace90354b3fa9d5a7c8926da -->
+</html>

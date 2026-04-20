@@ -14,6 +14,68 @@ export function loadSampleDiagram(modeler, which) {
   return openBPMN(modeler, url);
 }
 
+/**
+ * Crea un nuovo diagramma BPMN vuoto
+ * @param {Object} modeler - Istanza del modeler BPMN.js
+ */
+export function createNewDiagram(modeler) {
+  // Genera ID univoci per tutti gli elementi
+  const definitionsId = `Definitions_${generateId()}`;
+  const processId = `Process_${generateId()}`;
+  const startEventId = `StartEvent_${generateId()}`;
+  const diagramId = `BPMNDiagram_${generateId()}`;
+  const planeId = `BPMNPlane_${generateId()}`;
+  const shapeId = `${startEventId}_di`;
+  
+  const emptyBpmn = `<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                   xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                   xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   id="${definitionsId}"
+                   targetNamespace="http://bpmn.io/schema/bpmn"
+                   exporter="BPMN Cyber Lab"
+                   exporterVersion="1.0.0">
+  <bpmn:process id="${processId}" isExecutable="true">
+    <bpmn:startEvent id="${startEventId}"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="${diagramId}">
+    <bpmndi:BPMNPlane id="${planeId}" bpmnElement="${processId}">
+      <bpmndi:BPMNShape id="${shapeId}" bpmnElement="${startEventId}">
+        <dc:Bounds x="152" y="102" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>`;
+
+  console.log('Creazione nuovo diagramma BPMN');
+  
+  // Salva il nuovo BPMN nello stato globale
+  saveCurrentBpmn(emptyBpmn, 'nuovo-diagramma.bpmn');
+  
+  const target = modeler || (typeof window !== 'undefined' && window.getActiveModeler ? window.getActiveModeler() : null);
+  if (!target) {
+    console.error('No modeler instance available to create new diagram');
+    return Promise.reject(new Error('No modeler available'));
+  }
+  
+  return target.importXML(emptyBpmn).then(() => {
+    try { target.get('canvas').zoom('fit-viewport'); } catch (e) { console.warn('zoom failed', e); }
+    console.log('✅ Nuovo diagramma creato con successo');
+  }).catch(err => {
+    console.error('❌ Errore nella creazione del nuovo diagramma', err);
+    throw err;
+  });
+}
+
+/**
+ * Genera un ID univoco per gli elementi BPMN
+ */
+function generateId() {
+  return Math.random().toString(36).substring(2, 9);
+}
+
 export function openBPMN(modeler, url) {
   return fetch(url).then(resp => {
     if (!resp.ok) throw new Error('Network response not ok: ' + resp.status);
@@ -122,10 +184,25 @@ function ensureBpmnDiagram(xml) {
 }
 
 export function setupFileHandlers(modeler) {
+  const newBtn = document.getElementById('btn-new');
   const openBtn = document.getElementById('btn-open');
   const saveBtn = document.getElementById('btn-save');
   const fileInput = document.getElementById('file-input');
   const examplesMenu = document.getElementById('bpmns-menu');
+
+  // Gestore per creare un nuovo diagramma
+  if (newBtn) {
+    newBtn.addEventListener('click', () => {
+      createNewDiagram(modeler)
+        .then(() => {
+          console.log('✅ Nuovo diagramma creato');
+        })
+        .catch(err => {
+          console.error('❌ Errore nella creazione del nuovo diagramma:', err);
+          alert('Errore nella creazione del nuovo diagramma');
+        });
+    });
+  }
 
   openBtn.addEventListener('click', () => fileInput.click());
 

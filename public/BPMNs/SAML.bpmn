@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" id="Definitions_SAML_Federated_Identity" targetNamespace="http://example.com/bpmn/saml-federated-identity">
+  <bpmn:collaboration id="Collaboration_SAML">
+    <bpmn:participant id="Participant_User" name="Utente" processRef="Process_User" />
+    <bpmn:participant id="Participant_SP" name="Service Provider" processRef="Process_SP" />
+    <bpmn:participant id="Participant_IdP" name="Identity Provider" processRef="Process_IdP" />
+    <bpmn:messageFlow id="MessageFlow_User_Request_SP" name="Richiesta accesso" sourceRef="Task_User_AccessApp" targetRef="Start_SP_RequestReceived" />
+    <bpmn:messageFlow id="MessageFlow_SP_AuthnRequest_IdP" name="AuthnRequest SAML" sourceRef="Task_SP_SendAuthnRequest" targetRef="Start_IdP_AuthnRequestReceived" />
+    <bpmn:messageFlow id="MessageFlow_IdP_LoginRequest_User" name="Richiesta autenticazione" sourceRef="Task_IdP_RequestLogin" targetRef="Task_User_Login" />
+    <bpmn:messageFlow id="MessageFlow_User_Credentials_IdP" name="Credenziali" sourceRef="Task_User_SubmitCredentials" targetRef="Task_IdP_ValidateCredentials" />
+    <bpmn:messageFlow id="MessageFlow_IdP_SAMLResponse_SP" name="SAML Response / Assertion" sourceRef="Task_IdP_SendSAMLResponse" targetRef="Task_SP_ValidateAssertion" />
+    <bpmn:messageFlow id="MessageFlow_SP_AccessGranted_User" name="Accesso consentito" sourceRef="Task_SP_CreateSession" targetRef="Task_User_AccessGranted" />
+    <bpmn:messageFlow id="MessageFlow_SP_AccessDenied_User" name="Accesso negato" sourceRef="Task_SP_DenyAccess" targetRef="Task_User_AccessDenied" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_User" name="Processo Utente" isExecutable="false">
+    <bpmn:startEvent id="Start_User" name="Necessità di accesso">
+      <bpmn:outgoing>Flow_User_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_User_AccessApp" name="Accede all&#39;applicazione">
+      <bpmn:incoming>Flow_User_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_User_2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_User_Login" name="Inserisce credenziali presso IdP">
+      <bpmn:incoming>Flow_User_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_User_3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_User_SubmitCredentials" name="Invia credenziali">
+      <bpmn:incoming>Flow_User_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_User_4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:eventBasedGateway id="Gateway_User_WaitResult" name="Attende esito">
+      <bpmn:incoming>Flow_User_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_User_5</bpmn:outgoing>
+      <bpmn:outgoing>Flow_User_6</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:receiveTask id="Task_User_AccessGranted" name="Riceve accesso all&#39;applicazione">
+      <bpmn:incoming>Flow_User_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_User_7</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:receiveTask id="Task_User_AccessDenied" name="Riceve errore di accesso">
+      <bpmn:incoming>Flow_User_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_User_8</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:endEvent id="End_User_Success" name="Accesso completato">
+      <bpmn:incoming>Flow_User_7</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="End_User_Failure" name="Accesso fallito">
+      <bpmn:incoming>Flow_User_8</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_User_1" sourceRef="Start_User" targetRef="Task_User_AccessApp" />
+    <bpmn:sequenceFlow id="Flow_User_2" sourceRef="Task_User_AccessApp" targetRef="Task_User_Login" />
+    <bpmn:sequenceFlow id="Flow_User_3" sourceRef="Task_User_Login" targetRef="Task_User_SubmitCredentials" />
+    <bpmn:sequenceFlow id="Flow_User_4" sourceRef="Task_User_SubmitCredentials" targetRef="Gateway_User_WaitResult" />
+    <bpmn:sequenceFlow id="Flow_User_5" sourceRef="Gateway_User_WaitResult" targetRef="Task_User_AccessGranted" />
+    <bpmn:sequenceFlow id="Flow_User_6" sourceRef="Gateway_User_WaitResult" targetRef="Task_User_AccessDenied" />
+    <bpmn:sequenceFlow id="Flow_User_7" sourceRef="Task_User_AccessGranted" targetRef="End_User_Success" />
+    <bpmn:sequenceFlow id="Flow_User_8" sourceRef="Task_User_AccessDenied" targetRef="End_User_Failure" />
+  </bpmn:process>
+  <bpmn:process id="Process_SP" name="Processo Service Provider" isExecutable="false">
+    <bpmn:startEvent id="Start_SP_RequestReceived" name="Richiesta ricevuta">
+      <bpmn:outgoing>Flow_SP_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_SP_CheckSession" name="Verifica sessione locale">
+      <bpmn:incoming>Flow_SP_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_SP_2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_SP_SessionExists" name="Sessione esistente?">
+      <bpmn:incoming>Flow_SP_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_SP_3</bpmn:outgoing>
+      <bpmn:outgoing>Flow_SP_4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_SP_SendAuthnRequest" name="Invia AuthnRequest a IdP">
+      <bpmn:incoming>Flow_SP_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_SP_5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_SP_ValidateAssertion" name="Valida SAML Response / Assertion">
+      <bpmn:incoming>Flow_SP_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_SP_6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_SP_AssertionValid" name="Assertion valida?">
+      <bpmn:incoming>Flow_SP_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_SP_7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_SP_8</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_SP_CreateSession" name="Crea sessione e autorizza accesso">
+      <bpmn:incoming>Flow_SP_3</bpmn:incoming>
+      <bpmn:incoming>Flow_SP_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_SP_9</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_SP_DenyAccess" name="Nega accesso">
+      <bpmn:incoming>Flow_SP_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_SP_10</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_SP_Success" name="Accesso erogato">
+      <bpmn:incoming>Flow_SP_9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="End_SP_Failure" name="Accesso rifiutato">
+      <bpmn:incoming>Flow_SP_10</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_SP_1" sourceRef="Start_SP_RequestReceived" targetRef="Task_SP_CheckSession" />
+    <bpmn:sequenceFlow id="Flow_SP_2" sourceRef="Task_SP_CheckSession" targetRef="Gateway_SP_SessionExists" />
+    <bpmn:sequenceFlow id="Flow_SP_3" name="Sì" sourceRef="Gateway_SP_SessionExists" targetRef="Task_SP_CreateSession" />
+    <bpmn:sequenceFlow id="Flow_SP_4" name="No" sourceRef="Gateway_SP_SessionExists" targetRef="Task_SP_SendAuthnRequest" />
+    <bpmn:sequenceFlow id="Flow_SP_5" sourceRef="Task_SP_SendAuthnRequest" targetRef="Task_SP_ValidateAssertion" />
+    <bpmn:sequenceFlow id="Flow_SP_6" sourceRef="Task_SP_ValidateAssertion" targetRef="Gateway_SP_AssertionValid" />
+    <bpmn:sequenceFlow id="Flow_SP_7" name="Sì" sourceRef="Gateway_SP_AssertionValid" targetRef="Task_SP_CreateSession" />
+    <bpmn:sequenceFlow id="Flow_SP_8" name="No" sourceRef="Gateway_SP_AssertionValid" targetRef="Task_SP_DenyAccess" />
+    <bpmn:sequenceFlow id="Flow_SP_9" sourceRef="Task_SP_CreateSession" targetRef="End_SP_Success" />
+    <bpmn:sequenceFlow id="Flow_SP_10" sourceRef="Task_SP_DenyAccess" targetRef="End_SP_Failure" />
+  </bpmn:process>
+  <bpmn:process id="Process_IdP" name="Processo Identity Provider" isExecutable="false">
+    <bpmn:startEvent id="Start_IdP_AuthnRequestReceived" name="AuthnRequest ricevuta">
+      <bpmn:outgoing>Flow_IdP_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_IdP_RequestLogin" name="Richiede autenticazione utente">
+      <bpmn:incoming>Flow_IdP_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_IdP_2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_IdP_ValidateCredentials" name="Valida credenziali">
+      <bpmn:incoming>Flow_IdP_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_IdP_3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_IdP_CredentialsValid" name="Credenziali valide?">
+      <bpmn:incoming>Flow_IdP_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_IdP_4</bpmn:outgoing>
+      <bpmn:outgoing>Flow_IdP_5</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_IdP_CreateAssertion" name="Genera SAML Assertion">
+      <bpmn:incoming>Flow_IdP_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_IdP_6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_IdP_SendSAMLResponse" name="Invia SAML Response allo SP">
+      <bpmn:incoming>Flow_IdP_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_IdP_7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_IdP_Success" name="Assertion emessa">
+      <bpmn:incoming>Flow_IdP_7</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="End_IdP_Failure" name="Autenticazione fallita">
+      <bpmn:incoming>Flow_IdP_5</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_IdP_1" sourceRef="Start_IdP_AuthnRequestReceived" targetRef="Task_IdP_RequestLogin" />
+    <bpmn:sequenceFlow id="Flow_IdP_2" sourceRef="Task_IdP_RequestLogin" targetRef="Task_IdP_ValidateCredentials" />
+    <bpmn:sequenceFlow id="Flow_IdP_3" sourceRef="Task_IdP_ValidateCredentials" targetRef="Gateway_IdP_CredentialsValid" />
+    <bpmn:sequenceFlow id="Flow_IdP_4" name="Sì" sourceRef="Gateway_IdP_CredentialsValid" targetRef="Task_IdP_CreateAssertion" />
+    <bpmn:sequenceFlow id="Flow_IdP_5" name="No" sourceRef="Gateway_IdP_CredentialsValid" targetRef="End_IdP_Failure" />
+    <bpmn:sequenceFlow id="Flow_IdP_6" sourceRef="Task_IdP_CreateAssertion" targetRef="Task_IdP_SendSAMLResponse" />
+    <bpmn:sequenceFlow id="Flow_IdP_7" sourceRef="Task_IdP_SendSAMLResponse" targetRef="End_IdP_Success" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SAML">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_SAML">
+      <bpmndi:BPMNShape id="Participant_User_di" bpmnElement="Participant_User" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1300" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_User_di" bpmnElement="Start_User">
+        <dc:Bounds x="232" y="187" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_User_AccessApp_di" bpmnElement="Task_User_AccessApp" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="320" y="165" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_User_Login_di" bpmnElement="Task_User_Login" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="470" y="165" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_User_SubmitCredentials_di" bpmnElement="Task_User_SubmitCredentials" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="620" y="165" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_User_WaitResult_di" bpmnElement="Gateway_User_WaitResult">
+        <dc:Bounds x="775" y="180" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_User_AccessGranted_di" bpmnElement="Task_User_AccessGranted" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="880" y="120" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_User_AccessDenied_di" bpmnElement="Task_User_AccessDenied" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="880" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_User_Success_di" bpmnElement="End_User_Success">
+        <dc:Bounds x="1032" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_User_Failure_di" bpmnElement="End_User_Failure">
+        <dc:Bounds x="1032" y="242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_User_1_di" bpmnElement="Flow_User_1">
+        <di:waypoint x="268" y="205" />
+        <di:waypoint x="320" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_User_2_di" bpmnElement="Flow_User_2">
+        <di:waypoint x="420" y="205" />
+        <di:waypoint x="470" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_User_3_di" bpmnElement="Flow_User_3">
+        <di:waypoint x="570" y="205" />
+        <di:waypoint x="620" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_User_4_di" bpmnElement="Flow_User_4">
+        <di:waypoint x="720" y="205" />
+        <di:waypoint x="775" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_User_5_di" bpmnElement="Flow_User_5">
+        <di:waypoint x="800" y="180" />
+        <di:waypoint x="800" y="160" />
+        <di:waypoint x="880" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_User_6_di" bpmnElement="Flow_User_6">
+        <di:waypoint x="800" y="230" />
+        <di:waypoint x="800" y="260" />
+        <di:waypoint x="880" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_User_7_di" bpmnElement="Flow_User_7">
+        <di:waypoint x="980" y="160" />
+        <di:waypoint x="1032" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_User_8_di" bpmnElement="Flow_User_8">
+        <di:waypoint x="980" y="260" />
+        <di:waypoint x="1032" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_SP_di" bpmnElement="Participant_SP" isHorizontal="true">
+        <dc:Bounds x="160" y="350" width="1300" height="350" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_SP_RequestReceived_di" bpmnElement="Start_SP_RequestReceived">
+        <dc:Bounds x="232" y="497" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="207" y="533" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SP_CheckSession_di" bpmnElement="Task_SP_CheckSession" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="320" y="475" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_SP_SessionExists_di" bpmnElement="Gateway_SP_SessionExists" isMarkerVisible="true">
+        <dc:Bounds x="475" y="490" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="475" y="540" width="51" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SP_SendAuthnRequest_di" bpmnElement="Task_SP_SendAuthnRequest" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="580" y="550" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SP_ValidateAssertion_di" bpmnElement="Task_SP_ValidateAssertion" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="730" y="550" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_SP_AssertionValid_di" bpmnElement="Gateway_SP_AssertionValid" isMarkerVisible="true">
+        <dc:Bounds x="885" y="565" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="868" y="615" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SP_CreateSession_di" bpmnElement="Task_SP_CreateSession" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="990" y="475" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SP_DenyAccess_di" bpmnElement="Task_SP_DenyAccess" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="990" y="590" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_SP_Success_di" bpmnElement="End_SP_Success">
+        <dc:Bounds x="1152" y="497" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1129" y="533" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_SP_Failure_di" bpmnElement="End_SP_Failure">
+        <dc:Bounds x="1152" y="612" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1130" y="648" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_SP_1_di" bpmnElement="Flow_SP_1">
+        <di:waypoint x="268" y="515" />
+        <di:waypoint x="320" y="515" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SP_2_di" bpmnElement="Flow_SP_2">
+        <di:waypoint x="420" y="515" />
+        <di:waypoint x="475" y="515" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SP_3_di" bpmnElement="Flow_SP_3">
+        <di:waypoint x="525" y="515" />
+        <di:waypoint x="990" y="515" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="752" y="490" width="11" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SP_4_di" bpmnElement="Flow_SP_4">
+        <di:waypoint x="500" y="540" />
+        <di:waypoint x="500" y="590" />
+        <di:waypoint x="580" y="590" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="508" y="555" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SP_5_di" bpmnElement="Flow_SP_5">
+        <di:waypoint x="680" y="590" />
+        <di:waypoint x="730" y="590" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SP_6_di" bpmnElement="Flow_SP_6">
+        <di:waypoint x="830" y="590" />
+        <di:waypoint x="885" y="590" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SP_7_di" bpmnElement="Flow_SP_7">
+        <di:waypoint x="910" y="565" />
+        <di:waypoint x="910" y="515" />
+        <di:waypoint x="990" y="515" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="920" y="530" width="11" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SP_8_di" bpmnElement="Flow_SP_8">
+        <di:waypoint x="935" y="590" />
+        <di:waypoint x="963" y="590" />
+        <di:waypoint x="963" y="630" />
+        <di:waypoint x="990" y="630" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="971" y="600" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SP_9_di" bpmnElement="Flow_SP_9">
+        <di:waypoint x="1090" y="515" />
+        <di:waypoint x="1152" y="515" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SP_10_di" bpmnElement="Flow_SP_10">
+        <di:waypoint x="1090" y="630" />
+        <di:waypoint x="1152" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_IdP_di" bpmnElement="Participant_IdP" isHorizontal="true">
+        <dc:Bounds x="160" y="720" width="1300" height="230" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_IdP_AuthnRequestReceived_di" bpmnElement="Start_IdP_AuthnRequestReceived">
+        <dc:Bounds x="232" y="792" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="215" y="828" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_IdP_RequestLogin_di" bpmnElement="Task_IdP_RequestLogin" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="320" y="770" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_IdP_ValidateCredentials_di" bpmnElement="Task_IdP_ValidateCredentials" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="470" y="770" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_IdP_CredentialsValid_di" bpmnElement="Gateway_IdP_CredentialsValid" isMarkerVisible="true">
+        <dc:Bounds x="625" y="785" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="622" y="835" width="56" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_IdP_CreateAssertion_di" bpmnElement="Task_IdP_CreateAssertion" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="730" y="770" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_IdP_SendSAMLResponse_di" bpmnElement="Task_IdP_SendSAMLResponse" bioc:stroke="#bdc3c7" color:border-color="#bdc3c7">
+        <dc:Bounds x="880" y="770" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_IdP_Success_di" bpmnElement="End_IdP_Success">
+        <dc:Bounds x="1032" y="792" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1006" y="828" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_IdP_Failure_di" bpmnElement="End_IdP_Failure">
+        <dc:Bounds x="732" y="882" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="714" y="918" width="73" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_IdP_1_di" bpmnElement="Flow_IdP_1">
+        <di:waypoint x="268" y="810" />
+        <di:waypoint x="320" y="810" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_IdP_2_di" bpmnElement="Flow_IdP_2">
+        <di:waypoint x="420" y="810" />
+        <di:waypoint x="470" y="810" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_IdP_3_di" bpmnElement="Flow_IdP_3">
+        <di:waypoint x="570" y="810" />
+        <di:waypoint x="625" y="810" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_IdP_4_di" bpmnElement="Flow_IdP_4">
+        <di:waypoint x="675" y="810" />
+        <di:waypoint x="730" y="810" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="697" y="785" width="11" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_IdP_5_di" bpmnElement="Flow_IdP_5">
+        <di:waypoint x="650" y="835" />
+        <di:waypoint x="650" y="900" />
+        <di:waypoint x="732" y="900" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="658" y="858" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_IdP_6_di" bpmnElement="Flow_IdP_6">
+        <di:waypoint x="830" y="810" />
+        <di:waypoint x="880" y="810" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_IdP_7_di" bpmnElement="Flow_IdP_7">
+        <di:waypoint x="980" y="810" />
+        <di:waypoint x="1032" y="810" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_User_Request_SP_di" bpmnElement="MessageFlow_User_Request_SP">
+        <di:waypoint x="370" y="245" />
+        <di:waypoint x="370" y="386" />
+        <di:waypoint x="250" y="386" />
+        <di:waypoint x="250" y="497" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="266" y="361" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_SP_AuthnRequest_IdP_di" bpmnElement="MessageFlow_SP_AuthnRequest_IdP">
+        <di:waypoint x="630" y="630" />
+        <di:waypoint x="630" y="680" />
+        <di:waypoint x="250" y="680" />
+        <di:waypoint x="250" y="792" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="405" y="655" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_IdP_LoginRequest_User_di" bpmnElement="MessageFlow_IdP_LoginRequest_User">
+        <di:waypoint x="370" y="770" />
+        <di:waypoint x="370" y="558" />
+        <di:waypoint x="520" y="558" />
+        <di:waypoint x="520" y="245" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="410" y="533" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_User_Credentials_IdP_di" bpmnElement="MessageFlow_User_Credentials_IdP">
+        <di:waypoint x="670" y="245" />
+        <di:waypoint x="670" y="568" />
+        <di:waypoint x="520" y="568" />
+        <di:waypoint x="520" y="770" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="567" y="543" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_IdP_SAMLResponse_SP_di" bpmnElement="MessageFlow_IdP_SAMLResponse_SP">
+        <di:waypoint x="930" y="770" />
+        <di:waypoint x="930" y="690" />
+        <di:waypoint x="780" y="690" />
+        <di:waypoint x="780" y="630" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="811" y="655" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_SP_AccessGranted_User_di" bpmnElement="MessageFlow_SP_AccessGranted_User">
+        <di:waypoint x="1040" y="475" />
+        <di:waypoint x="1040" y="440" />
+        <di:waypoint x="1330" y="440" />
+        <di:waypoint x="1330" y="100" />
+        <di:waypoint x="930" y="100" />
+        <di:waypoint x="930" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1156" y="415" width="51" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_SP_AccessDenied_User_di" bpmnElement="MessageFlow_SP_AccessDenied_User">
+        <di:waypoint x="1040" y="670" />
+        <di:waypoint x="1040" y="690" />
+        <di:waypoint x="1260" y="690" />
+        <di:waypoint x="1260" y="230" />
+        <di:waypoint x="980" y="230" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1108" y="665" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
