@@ -2,8 +2,8 @@ name: Build Test Deploy con attesa e approvazione
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 8 * * 1-5"
+#  schedule:
+    # - cron: "0 8 * * 1-5"
 
 jobs:
   build:
