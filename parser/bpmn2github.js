@@ -11,7 +11,7 @@ class BpmnParser {
     this.process = rawData["bpmn:definitions"]["bpmn:process"];
     this.elements = new Map();
     this.flows = [];
-    this._indexElements();
+    this._indexElements(); // separa i nodi dagli archi 
   }
 
   _indexElements() {
