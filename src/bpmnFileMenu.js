@@ -19,7 +19,7 @@ export function initializeBpmnFileMenu(modeler) {
   }
 
   // Carica la lista dei file BPMN
-  fetch('/BPMNs/list.json')
+  fetch('./BPMNs/list.json')
     .then(response => {
       if (!response.ok) {
         throw new Error('Impossibile caricare list.json');
@@ -55,7 +55,7 @@ export function initializeBpmnFileMenu(modeler) {
         
         // Gestisci click per caricare il file
         button.addEventListener('click', () => {
-          const fileUrl = `/BPMNs/${fileName}`;
+          const fileUrl = `./BPMNs/${fileName}`;
           console.log(`Caricamento file BPMN: ${fileUrl}`);
           
           openBPMN(modeler, fileUrl)

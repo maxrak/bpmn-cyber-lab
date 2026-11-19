@@ -6,9 +6,9 @@ import { saveCurrentBpmn } from './globalBpmnState';
 export function loadSampleDiagram(modeler, which) {
   // map logical names to files in docs/
   const map = {
-    'empty': '/BPMNs/sample-empty.bpmn',
-    'as-is': '/BPMNs/sample-iam-as-is.bpmn',
-    'annotated': '/BPMNs/sample-iam-annotated.bpmn'
+    'empty': './BPMNs/sample-empty.bpmn',
+    'as-is': './BPMNs/sample-iam-as-is.bpmn',
+    'annotated': './BPMNs/sample-iam-annotated.bpmn'
   };
   const url = map[which] || map['empty'];
   return openBPMN(modeler, url);
@@ -255,7 +255,7 @@ export function setupFileHandlers(modeler) {
 
   // helper to populate the BPMNs menu
   function populateBpmns() {
-    fetch('/BPMNs/list.json').then(r => r.json()).then(list => {
+    fetch('./BPMNs/list.json').then(r => r.json()).then(list => {
       examplesMenu.innerHTML = '';
       list.forEach(name => {
         const li = document.createElement('li');
@@ -263,7 +263,7 @@ export function setupFileHandlers(modeler) {
         btn.type = 'button';
         btn.className = 'dropdown-item';
         btn.textContent = name.replace(/\.bpmn$/i, '');
-        btn.addEventListener('click', () => openBPMN(null, `/BPMNs/${name}`));
+        btn.addEventListener('click', () => openBPMN(null, `./BPMNs/${name}`));
         li.appendChild(btn);
         examplesMenu.appendChild(li);
       });
