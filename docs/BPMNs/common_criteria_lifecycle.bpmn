@@ -1,0 +1,756 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_CC_ISO15408" targetNamespace="http://bpmn.io/schema/bpmn">
+  
+  <!-- Collaboration with 3 Participants -->
+  <bpmn:collaboration id="Collaboration_CC">
+    <bpmn:participant id="Participant_Vendor" name="Vendor / Product Developer" processRef="Process_CC_ISO15408" />
+    <bpmn:participant id="Participant_Lab" name="Evaluation Laboratory" processRef="Process_Evaluation" />
+    <bpmn:participant id="Participant_CertBody" name="Certification Body" processRef="Process_Certification" />
+    
+    <!-- Message Flows between participants -->
+    <bpmn:messageFlow id="Flow_Vendor_ST_To_Lab" name="Security Target" sourceRef="Task_Requirements" targetRef="StartEvent_Lab_ST" />
+    <bpmn:messageFlow id="Flow_Lab_ST_Feedback" name="ST Feedback" sourceRef="Task_ST_Feedback" targetRef="IntermediateEvent_ST_Response" />
+    <bpmn:messageFlow id="Flow_Vendor_To_Lab" name="Evaluation Package" sourceRef="Task_EvalPrep" targetRef="StartEvent_Lab_Eval" />
+    <bpmn:messageFlow id="Flow_Lab_ETR_To_CertBody" name="ETR" sourceRef="EndEvent_Lab_ETR" targetRef="StartEvent_CertBody" />
+    <bpmn:messageFlow id="Flow_Lab_Feedback_To_Vendor" name="Correzioni richieste" sourceRef="EndEvent_Lab_Feedback" targetRef="IntermediateEvent_Corrections" />
+    <bpmn:messageFlow id="Flow_CertBody_To_Vendor" name="Certificate" sourceRef="Task_Certification" targetRef="StartEvent_Vendor_Cert" />
+  </bpmn:collaboration>
+  
+  <!-- Process 1: Vendor Activities -->
+  <bpmn:process id="Process_CC_ISO15408" isExecutable="false">
+    
+    <bpmn:laneSet id="LaneSet_Vendor">
+      <bpmn:lane id="Lane_Vendor" name="Vendor Activities">
+        <bpmn:flowNodeRef>StartEvent_CC</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Planning</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Requirements</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>IntermediateEvent_ST_Response</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ST_OK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Development</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_VandV</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Testing_OK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_EvalPrep</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>IntermediateEvent_Corrections</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Maintenance</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Recert</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Certified</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Vendor_Package</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>StartEvent_Vendor_Cert</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    
+    <!-- Start Event -->
+    <bpmn:startEvent id="StartEvent_CC" name="Inizio processo certificazione">
+      <bpmn:outgoing>Flow_Start_To_Planning</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <!-- Phase 1: Product Security Planning -->
+    <bpmn:task id="Task_Planning" name="Product Security Planning&#10;(Definizione TOE, EAL, Business Case)">
+      <bpmn:incoming>Flow_Start_To_Planning</bpmn:incoming>
+      <bpmn:incoming>Flow_ST_Rework</bpmn:incoming>
+      <bpmn:incoming>Flow_Corrections_To_Planning</bpmn:incoming>
+      <bpmn:incoming>Flow_Need_Recert</bpmn:incoming>
+      <bpmn:outgoing>Flow_Planning_To_Requirements</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Phase 2: Security Requirements Engineering -->
+    <bpmn:task id="Task_Requirements" name="Security Requirements Engineering&#10;(Threat Analysis, SFR, SAR, Security Target)">
+      <bpmn:incoming>Flow_Planning_To_Requirements</bpmn:incoming>
+      <bpmn:outgoing>Flow_Requirements_To_Wait</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Wait for Lab ST Review -->
+    <bpmn:intermediateCatchEvent id="IntermediateEvent_ST_Response" name="Attesa risposta Lab su ST">
+      <bpmn:incoming>Flow_Requirements_To_Wait</bpmn:incoming>
+      <bpmn:outgoing>Flow_Wait_To_Gateway</bpmn:outgoing>
+      <bpmn:messageEventDefinition />
+    </bpmn:intermediateCatchEvent>
+    
+    <!-- Gateway: ST Acceptable? -->
+    <bpmn:exclusiveGateway id="Gateway_ST_OK" name="Security Target accettato?">
+      <bpmn:incoming>Flow_Wait_To_Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_ST_OK</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ST_Rework</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <!-- Phase 3: Secure Development Process -->
+    <bpmn:task id="Task_Development" name="Secure Development Process&#10;(SSDLC, Config Mgmt, Version Control)">
+      <bpmn:incoming>Flow_ST_OK</bpmn:incoming>
+      <bpmn:incoming>Flow_Testing_Failed</bpmn:incoming>
+      <bpmn:outgoing>Flow_Development_To_Testing</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Phase 4: Verification & Validation -->
+    <bpmn:task id="Task_VandV" name="Verification &amp; Validation&#10;(Testing, Penetration Test, Vulnerability Analysis)">
+      <bpmn:incoming>Flow_Development_To_Testing</bpmn:incoming>
+      <bpmn:outgoing>Flow_VandV_To_TestReview</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Gateway: Testing OK? -->
+    <bpmn:exclusiveGateway id="Gateway_Testing_OK" name="Test superati?">
+      <bpmn:incoming>Flow_VandV_To_TestReview</bpmn:incoming>
+      <bpmn:outgoing>Flow_Testing_OK</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Testing_Failed</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <!-- Phase 5: Evaluation Preparation -->
+    <bpmn:task id="Task_EvalPrep" name="Evaluation Preparation&#10;(Raccolta evidenze, Gap Analysis, Compliance Matrix)">
+      <bpmn:incoming>Flow_Testing_OK</bpmn:incoming>
+      <bpmn:outgoing>Flow_EvalPrep_To_Vendor_End</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Intermediate Event: Receive corrections from Lab -->
+    <bpmn:intermediateCatchEvent id="IntermediateEvent_Corrections" name="Correzioni richieste">
+      <bpmn:outgoing>Flow_Corrections_To_Planning</bpmn:outgoing>
+      <bpmn:messageEventDefinition />
+    </bpmn:intermediateCatchEvent>
+    
+    <!-- Phase 8: Post-Certification Maintenance -->
+    <bpmn:task id="Task_Maintenance" name="Post-Certification Maintenance&#10;(Vulnerability Monitoring, Patch Mgmt, Impact Analysis)">
+      <bpmn:incoming>Flow_Cert_To_Maintenance</bpmn:incoming>
+      <bpmn:incoming>Flow_Continue_Maintenance</bpmn:incoming>
+      <bpmn:outgoing>Flow_Maintenance_To_Decision</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Gateway: Re-certification needed? -->
+    <bpmn:exclusiveGateway id="Gateway_Recert" name="Necessaria re-certificazione?">
+      <bpmn:incoming>Flow_Maintenance_To_Decision</bpmn:incoming>
+      <bpmn:outgoing>Flow_Continue_Maintenance</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Need_Recert</bpmn:outgoing>
+      <bpmn:outgoing>Flow_End_Lifecycle</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <!-- End Event -->
+    <bpmn:endEvent id="EndEvent_Certified" name="Prodotto certificato mantenuto">
+      <bpmn:incoming>Flow_End_Lifecycle</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Sequence Flows - Vendor Process -->
+    <bpmn:sequenceFlow id="Flow_Start_To_Planning" sourceRef="StartEvent_CC" targetRef="Task_Planning" />
+    <bpmn:sequenceFlow id="Flow_Planning_To_Requirements" sourceRef="Task_Planning" targetRef="Task_Requirements" />
+    <bpmn:sequenceFlow id="Flow_Requirements_To_Wait" sourceRef="Task_Requirements" targetRef="IntermediateEvent_ST_Response" />
+    <bpmn:sequenceFlow id="Flow_Wait_To_Gateway" sourceRef="IntermediateEvent_ST_Response" targetRef="Gateway_ST_OK" />
+    <bpmn:sequenceFlow id="Flow_ST_OK" name="Sì" sourceRef="Gateway_ST_OK" targetRef="Task_Development" />
+    <bpmn:sequenceFlow id="Flow_ST_Rework" name="No - rielaborare" sourceRef="Gateway_ST_OK" targetRef="Task_Planning" />
+    <bpmn:sequenceFlow id="Flow_Development_To_Testing" sourceRef="Task_Development" targetRef="Task_VandV" />
+    <bpmn:sequenceFlow id="Flow_VandV_To_TestReview" sourceRef="Task_VandV" targetRef="Gateway_Testing_OK" />
+    <bpmn:sequenceFlow id="Flow_Testing_OK" name="Sì" sourceRef="Gateway_Testing_OK" targetRef="Task_EvalPrep" />
+    <bpmn:sequenceFlow id="Flow_Testing_Failed" name="No - correggere" sourceRef="Gateway_Testing_OK" targetRef="Task_Development" />
+    <bpmn:sequenceFlow id="Flow_EvalPrep_To_Vendor_End" sourceRef="Task_EvalPrep" targetRef="EndEvent_Vendor_Package" />
+    <bpmn:sequenceFlow id="Flow_Corrections_To_Planning" sourceRef="IntermediateEvent_Corrections" targetRef="Task_Planning" />
+    <bpmn:sequenceFlow id="Flow_Maintenance_To_Decision" sourceRef="Task_Maintenance" targetRef="Gateway_Recert" />
+    <bpmn:sequenceFlow id="Flow_Continue_Maintenance" name="Manutenzione ordinaria" sourceRef="Gateway_Recert" targetRef="Task_Maintenance" />
+    <bpmn:sequenceFlow id="Flow_Need_Recert" name="Modifiche sostanziali" sourceRef="Gateway_Recert" targetRef="Task_Planning" />
+    <bpmn:sequenceFlow id="Flow_End_Lifecycle" name="Fine ciclo vita prodotto" sourceRef="Gateway_Recert" targetRef="EndEvent_Certified" />
+    
+    <!-- End Event for Vendor sending package -->
+    <bpmn:endEvent id="EndEvent_Vendor_Package" name="Package inviato">
+      <bpmn:incoming>Flow_EvalPrep_To_Vendor_End</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Start Event for Vendor receiving certificate -->
+    <bpmn:startEvent id="StartEvent_Vendor_Cert" name="Certificato ricevuto">
+      <bpmn:outgoing>Flow_Cert_To_Maintenance</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_Cert_To_Maintenance" sourceRef="StartEvent_Vendor_Cert" targetRef="Task_Maintenance" />
+    
+  </bpmn:process>
+  
+  <!-- Process 2: Evaluation Lab Activities -->
+  <bpmn:process id="Process_Evaluation" isExecutable="false">
+    
+    <bpmn:laneSet id="LaneSet_Lab">
+      <bpmn:lane id="Lane_Lab" name="Evaluation Lab Activities">
+        <bpmn:flowNodeRef>StartEvent_Lab_ST</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ST_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Lab_ST_OK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ST_Feedback</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Lab_ST_OK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Lab_ST_Rejected</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>StartEvent_Lab_Eval</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Evaluation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Eval_Passed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Feedback</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Lab_ETR</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Lab_Feedback</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    
+    <!-- Start Event: Security Target received -->
+    <bpmn:startEvent id="StartEvent_Lab_ST" name="Security Target ricevuto">
+      <bpmn:outgoing>Flow_Lab_ST_To_Review</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <!-- Task: Review Security Target -->
+    <bpmn:task id="Task_ST_Review" name="Revisione Security Target&#10;(Threat Model, SFR, SAR)">
+      <bpmn:incoming>Flow_Lab_ST_To_Review</bpmn:incoming>
+      <bpmn:outgoing>Flow_ST_Review_To_Gateway</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Gateway: ST acceptable by Lab? -->
+    <bpmn:exclusiveGateway id="Gateway_Lab_ST_OK" name="Security Target accettabile?">
+      <bpmn:incoming>Flow_ST_Review_To_Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_Lab_ST_Approved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Lab_ST_Rejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <!-- Task: Provide feedback on ST -->
+    <bpmn:task id="Task_ST_Feedback" name="Fornire feedback su ST">
+      <bpmn:incoming>Flow_Lab_ST_Rejected</bpmn:incoming>
+      <bpmn:outgoing>Flow_ST_Feedback_To_End</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- End Events for ST review -->
+    <bpmn:endEvent id="EndEvent_Lab_ST_OK" name="ST approvato">
+      <bpmn:incoming>Flow_Lab_ST_Approved</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <bpmn:endEvent id="EndEvent_Lab_ST_Rejected" name="ST rifiutato">
+      <bpmn:incoming>Flow_ST_Feedback_To_End</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Start Event: Evaluation Package received -->
+    <bpmn:startEvent id="StartEvent_Lab_Eval" name="Package ricevuto">
+      <bpmn:outgoing>Flow_Lab_Start_To_Eval</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <!-- Phase 6: Independent Evaluation -->
+    <bpmn:task id="Task_Evaluation" name="Independent Evaluation&#10;(Doc Review, Code Review, Independent Testing)">
+      <bpmn:incoming>Flow_Lab_Start_To_Eval</bpmn:incoming>
+      <bpmn:outgoing>Flow_Evaluation_To_ETR</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Gateway: Evaluation passed? -->
+    <bpmn:exclusiveGateway id="Gateway_Eval_Passed" name="Valutazione positiva?">
+      <bpmn:incoming>Flow_Evaluation_To_ETR</bpmn:incoming>
+      <bpmn:outgoing>Flow_Eval_Passed</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Eval_Failed</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <!-- Feedback task for failed evaluation -->
+    <bpmn:task id="Task_Feedback" name="Fornire feedback su correzioni necessarie">
+      <bpmn:incoming>Flow_Eval_Failed</bpmn:incoming>
+      <bpmn:outgoing>Flow_Feedback_To_End</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- End Events -->
+    <bpmn:endEvent id="EndEvent_Lab_ETR" name="ETR inviato">
+      <bpmn:incoming>Flow_Eval_Passed</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <bpmn:endEvent id="EndEvent_Lab_Feedback" name="Feedback inviato">
+      <bpmn:incoming>Flow_Feedback_To_End</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Sequence Flows - Lab Process -->
+    <!-- ST Review flows -->
+    <bpmn:sequenceFlow id="Flow_Lab_ST_To_Review" sourceRef="StartEvent_Lab_ST" targetRef="Task_ST_Review" />
+    <bpmn:sequenceFlow id="Flow_ST_Review_To_Gateway" sourceRef="Task_ST_Review" targetRef="Gateway_Lab_ST_OK" />
+    <bpmn:sequenceFlow id="Flow_Lab_ST_Approved" name="Sì" sourceRef="Gateway_Lab_ST_OK" targetRef="EndEvent_Lab_ST_OK" />
+    <bpmn:sequenceFlow id="Flow_Lab_ST_Rejected" name="No - modifiche necessarie" sourceRef="Gateway_Lab_ST_OK" targetRef="Task_ST_Feedback" />
+    <bpmn:sequenceFlow id="Flow_ST_Feedback_To_End" sourceRef="Task_ST_Feedback" targetRef="EndEvent_Lab_ST_Rejected" />
+    <!-- Evaluation flows -->
+    <bpmn:sequenceFlow id="Flow_Lab_Start_To_Eval" sourceRef="StartEvent_Lab_Eval" targetRef="Task_Evaluation" />
+    <bpmn:sequenceFlow id="Flow_Evaluation_To_ETR" sourceRef="Task_Evaluation" targetRef="Gateway_Eval_Passed" />
+    <bpmn:sequenceFlow id="Flow_Eval_Passed" name="Sì" sourceRef="Gateway_Eval_Passed" targetRef="EndEvent_Lab_ETR" />
+    <bpmn:sequenceFlow id="Flow_Eval_Failed" name="No - correzioni necessarie" sourceRef="Gateway_Eval_Passed" targetRef="Task_Feedback" />
+    <bpmn:sequenceFlow id="Flow_Feedback_To_End" sourceRef="Task_Feedback" targetRef="EndEvent_Lab_Feedback" />
+    
+  </bpmn:process>
+  
+  <!-- Process 3: Certification Body Activities -->
+  <bpmn:process id="Process_Certification" isExecutable="false">
+    
+    <bpmn:laneSet id="LaneSet_CertBody">
+      <bpmn:lane id="Lane_CertBody" name="Certification Body Activities">
+        <bpmn:flowNodeRef>StartEvent_CertBody</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Certification</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_CertBody</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    
+    <!-- Start Event -->
+    <bpmn:startEvent id="StartEvent_CertBody" name="ETR ricevuto">
+      <bpmn:outgoing>Flow_CertBody_Start_To_Cert</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <!-- Phase 7: Certification Decision -->
+    <bpmn:task id="Task_Certification" name="Certification Decision&#10;(Review ETR, Emissione certificato CC)">
+      <bpmn:incoming>Flow_CertBody_Start_To_Cert</bpmn:incoming>
+      <bpmn:outgoing>Flow_Certification_To_End</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- End Event -->
+    <bpmn:endEvent id="EndEvent_CertBody" name="Certificato emesso">
+      <bpmn:incoming>Flow_Certification_To_End</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Sequence Flows - Certification Body Process -->
+    <bpmn:sequenceFlow id="Flow_CertBody_Start_To_Cert" sourceRef="StartEvent_CertBody" targetRef="Task_Certification" />
+    <bpmn:sequenceFlow id="Flow_Certification_To_End" sourceRef="Task_Certification" targetRef="EndEvent_CertBody" />
+    
+  </bpmn:process>
+  
+  <!-- BPMN Diagram -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_CC_ISO15408">
+    <bpmndi:BPMNPlane id="BPMNPlane_CC_ISO15408" bpmnElement="Collaboration_CC">
+      
+      <!-- Participant Shapes -->
+      <bpmndi:BPMNShape id="Shape_Participant_Vendor" bpmnElement="Participant_Vendor" isHorizontal="true">
+        <dc:Bounds x="120" y="80" width="2500" height="400" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Participant_Lab" bpmnElement="Participant_Lab" isHorizontal="true">
+        <dc:Bounds x="120" y="530" width="1200" height="300" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Participant_CertBody" bpmnElement="Participant_CertBody" isHorizontal="true">
+        <dc:Bounds x="1370" y="530" width="600" height="300" />
+      </bpmndi:BPMNShape>
+      
+      <!-- Lane Shapes - Vendor -->
+      <bpmndi:BPMNShape id="Shape_Lane_Vendor" bpmnElement="Lane_Vendor" isHorizontal="true">
+        <dc:Bounds x="150" y="80" width="2470" height="400" />
+      </bpmndi:BPMNShape>
+      
+      <!-- Lane Shapes - Lab -->
+      <bpmndi:BPMNShape id="Shape_Lane_Lab" bpmnElement="Lane_Lab" isHorizontal="true">
+        <dc:Bounds x="150" y="530" width="1170" height="300" />
+      </bpmndi:BPMNShape>
+      
+      <!-- Lane Shapes - Cert Body -->
+      <bpmndi:BPMNShape id="Shape_Lane_CertBody" bpmnElement="Lane_CertBody" isHorizontal="true">
+        <dc:Bounds x="1400" y="530" width="570" height="300" />
+      </bpmndi:BPMNShape>
+      
+      <!-- Vendor Process Shapes -->
+      <bpmndi:BPMNShape id="Shape_StartEvent_CC" bpmnElement="StartEvent_CC">
+        <dc:Bounds x="202" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="185" y="295" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_Planning" bpmnElement="Task_Planning">
+        <dc:Bounds x="290" y="230" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_Requirements" bpmnElement="Task_Requirements">
+        <dc:Bounds x="460" y="230" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_IntermediateEvent_ST_Response" bpmnElement="IntermediateEvent_ST_Response">
+        <dc:Bounds x="622" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="599" y="295" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Gateway_ST_OK" bpmnElement="Gateway_ST_OK" isMarkerVisible="true">
+        <dc:Bounds x="710" y="245" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="698" y="207" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_Development" bpmnElement="Task_Development">
+        <dc:Bounds x="810" y="230" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_VandV" bpmnElement="Task_VandV">
+        <dc:Bounds x="980" y="230" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Gateway_Testing_OK" bpmnElement="Gateway_Testing_OK" isMarkerVisible="true">
+        <dc:Bounds x="1150" y="245" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="207" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_EvalPrep" bpmnElement="Task_EvalPrep">
+        <dc:Bounds x="1250" y="230" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_Vendor_Package" bpmnElement="EndEvent_Vendor_Package">
+        <dc:Bounds x="1422" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1398" y="295" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_IntermediateEvent_Corrections" bpmnElement="IntermediateEvent_Corrections">
+        <dc:Bounds x="1292" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1276" y="425" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_StartEvent_Vendor_Cert" bpmnElement="StartEvent_Vendor_Cert">
+        <dc:Bounds x="2032" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2024" y="295" width="52" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_Maintenance" bpmnElement="Task_Maintenance">
+        <dc:Bounds x="2120" y="230" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Gateway_Recert" bpmnElement="Gateway_Recert" isMarkerVisible="true">
+        <dc:Bounds x="2290" y="245" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2277" y="207" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_Certified" bpmnElement="EndEvent_Certified">
+        <dc:Bounds x="2392" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2367" y="295" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Lab Process Shapes -->
+      <bpmndi:BPMNShape id="Shape_StartEvent_Lab_ST" bpmnElement="StartEvent_Lab_ST">
+        <dc:Bounds x="202" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="625" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_ST_Review" bpmnElement="Task_ST_Review">
+        <dc:Bounds x="290" y="560" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Gateway_Lab_ST_OK" bpmnElement="Gateway_Lab_ST_OK" isMarkerVisible="true">
+        <dc:Bounds x="460" y="575" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="448" y="537" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_ST_Feedback" bpmnElement="Task_ST_Feedback">
+        <dc:Bounds x="425" y="680" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_Lab_ST_OK" bpmnElement="EndEvent_Lab_ST_OK">
+        <dc:Bounds x="562" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="541" y="625" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_Lab_ST_Rejected" bpmnElement="EndEvent_Lab_ST_Rejected">
+        <dc:Bounds x="587" y="692" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="572" y="735" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_StartEvent_Lab_Eval" bpmnElement="StartEvent_Lab_Eval">
+        <dc:Bounds x="662" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="652" y="625" width="56" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_Evaluation" bpmnElement="Task_Evaluation">
+        <dc:Bounds x="750" y="560" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Gateway_Eval_Passed" bpmnElement="Gateway_Eval_Passed" isMarkerVisible="true">
+        <dc:Bounds x="920" y="575" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="908" y="537" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_Feedback" bpmnElement="Task_Feedback">
+        <dc:Bounds x="885" y="680" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_Lab_ETR" bpmnElement="EndEvent_Lab_ETR">
+        <dc:Bounds x="1022" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1008" y="625" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_Lab_Feedback" bpmnElement="EndEvent_Lab_Feedback">
+        <dc:Bounds x="1047" y="692" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1024" y="735" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Cert Body Process Shapes -->
+      <bpmndi:BPMNShape id="Shape_StartEvent_CertBody" bpmnElement="StartEvent_CertBody">
+        <dc:Bounds x="1432" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1416" y="625" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_Certification" bpmnElement="Task_Certification">
+        <dc:Bounds x="1520" y="560" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_CertBody" bpmnElement="EndEvent_CertBody">
+        <dc:Bounds x="1692" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1667" y="625" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Vendor Process Edges -->
+      <bpmndi:BPMNEdge id="Edge_Flow_Start_To_Planning" bpmnElement="Flow_Start_To_Planning">
+        <di:waypoint x="238" y="270" />
+        <di:waypoint x="290" y="270" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Planning_To_Requirements" bpmnElement="Flow_Planning_To_Requirements">
+        <di:waypoint x="410" y="270" />
+        <di:waypoint x="460" y="270" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Requirements_To_Wait" bpmnElement="Flow_Requirements_To_Wait">
+        <di:waypoint x="580" y="270" />
+        <di:waypoint x="622" y="270" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Wait_To_Gateway" bpmnElement="Flow_Wait_To_Gateway">
+        <di:waypoint x="658" y="270" />
+        <di:waypoint x="710" y="270" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ST_OK" bpmnElement="Flow_ST_OK">
+        <di:waypoint x="760" y="270" />
+        <di:waypoint x="810" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="774" y="252" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ST_Rework" bpmnElement="Flow_ST_Rework">
+        <di:waypoint x="735" y="295" />
+        <di:waypoint x="735" y="390" />
+        <di:waypoint x="350" y="390" />
+        <di:waypoint x="350" y="310" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="508" y="372" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Development_To_Testing" bpmnElement="Flow_Development_To_Testing">
+        <di:waypoint x="930" y="270" />
+        <di:waypoint x="980" y="270" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_VandV_To_TestReview" bpmnElement="Flow_VandV_To_TestReview">
+        <di:waypoint x="1100" y="270" />
+        <di:waypoint x="1150" y="270" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Testing_OK" bpmnElement="Flow_Testing_OK">
+        <di:waypoint x="1200" y="270" />
+        <di:waypoint x="1250" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1214" y="252" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Testing_Failed" bpmnElement="Flow_Testing_Failed">
+        <di:waypoint x="1175" y="295" />
+        <di:waypoint x="1175" y="420" />
+        <di:waypoint x="870" y="420" />
+        <di:waypoint x="870" y="310" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="985" y="402" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_EvalPrep_To_Vendor_End" bpmnElement="Flow_EvalPrep_To_Vendor_End">
+        <di:waypoint x="1370" y="270" />
+        <di:waypoint x="1422" y="270" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Corrections_To_Planning" bpmnElement="Flow_Corrections_To_Planning">
+        <di:waypoint x="1292" y="400" />
+        <di:waypoint x="350" y="400" />
+        <di:waypoint x="350" y="310" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Cert_To_Maintenance" bpmnElement="Flow_Cert_To_Maintenance">
+        <di:waypoint x="2068" y="270" />
+        <di:waypoint x="2120" y="270" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Maintenance_To_Decision" bpmnElement="Flow_Maintenance_To_Decision">
+        <di:waypoint x="2240" y="270" />
+        <di:waypoint x="2290" y="270" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Continue_Maintenance" bpmnElement="Flow_Continue_Maintenance">
+        <di:waypoint x="2315" y="245" />
+        <di:waypoint x="2315" y="190" />
+        <di:waypoint x="2180" y="190" />
+        <di:waypoint x="2180" y="230" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2206" y="172" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Need_Recert" bpmnElement="Flow_Need_Recert">
+        <di:waypoint x="2315" y="295" />
+        <di:waypoint x="2315" y="450" />
+        <di:waypoint x="350" y="450" />
+        <di:waypoint x="350" y="310" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1291" y="432" width="64" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_End_Lifecycle" bpmnElement="Flow_End_Lifecycle">
+        <di:waypoint x="2340" y="270" />
+        <di:waypoint x="2392" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2336" y="236" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <!-- Lab Process Edges -->
+      <bpmndi:BPMNEdge id="Edge_Flow_Lab_ST_To_Review" bpmnElement="Flow_Lab_ST_To_Review">
+        <di:waypoint x="238" y="600" />
+        <di:waypoint x="290" y="600" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ST_Review_To_Gateway" bpmnElement="Flow_ST_Review_To_Gateway">
+        <di:waypoint x="410" y="600" />
+        <di:waypoint x="460" y="600" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Lab_ST_Approved" bpmnElement="Flow_Lab_ST_Approved">
+        <di:waypoint x="510" y="600" />
+        <di:waypoint x="562" y="600" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="525" y="582" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Lab_ST_Rejected" bpmnElement="Flow_Lab_ST_Rejected">
+        <di:waypoint x="485" y="625" />
+        <di:waypoint x="485" y="680" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="492" y="633" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ST_Feedback_To_End" bpmnElement="Flow_ST_Feedback_To_End">
+        <di:waypoint x="545" y="710" />
+        <di:waypoint x="587" y="710" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Lab_Start_To_Eval" bpmnElement="Flow_Lab_Start_To_Eval">
+        <di:waypoint x="698" y="600" />
+        <di:waypoint x="750" y="600" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Evaluation_To_ETR" bpmnElement="Flow_Evaluation_To_ETR">
+        <di:waypoint x="870" y="600" />
+        <di:waypoint x="920" y="600" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Eval_Passed" bpmnElement="Flow_Eval_Passed">
+        <di:waypoint x="970" y="600" />
+        <di:waypoint x="1022" y="600" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="985" y="582" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Eval_Failed" bpmnElement="Flow_Eval_Failed">
+        <di:waypoint x="945" y="625" />
+        <di:waypoint x="945" y="680" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="952" y="633" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Feedback_To_End" bpmnElement="Flow_Feedback_To_End">
+        <di:waypoint x="1005" y="710" />
+        <di:waypoint x="1047" y="710" />
+      </bpmndi:BPMNEdge>
+      
+      <!-- Cert Body Process Edges -->
+      <bpmndi:BPMNEdge id="Edge_Flow_CertBody_Start_To_Cert" bpmnElement="Flow_CertBody_Start_To_Cert">
+        <di:waypoint x="1468" y="600" />
+        <di:waypoint x="1520" y="600" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Certification_To_End" bpmnElement="Flow_Certification_To_End">
+        <di:waypoint x="1640" y="600" />
+        <di:waypoint x="1692" y="600" />
+      </bpmndi:BPMNEdge>
+      
+      <!-- Message Flow Edges -->
+      <bpmndi:BPMNEdge id="Edge_Flow_Vendor_ST_To_Lab" bpmnElement="Flow_Vendor_ST_To_Lab">
+        <di:waypoint x="520" y="310" />
+        <di:waypoint x="520" y="445" />
+        <di:waypoint x="220" y="445" />
+        <di:waypoint x="220" y="582" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="338" y="427" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Lab_ST_Feedback" bpmnElement="Flow_Lab_ST_Feedback">
+        <di:waypoint x="485" y="640" />
+        <di:waypoint x="485" y="505" />
+        <di:waypoint x="640" y="505" />
+        <di:waypoint x="640" y="288" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="534" y="487" width="62" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Vendor_To_Lab" bpmnElement="Flow_Vendor_To_Lab">
+        <di:waypoint x="1310" y="310" />
+        <di:waypoint x="1310" y="445" />
+        <di:waypoint x="680" y="445" />
+        <di:waypoint x="680" y="582" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="953" y="427" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Lab_ETR_To_CertBody" bpmnElement="Flow_Lab_ETR_To_CertBody">
+        <di:waypoint x="1058" y="600" />
+        <di:waypoint x="1432" y="600" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1232" y="582" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Lab_Feedback_To_Vendor" bpmnElement="Flow_Lab_Feedback_To_Vendor">
+        <di:waypoint x="945" y="740" />
+        <di:waypoint x="945" y="770" />
+        <di:waypoint x="1310" y="770" />
+        <di:waypoint x="1310" y="418" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1086" y="752" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_CertBody_To_Vendor" bpmnElement="Flow_CertBody_To_Vendor">
+        <di:waypoint x="1640" y="600" />
+        <di:waypoint x="2050" y="600" />
+        <di:waypoint x="2050" y="288" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1817" y="582" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

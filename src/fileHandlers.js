@@ -1,10 +1,10 @@
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 import { saveCurrentBpmn } from './globalBpmnState';
 
-// sample BPMN files are served from `public/`; load them at runtime via fetch
+// sample BPMN files are served from `docs/`; load them at runtime via fetch
 
 export function loadSampleDiagram(modeler, which) {
-  // map logical names to files in public/
+  // map logical names to files in docs/
   const map = {
     'empty': '/BPMNs/sample-empty.bpmn',
     'as-is': '/BPMNs/sample-iam-as-is.bpmn',

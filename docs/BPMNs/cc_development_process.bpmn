@@ -1,0 +1,797 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_CC_Development" targetNamespace="http://bpmn.io/schema/bpmn">
+  
+  <!-- Collaboration with 2 Participants -->
+  <bpmn:collaboration id="Collaboration_CC_Dev">
+    <bpmn:participant id="Participant_Developer" name="Product Developer" processRef="Process_Development" />
+    <bpmn:participant id="Participant_Evaluator" name="Evaluator" processRef="Process_Evaluation" />
+    
+    <!-- Message Flows -->
+    <bpmn:messageFlow id="Flow_Send_SecurityTarget" name="Security Target" sourceRef="Task_DefineSecurityObjectives" targetRef="Task_ASE" />
+    <bpmn:messageFlow id="Flow_Send_Design" name="Design Documentation" sourceRef="Task_SystemDesign" targetRef="Task_ADV_Design" />
+    <bpmn:messageFlow id="Flow_Send_Implementation" name="Implementation + Tests" sourceRef="Task_Implementation" targetRef="Task_ADV_IMP" />
+  </bpmn:collaboration>
+  
+  <!-- Process 1: Development Activities -->
+  <bpmn:process id="Process_Development" isExecutable="false">
+    
+    <bpmn:laneSet id="LaneSet_Dev">
+      <bpmn:lane id="Lane_Dev" name="Development Activities">
+        <bpmn:flowNodeRef>StartEvent_Dev</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_DefineProblem</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_DefineSecurityObjectives</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_DefineFunctionalReq</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_TOESummary</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_STApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SystemDesign</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FunctionalSpec</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SecurityPolicyModel</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_TOEDesign</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ConfigMgmt</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_DesignApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Implementation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ImplRepresentation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Testing</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_VulnAssessment</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ImplApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Dev</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>IntermediateEvent_ST_Feedback</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>IntermediateEvent_Design_Feedback</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>IntermediateEvent_Impl_Feedback</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    
+    <!-- Start Event -->
+    <bpmn:startEvent id="StartEvent_Dev" name="Inizio sviluppo">
+      <bpmn:outgoing>Flow_Start_To_Problem</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <!-- PHASE 1: SYSTEM DEFINITION -->
+    <bpmn:task id="Task_DefineProblem" name="Define Security Problem">
+      <bpmn:incoming>Flow_Start_To_Problem</bpmn:incoming>
+      <bpmn:outgoing>Flow_Problem_To_Objectives</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_DefineSecurityObjectives" name="Define Security Objectives&#10;[Verified by: APE/ASE.OBJ]">
+      <bpmn:incoming>Flow_Problem_To_Objectives</bpmn:incoming>
+      <bpmn:incoming>Flow_ST_Rework</bpmn:incoming>
+      <bpmn:outgoing>Flow_Objectives_To_FuncReq</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_DefineFunctionalReq" name="Define Functional Requirements&#10;[Verified by: APE/ASE.REQ]">
+      <bpmn:incoming>Flow_Objectives_To_FuncReq</bpmn:incoming>
+      <bpmn:outgoing>Flow_FuncReq_To_Summary</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_TOESummary" name="TOE Summary Specification&#10;[Verified by: ASE.TSS]">
+      <bpmn:incoming>Flow_FuncReq_To_Summary</bpmn:incoming>
+      <bpmn:outgoing>Flow_Summary_To_Wait</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Wait for ASE approval -->
+    <bpmn:intermediateCatchEvent id="IntermediateEvent_ST_Feedback" name="Attesa valutazione ASE">
+      <bpmn:incoming>Flow_Summary_To_Wait</bpmn:incoming>
+      <bpmn:outgoing>Flow_Wait_To_Gateway</bpmn:outgoing>
+      <bpmn:messageEventDefinition />
+    </bpmn:intermediateCatchEvent>
+    
+    <bpmn:exclusiveGateway id="Gateway_STApproved" name="Security Target approvato?">
+      <bpmn:incoming>Flow_Wait_To_Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_ST_Approved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ST_Rework</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <!-- PHASE 2: SYSTEM DESIGN -->
+    <bpmn:task id="Task_SystemDesign" name="System Design">
+      <bpmn:incoming>Flow_ST_Approved</bpmn:incoming>
+      <bpmn:incoming>Flow_Design_Rework</bpmn:incoming>
+      <bpmn:outgoing>Flow_Design_To_FuncSpec</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_FunctionalSpec" name="Functional Specification&#10;[Verified by: ADV.FSP]">
+      <bpmn:incoming>Flow_Design_To_FuncSpec</bpmn:incoming>
+      <bpmn:outgoing>Flow_FuncSpec_To_SPM</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_SecurityPolicyModel" name="Security Policy Modelling&#10;[Verified by: ADV.SPM]">
+      <bpmn:incoming>Flow_FuncSpec_To_SPM</bpmn:incoming>
+      <bpmn:outgoing>Flow_SPM_To_TOEDesign</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_TOEDesign" name="TOE Design&#10;[Verified by: ADV.TDS]">
+      <bpmn:incoming>Flow_SPM_To_TOEDesign</bpmn:incoming>
+      <bpmn:outgoing>Flow_TOEDesign_To_CM</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_ConfigMgmt" name="Configuration Management&#10;[Verified by: ALC.CMC]">
+      <bpmn:incoming>Flow_TOEDesign_To_CM</bpmn:incoming>
+      <bpmn:outgoing>Flow_CM_To_WaitDesign</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Wait for ADV approval -->
+    <bpmn:intermediateCatchEvent id="IntermediateEvent_Design_Feedback" name="Attesa valutazione ADV">
+      <bpmn:incoming>Flow_CM_To_WaitDesign</bpmn:incoming>
+      <bpmn:outgoing>Flow_WaitDesign_To_Gateway</bpmn:outgoing>
+      <bpmn:messageEventDefinition />
+    </bpmn:intermediateCatchEvent>
+    
+    <bpmn:exclusiveGateway id="Gateway_DesignApproved" name="Design approvato?">
+      <bpmn:incoming>Flow_WaitDesign_To_Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_Design_Approved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Design_Rework</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <!-- PHASE 3: IMPLEMENTATION -->
+    <bpmn:task id="Task_Implementation" name="Implementation">
+      <bpmn:incoming>Flow_Design_Approved</bpmn:incoming>
+      <bpmn:incoming>Flow_Impl_Rework</bpmn:incoming>
+      <bpmn:outgoing>Flow_Impl_To_ImplRep</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_ImplRepresentation" name="Implementation Representation&#10;[Verified by: ADV.IMP]">
+      <bpmn:incoming>Flow_Impl_To_ImplRep</bpmn:incoming>
+      <bpmn:outgoing>Flow_ImplRep_To_Testing</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_Testing" name="Testing&#10;[Verified by: ATE]">
+      <bpmn:incoming>Flow_ImplRep_To_Testing</bpmn:incoming>
+      <bpmn:outgoing>Flow_Testing_To_Vuln</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_VulnAssessment" name="Vulnerability Assessment&#10;[Verified by: AVA]">
+      <bpmn:incoming>Flow_Testing_To_Vuln</bpmn:incoming>
+      <bpmn:outgoing>Flow_Vuln_To_WaitImpl</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Wait for Implementation approval -->
+    <bpmn:intermediateCatchEvent id="IntermediateEvent_Impl_Feedback" name="Attesa valutazione ATE/AVA">
+      <bpmn:incoming>Flow_Vuln_To_WaitImpl</bpmn:incoming>
+      <bpmn:outgoing>Flow_WaitImpl_To_Gateway</bpmn:outgoing>
+      <bpmn:messageEventDefinition />
+    </bpmn:intermediateCatchEvent>
+    
+    <bpmn:exclusiveGateway id="Gateway_ImplApproved" name="Implementation approvata?">
+      <bpmn:incoming>Flow_WaitImpl_To_Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_Impl_Approved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Impl_Rework</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <!-- End Event -->
+    <bpmn:endEvent id="EndEvent_Dev" name="Prodotto certificato">
+      <bpmn:incoming>Flow_Impl_Approved</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Sequence Flows -->
+    <bpmn:sequenceFlow id="Flow_Start_To_Problem" sourceRef="StartEvent_Dev" targetRef="Task_DefineProblem" />
+    <bpmn:sequenceFlow id="Flow_Problem_To_Objectives" sourceRef="Task_DefineProblem" targetRef="Task_DefineSecurityObjectives" />
+    <bpmn:sequenceFlow id="Flow_Objectives_To_FuncReq" sourceRef="Task_DefineSecurityObjectives" targetRef="Task_DefineFunctionalReq" />
+    <bpmn:sequenceFlow id="Flow_FuncReq_To_Summary" sourceRef="Task_DefineFunctionalReq" targetRef="Task_TOESummary" />
+    <bpmn:sequenceFlow id="Flow_Summary_To_Wait" sourceRef="Task_TOESummary" targetRef="IntermediateEvent_ST_Feedback" />
+    <bpmn:sequenceFlow id="Flow_Wait_To_Gateway" sourceRef="IntermediateEvent_ST_Feedback" targetRef="Gateway_STApproved" />
+    <bpmn:sequenceFlow id="Flow_ST_Approved" name="Sì" sourceRef="Gateway_STApproved" targetRef="Task_SystemDesign" />
+    <bpmn:sequenceFlow id="Flow_ST_Rework" name="No - correzioni" sourceRef="Gateway_STApproved" targetRef="Task_DefineSecurityObjectives" />
+    <bpmn:sequenceFlow id="Flow_Design_To_FuncSpec" sourceRef="Task_SystemDesign" targetRef="Task_FunctionalSpec" />
+    <bpmn:sequenceFlow id="Flow_FuncSpec_To_SPM" sourceRef="Task_FunctionalSpec" targetRef="Task_SecurityPolicyModel" />
+    <bpmn:sequenceFlow id="Flow_SPM_To_TOEDesign" sourceRef="Task_SecurityPolicyModel" targetRef="Task_TOEDesign" />
+    <bpmn:sequenceFlow id="Flow_TOEDesign_To_CM" sourceRef="Task_TOEDesign" targetRef="Task_ConfigMgmt" />
+    <bpmn:sequenceFlow id="Flow_CM_To_WaitDesign" sourceRef="Task_ConfigMgmt" targetRef="IntermediateEvent_Design_Feedback" />
+    <bpmn:sequenceFlow id="Flow_WaitDesign_To_Gateway" sourceRef="IntermediateEvent_Design_Feedback" targetRef="Gateway_DesignApproved" />
+    <bpmn:sequenceFlow id="Flow_Design_Approved" name="Sì" sourceRef="Gateway_DesignApproved" targetRef="Task_Implementation" />
+    <bpmn:sequenceFlow id="Flow_Design_Rework" name="No - correzioni" sourceRef="Gateway_DesignApproved" targetRef="Task_SystemDesign" />
+    <bpmn:sequenceFlow id="Flow_Impl_To_ImplRep" sourceRef="Task_Implementation" targetRef="Task_ImplRepresentation" />
+    <bpmn:sequenceFlow id="Flow_ImplRep_To_Testing" sourceRef="Task_ImplRepresentation" targetRef="Task_Testing" />
+    <bpmn:sequenceFlow id="Flow_Testing_To_Vuln" sourceRef="Task_Testing" targetRef="Task_VulnAssessment" />
+    <bpmn:sequenceFlow id="Flow_Vuln_To_WaitImpl" sourceRef="Task_VulnAssessment" targetRef="IntermediateEvent_Impl_Feedback" />
+    <bpmn:sequenceFlow id="Flow_WaitImpl_To_Gateway" sourceRef="IntermediateEvent_Impl_Feedback" targetRef="Gateway_ImplApproved" />
+    <bpmn:sequenceFlow id="Flow_Impl_Approved" name="Sì" sourceRef="Gateway_ImplApproved" targetRef="EndEvent_Dev" />
+    <bpmn:sequenceFlow id="Flow_Impl_Rework" name="No - correzioni" sourceRef="Gateway_ImplApproved" targetRef="Task_Implementation" />
+    
+  </bpmn:process>
+  
+  <!-- Process 2: Evaluation Activities -->
+  <bpmn:process id="Process_Evaluation" isExecutable="false">
+    
+    <bpmn:laneSet id="LaneSet_Eval">
+      <bpmn:lane id="Lane_Eval" name="Evaluation Activities">
+        <bpmn:flowNodeRef>StartEvent_ASE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ASE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ASE_Result</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_ASE_OK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_ASE_NOK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>StartEvent_ADV</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ADV_Design</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ADV_Result</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_ADV_OK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_ADV_NOK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>StartEvent_ATE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ADV_IMP</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ATE_AVA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ATE_Result</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_ATE_OK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_ATE_NOK</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    
+    <!-- ASE Evaluation -->
+    <bpmn:startEvent id="StartEvent_ASE" name="ST ricevuto">
+      <bpmn:outgoing>Flow_ASE_Start</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <bpmn:task id="Task_ASE" name="ASE Evaluation&#10;(OBJ, REQ, TSS)">
+      <bpmn:incoming>Flow_ASE_Start</bpmn:incoming>
+      <bpmn:outgoing>Flow_ASE_To_Gateway</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:exclusiveGateway id="Gateway_ASE_Result" name="ASE passed?">
+      <bpmn:incoming>Flow_ASE_To_Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_ASE_Pass</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ASE_Fail</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <bpmn:endEvent id="EndEvent_ASE_OK" name="ST approvato">
+      <bpmn:incoming>Flow_ASE_Pass</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <bpmn:endEvent id="EndEvent_ASE_NOK" name="ST rifiutato">
+      <bpmn:incoming>Flow_ASE_Fail</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- ADV Evaluation -->
+    <bpmn:startEvent id="StartEvent_ADV" name="Design ricevuto">
+      <bpmn:outgoing>Flow_ADV_Start</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <bpmn:task id="Task_ADV_Design" name="ADV Evaluation&#10;(FSP, SPM, TDS)&#10;+ ALC.CMC">
+      <bpmn:incoming>Flow_ADV_Start</bpmn:incoming>
+      <bpmn:outgoing>Flow_ADV_To_Gateway</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:exclusiveGateway id="Gateway_ADV_Result" name="ADV passed?">
+      <bpmn:incoming>Flow_ADV_To_Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_ADV_Pass</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ADV_Fail</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <bpmn:endEvent id="EndEvent_ADV_OK" name="Design approvato">
+      <bpmn:incoming>Flow_ADV_Pass</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <bpmn:endEvent id="EndEvent_ADV_NOK" name="Design rifiutato">
+      <bpmn:incoming>Flow_ADV_Fail</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- ATE/AVA Evaluation -->
+    <bpmn:startEvent id="StartEvent_ATE" name="Implementation ricevuta">
+      <bpmn:outgoing>Flow_ATE_Start</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <bpmn:task id="Task_ADV_IMP" name="ADV.IMP Evaluation&#10;+ ALC.CMC">
+      <bpmn:incoming>Flow_ATE_Start</bpmn:incoming>
+      <bpmn:outgoing>Flow_IMP_To_ATE</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_ATE_AVA" name="ATE + AVA Evaluation&#10;(Testing + Vulnerability Assessment)">
+      <bpmn:incoming>Flow_IMP_To_ATE</bpmn:incoming>
+      <bpmn:outgoing>Flow_ATE_To_Gateway</bpmn:outgoing>
+    </bpmn:task>
+    
+    <bpmn:exclusiveGateway id="Gateway_ATE_Result" name="ATE/AVA passed?">
+      <bpmn:incoming>Flow_ATE_To_Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_ATE_Pass</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ATE_Fail</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <bpmn:endEvent id="EndEvent_ATE_OK" name="Implementation approvata">
+      <bpmn:incoming>Flow_ATE_Pass</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <bpmn:endEvent id="EndEvent_ATE_NOK" name="Implementation rifiutata">
+      <bpmn:incoming>Flow_ATE_Fail</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Sequence Flows - Evaluation -->
+    <bpmn:sequenceFlow id="Flow_ASE_Start" sourceRef="StartEvent_ASE" targetRef="Task_ASE" />
+    <bpmn:sequenceFlow id="Flow_ASE_To_Gateway" sourceRef="Task_ASE" targetRef="Gateway_ASE_Result" />
+    <bpmn:sequenceFlow id="Flow_ASE_Pass" name="Sì" sourceRef="Gateway_ASE_Result" targetRef="EndEvent_ASE_OK" />
+    <bpmn:sequenceFlow id="Flow_ASE_Fail" name="No" sourceRef="Gateway_ASE_Result" targetRef="EndEvent_ASE_NOK" />
+    <bpmn:sequenceFlow id="Flow_ADV_Start" sourceRef="StartEvent_ADV" targetRef="Task_ADV_Design" />
+    <bpmn:sequenceFlow id="Flow_ADV_To_Gateway" sourceRef="Task_ADV_Design" targetRef="Gateway_ADV_Result" />
+    <bpmn:sequenceFlow id="Flow_ADV_Pass" name="Sì" sourceRef="Gateway_ADV_Result" targetRef="EndEvent_ADV_OK" />
+    <bpmn:sequenceFlow id="Flow_ADV_Fail" name="No" sourceRef="Gateway_ADV_Result" targetRef="EndEvent_ADV_NOK" />
+    <bpmn:sequenceFlow id="Flow_ATE_Start" sourceRef="StartEvent_ATE" targetRef="Task_ADV_IMP" />
+    <bpmn:sequenceFlow id="Flow_IMP_To_ATE" sourceRef="Task_ADV_IMP" targetRef="Task_ATE_AVA" />
+    <bpmn:sequenceFlow id="Flow_ATE_To_Gateway" sourceRef="Task_ATE_AVA" targetRef="Gateway_ATE_Result" />
+    <bpmn:sequenceFlow id="Flow_ATE_Pass" name="Sì" sourceRef="Gateway_ATE_Result" targetRef="EndEvent_ATE_OK" />
+    <bpmn:sequenceFlow id="Flow_ATE_Fail" name="No" sourceRef="Gateway_ATE_Result" targetRef="EndEvent_ATE_NOK" />
+    
+  </bpmn:process>
+  
+  <!-- BPMN Diagram -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_CC_Development">
+    <bpmndi:BPMNPlane id="BPMNPlane_CC_Development" bpmnElement="Collaboration_CC_Dev">
+      
+      <!-- Participant Shapes -->
+      <bpmndi:BPMNShape id="Shape_Participant_Developer" bpmnElement="Participant_Developer" isHorizontal="true">
+        <dc:Bounds x="120" y="80" width="2800" height="350" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Participant_Evaluator" bpmnElement="Participant_Evaluator" isHorizontal="true">
+        <dc:Bounds x="120" y="480" width="2800" height="300" />
+      </bpmndi:BPMNShape>
+      
+      <!-- Lane Shapes -->
+      <bpmndi:BPMNShape id="Shape_Lane_Dev" bpmnElement="Lane_Dev" isHorizontal="true">
+        <dc:Bounds x="150" y="80" width="2770" height="350" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Lane_Eval" bpmnElement="Lane_Eval" isHorizontal="true">
+        <dc:Bounds x="150" y="480" width="2770" height="300" />
+      </bpmndi:BPMNShape>
+      
+      <!-- Development Process Shapes -->
+      <bpmndi:BPMNShape id="Shape_StartEvent_Dev" bpmnElement="StartEvent_Dev">
+        <dc:Bounds x="202" y="232" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="179" y="275" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Phase 1: System Definition -->
+      <bpmndi:BPMNShape id="Shape_Task_DefineProblem" bpmnElement="Task_DefineProblem">
+        <dc:Bounds x="290" y="210" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_DefineSecurityObjectives" bpmnElement="Task_DefineSecurityObjectives">
+        <dc:Bounds x="460" y="210" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_DefineFunctionalReq" bpmnElement="Task_DefineFunctionalReq">
+        <dc:Bounds x="650" y="210" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_TOESummary" bpmnElement="Task_TOESummary">
+        <dc:Bounds x="840" y="210" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_IntermediateEvent_ST_Feedback" bpmnElement="IntermediateEvent_ST_Feedback">
+        <dc:Bounds x="1012" y="232" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="988" y="275" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Gateway_STApproved" bpmnElement="Gateway_STApproved" isMarkerVisible="true">
+        <dc:Bounds x="1100" y="225" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1084" y="187" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Phase 2: System Design -->
+      <bpmndi:BPMNShape id="Shape_Task_SystemDesign" bpmnElement="Task_SystemDesign">
+        <dc:Bounds x="1200" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_FunctionalSpec" bpmnElement="Task_FunctionalSpec">
+        <dc:Bounds x="1350" y="210" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_SecurityPolicyModel" bpmnElement="Task_SecurityPolicyModel">
+        <dc:Bounds x="1520" y="210" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_TOEDesign" bpmnElement="Task_TOEDesign">
+        <dc:Bounds x="1700" y="210" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_ConfigMgmt" bpmnElement="Task_ConfigMgmt">
+        <dc:Bounds x="1860" y="210" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_IntermediateEvent_Design_Feedback" bpmnElement="IntermediateEvent_Design_Feedback">
+        <dc:Bounds x="2042" y="232" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2018" y="275" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Gateway_DesignApproved" bpmnElement="Gateway_DesignApproved" isMarkerVisible="true">
+        <dc:Bounds x="2130" y="225" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2114" y="187" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Phase 3: Implementation -->
+      <bpmndi:BPMNShape id="Shape_Task_Implementation" bpmnElement="Task_Implementation">
+        <dc:Bounds x="2230" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_ImplRepresentation" bpmnElement="Task_ImplRepresentation">
+        <dc:Bounds x="2380" y="210" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_Testing" bpmnElement="Task_Testing">
+        <dc:Bounds x="2560" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_VulnAssessment" bpmnElement="Task_VulnAssessment">
+        <dc:Bounds x="2710" y="210" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_IntermediateEvent_Impl_Feedback" bpmnElement="IntermediateEvent_Impl_Feedback">
+        <dc:Bounds x="2752" y="332" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2726" y="375" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Gateway_ImplApproved" bpmnElement="Gateway_ImplApproved" isMarkerVisible="true">
+        <dc:Bounds x="2745" y="145" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2804" y="156" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_Dev" bpmnElement="EndEvent_Dev">
+        <dc:Bounds x="2752" y="92" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2739" y="135" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Evaluation Process Shapes -->
+      <!-- ASE -->
+      <bpmndi:BPMNShape id="Shape_StartEvent_ASE" bpmnElement="StartEvent_ASE">
+        <dc:Bounds x="512" y="552" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="497" y="595" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_ASE" bpmnElement="Task_ASE">
+        <dc:Bounds x="600" y="530" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Gateway_ASE_Result" bpmnElement="Gateway_ASE_Result" isMarkerVisible="true">
+        <dc:Bounds x="770" y="545" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="758" y="515" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_ASE_OK" bpmnElement="EndEvent_ASE_OK">
+        <dc:Bounds x="872" y="552" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="851" y="595" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_ASE_NOK" bpmnElement="EndEvent_ASE_NOK">
+        <dc:Bounds x="777" y="652" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="762" y="695" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- ADV -->
+      <bpmndi:BPMNShape id="Shape_StartEvent_ADV" bpmnElement="StartEvent_ADV">
+        <dc:Bounds x="1562" y="552" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1537" y="595" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_ADV_Design" bpmnElement="Task_ADV_Design">
+        <dc:Bounds x="1650" y="530" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Gateway_ADV_Result" bpmnElement="Gateway_ADV_Result" isMarkerVisible="true">
+        <dc:Bounds x="1840" y="545" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1828" y="515" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_ADV_OK" bpmnElement="EndEvent_ADV_OK">
+        <dc:Bounds x="1942" y="552" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1916" y="595" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_ADV_NOK" bpmnElement="EndEvent_ADV_NOK">
+        <dc:Bounds x="1847" y="652" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1827" y="695" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- ATE/AVA -->
+      <bpmndi:BPMNShape id="Shape_StartEvent_ATE" bpmnElement="StartEvent_ATE">
+        <dc:Bounds x="2292" y="552" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2266" y="595" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_ADV_IMP" bpmnElement="Task_ADV_IMP">
+        <dc:Bounds x="2380" y="530" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Task_ATE_AVA" bpmnElement="Task_ATE_AVA">
+        <dc:Bounds x="2560" y="530" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_Gateway_ATE_Result" bpmnElement="Gateway_ATE_Result" isMarkerVisible="true">
+        <dc:Bounds x="2750" y="545" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2809" y="556" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_ATE_OK" bpmnElement="EndEvent_ATE_OK">
+        <dc:Bounds x="2757" y="492" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2803" y="496" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Shape_EndEvent_ATE_NOK" bpmnElement="EndEvent_ATE_NOK">
+        <dc:Bounds x="2757" y="652" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2803" y="656" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Development Process Edges -->
+      <bpmndi:BPMNEdge id="Edge_Flow_Start_To_Problem" bpmnElement="Flow_Start_To_Problem">
+        <di:waypoint x="238" y="250" />
+        <di:waypoint x="290" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Problem_To_Objectives" bpmnElement="Flow_Problem_To_Objectives">
+        <di:waypoint x="410" y="250" />
+        <di:waypoint x="460" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Objectives_To_FuncReq" bpmnElement="Flow_Objectives_To_FuncReq">
+        <di:waypoint x="600" y="250" />
+        <di:waypoint x="650" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_FuncReq_To_Summary" bpmnElement="Flow_FuncReq_To_Summary">
+        <di:waypoint x="790" y="250" />
+        <di:waypoint x="840" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Summary_To_Wait" bpmnElement="Flow_Summary_To_Wait">
+        <di:waypoint x="960" y="250" />
+        <di:waypoint x="1012" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Wait_To_Gateway" bpmnElement="Flow_Wait_To_Gateway">
+        <di:waypoint x="1048" y="250" />
+        <di:waypoint x="1100" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ST_Approved" bpmnElement="Flow_ST_Approved">
+        <di:waypoint x="1150" y="250" />
+        <di:waypoint x="1200" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1164" y="232" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ST_Rework" bpmnElement="Flow_ST_Rework">
+        <di:waypoint x="1125" y="275" />
+        <di:waypoint x="1125" y="380" />
+        <di:waypoint x="530" y="380" />
+        <di:waypoint x="530" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="794" y="362" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Design_To_FuncSpec" bpmnElement="Flow_Design_To_FuncSpec">
+        <di:waypoint x="1300" y="250" />
+        <di:waypoint x="1350" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_FuncSpec_To_SPM" bpmnElement="Flow_FuncSpec_To_SPM">
+        <di:waypoint x="1470" y="250" />
+        <di:waypoint x="1520" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_SPM_To_TOEDesign" bpmnElement="Flow_SPM_To_TOEDesign">
+        <di:waypoint x="1650" y="250" />
+        <di:waypoint x="1700" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_TOEDesign_To_CM" bpmnElement="Flow_TOEDesign_To_CM">
+        <di:waypoint x="1810" y="250" />
+        <di:waypoint x="1860" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_CM_To_WaitDesign" bpmnElement="Flow_CM_To_WaitDesign">
+        <di:waypoint x="1990" y="250" />
+        <di:waypoint x="2042" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_WaitDesign_To_Gateway" bpmnElement="Flow_WaitDesign_To_Gateway">
+        <di:waypoint x="2078" y="250" />
+        <di:waypoint x="2130" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Design_Approved" bpmnElement="Flow_Design_Approved">
+        <di:waypoint x="2180" y="250" />
+        <di:waypoint x="2230" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2194" y="232" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Design_Rework" bpmnElement="Flow_Design_Rework">
+        <di:waypoint x="2155" y="275" />
+        <di:waypoint x="2155" y="400" />
+        <di:waypoint x="1250" y="400" />
+        <di:waypoint x="1250" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1669" y="382" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Impl_To_ImplRep" bpmnElement="Flow_Impl_To_ImplRep">
+        <di:waypoint x="2330" y="250" />
+        <di:waypoint x="2380" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ImplRep_To_Testing" bpmnElement="Flow_ImplRep_To_Testing">
+        <di:waypoint x="2510" y="250" />
+        <di:waypoint x="2560" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Testing_To_Vuln" bpmnElement="Flow_Testing_To_Vuln">
+        <di:waypoint x="2660" y="250" />
+        <di:waypoint x="2710" y="250" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Vuln_To_WaitImpl" bpmnElement="Flow_Vuln_To_WaitImpl">
+        <di:waypoint x="2770" y="290" />
+        <di:waypoint x="2770" y="332" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_WaitImpl_To_Gateway" bpmnElement="Flow_WaitImpl_To_Gateway">
+        <di:waypoint x="2770" y="332" />
+        <di:waypoint x="2770" y="195" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Impl_Approved" bpmnElement="Flow_Impl_Approved">
+        <di:waypoint x="2770" y="145" />
+        <di:waypoint x="2770" y="128" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2779" y="134" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Impl_Rework" bpmnElement="Flow_Impl_Rework">
+        <di:waypoint x="2745" y="170" />
+        <di:waypoint x="2280" y="170" />
+        <di:waypoint x="2280" y="210" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2473" y="152" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <!-- Evaluation Process Edges -->
+      <bpmndi:BPMNEdge id="Edge_Flow_ASE_Start" bpmnElement="Flow_ASE_Start">
+        <di:waypoint x="548" y="570" />
+        <di:waypoint x="600" y="570" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ASE_To_Gateway" bpmnElement="Flow_ASE_To_Gateway">
+        <di:waypoint x="720" y="570" />
+        <di:waypoint x="770" y="570" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ASE_Pass" bpmnElement="Flow_ASE_Pass">
+        <di:waypoint x="820" y="570" />
+        <di:waypoint x="872" y="570" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="835" y="552" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ASE_Fail" bpmnElement="Flow_ASE_Fail">
+        <di:waypoint x="795" y="595" />
+        <di:waypoint x="795" y="652" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="802" y="621" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ADV_Start" bpmnElement="Flow_ADV_Start">
+        <di:waypoint x="1598" y="570" />
+        <di:waypoint x="1650" y="570" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ADV_To_Gateway" bpmnElement="Flow_ADV_To_Gateway">
+        <di:waypoint x="1790" y="570" />
+        <di:waypoint x="1840" y="570" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ADV_Pass" bpmnElement="Flow_ADV_Pass">
+        <di:waypoint x="1890" y="570" />
+        <di:waypoint x="1942" y="570" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1905" y="552" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ADV_Fail" bpmnElement="Flow_ADV_Fail">
+        <di:waypoint x="1865" y="595" />
+        <di:waypoint x="1865" y="652" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1872" y="621" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ATE_Start" bpmnElement="Flow_ATE_Start">
+        <di:waypoint x="2328" y="570" />
+        <di:waypoint x="2380" y="570" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_IMP_To_ATE" bpmnElement="Flow_IMP_To_ATE">
+        <di:waypoint x="2510" y="570" />
+        <di:waypoint x="2560" y="570" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ATE_To_Gateway" bpmnElement="Flow_ATE_To_Gateway">
+        <di:waypoint x="2700" y="570" />
+        <di:waypoint x="2750" y="570" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ATE_Pass" bpmnElement="Flow_ATE_Pass">
+        <di:waypoint x="2775" y="545" />
+        <di:waypoint x="2775" y="528" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2783" y="534" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_ATE_Fail" bpmnElement="Flow_ATE_Fail">
+        <di:waypoint x="2775" y="595" />
+        <di:waypoint x="2775" y="652" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2782" y="621" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <!-- Message Flows -->
+      <bpmndi:BPMNEdge id="Edge_Flow_Send_SecurityTarget" bpmnElement="Flow_Send_SecurityTarget">
+        <di:waypoint x="530" y="290" />
+        <di:waypoint x="530" y="552" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="455" y="418" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Send_Design" bpmnElement="Flow_Send_Design">
+        <di:waypoint x="1580" y="290" />
+        <di:waypoint x="1580" y="552" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1499" y="418" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Edge_Flow_Send_Implementation" bpmnElement="Flow_Send_Implementation">
+        <di:waypoint x="2310" y="290" />
+        <di:waypoint x="2310" y="552" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2218" y="418" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

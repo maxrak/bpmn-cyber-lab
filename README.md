@@ -49,7 +49,7 @@ npm run build
 |---------|-------------|
 | `npm start` | Dev server con hot reload |
 | `npm run build` | Build ottimizzata per produzione |
-| `npm run generate-list` | Rigenera `public/BPMNs/list.json` |
+| `npm run generate-list` | Rigenera `docs/BPMNs/list.json` |
 
 ---
 
@@ -59,7 +59,7 @@ npm run build
 
 Editor BPMN visuale con:
 - **Toolbar**: Carica / Salva BPMN, Undo/Redo, Zoom, Fit to view
-- **Menu File** (navbar): accesso rapido ai diagrammi salvati in `public/BPMNs/`
+- **Menu File** (navbar): accesso rapido ai diagrammi salvati in `docs/BPMNs/`
 - **Pannello proprietà cybersecurity** (laterale destro) per annotare ogni task con:
   - `cyber.riskScore` (0–100) — punteggio numerico di rischio
   - `cyber.riskLevel` — Low / Medium / High / Critical
@@ -117,7 +117,7 @@ bpmn-cyber-lab/
 │       ├── properties-accordion.css
 │       ├── form-controls.css
 │       └── list-group.css
-├── public/                           # File statici serviti direttamente
+├── docs/                             # File statici serviti direttamente
 │   ├── index.html                    # Homepage
 │   ├── modeler.html                  # Pagina Modeler
 │   ├── simulation.html               # Pagina Simulation

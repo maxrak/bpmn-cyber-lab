@@ -8,14 +8,15 @@ module.exports = {
   },
 
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'docs', 'dist'),
     filename: '[name].bundle.js',
+    publicPath: '/dist/',
     clean: true
   },
 
   devServer: {
     static: {
-      directory: path.join(__dirname, 'public')
+      directory: path.join(__dirname, 'docs')
     },
     compress: true,
     port: 8090
@@ -36,7 +37,7 @@ module.exports = {
 
   plugins: [
     new HtmlWebpackPlugin({
-      template: './public/index.html'
+      template: './docs/index.html'
     })
   ]
 };

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const dir = path.join(__dirname, '..', 'public', 'BPMNs');
+const dir = path.join(__dirname, '..', 'docs', 'BPMNs');
 const out = path.join(dir, 'list.json');
 
 try {

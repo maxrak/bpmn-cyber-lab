@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_CommonCriteriaLifecycle"
+                  targetNamespace="http://example.com/common-criteria-lifecycle">
+
+  <bpmn:collaboration id="Collaboration_CommonCriteria">
+    <bpmn:participant id="Participant_Sponsor" name="Sponsor / Developer" processRef="Process_Sponsor" />
+    <bpmn:participant id="Participant_Lab" name="Laboratorio / Evaluator" processRef="Process_Lab" />
+    <bpmn:participant id="Participant_CertBody" name="Certification Body / Scheme" processRef="Process_CertBody" />
+    
+    <bpmn:messageFlow id="Flow_Msg_ST_To_CertBody" sourceRef="Task_Write_ST" targetRef="Task_Register_Evaluation" />
+    <bpmn:messageFlow id="Flow_Msg_CertBody_To_Lab" sourceRef="Task_Register_Evaluation" targetRef="Task_Evaluate_ST" />
+    <bpmn:messageFlow id="Flow_Msg_ST_NotOK" sourceRef="Gateway_ST_Acceptable" targetRef="Task_Correct_ST" />
+    <bpmn:messageFlow id="Flow_Msg_Evidence_To_Lab" sourceRef="Task_Provide_Evidence" targetRef="Task_Evaluate_SAR" />
+    <bpmn:messageFlow id="Flow_Msg_ObsReport" sourceRef="Task_Observation_Report" targetRef="Task_Correct_Evidence" />
+    <bpmn:messageFlow id="Flow_Msg_ETR" sourceRef="Task_Produce_ETR" targetRef="Task_Review_ETR" />
+    <bpmn:messageFlow id="Flow_Msg_Certificate" sourceRef="Task_Issue_Certificate" targetRef="Gateway_PostCert_Changes" />
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_CC_Lifecycle" name="Ciclo di vita Common Criteria" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_CC">
+      <bpmn:lane id="Lane_Developer" name="Sponsor / Developer">
+        <bpmn:flowNodeRef>StartEvent</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Define_TOE</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Write_ST</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Correct_ST</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Provide_Evidence</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Correct_Evidence</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_PostCert_Changes</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Impact_Analysis</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Minor_Change</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Maintenance</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Normal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Maintained</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Lab" name="Laboratorio / Evaluator">
+        <bpmn:flowNodeRef>Task_Evaluate_ST</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ST_Acceptable</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Evaluate_SAR</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Testing_VulnAssess</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Evidence_OK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Observation_Report</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Produce_ETR</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Certifier" name="Certification Body / Scheme">
+        <bpmn:flowNodeRef>Task_Register_Evaluation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Review_ETR</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Approve_Cert</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Request_Clarifications</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Issue_Certificate</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- SPONSOR / DEVELOPER LANE -->
+    <bpmn:startEvent id="StartEvent" name="Avvio valutazione">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:task id="Task_Define_TOE" name="Definire TOE">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Write_ST" name="Redigere Security Target">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:incoming>Flow_ST_Correction</bpmn:incoming>
+      <bpmn:incoming>Flow_Major</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Correct_ST" name="Correggere Security Target">
+      <bpmn:incoming>Flow_ST_NotOK</bpmn:incoming>
+      <bpmn:outgoing>Flow_ST_Correction</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Provide_Evidence" name="Fornire evidenze di assurance (ADV, AGD, ALC, ATE)">
+      <bpmn:incoming>Flow_ST_OK</bpmn:incoming>
+      <bpmn:incoming>Flow_Evidence_Correction</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Correct_Evidence" name="Correggere evidenze/TOE">
+      <bpmn:incoming>Flow_ObsReport</bpmn:incoming>
+      <bpmn:outgoing>Flow_Evidence_Correction</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="Gateway_PostCert_Changes" name="Modifiche al TOE dopo certificazione?">
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:outgoing>Flow_NoChanges</bpmn:outgoing>
+      <bpmn:outgoing>Flow_HasChanges</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="Task_Impact_Analysis" name="Analisi impatto / Assurance Continuity">
+      <bpmn:incoming>Flow_HasChanges</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="Gateway_Minor_Change" name="Modifica minore?">
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_Minor</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Major</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="Task_Maintenance" name="Maintenance">
+      <bpmn:incoming>Flow_Minor</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="EndEvent_Normal" name="Fine">
+      <bpmn:incoming>Flow_NoChanges</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:endEvent id="EndEvent_Maintained" name="Certificato mantenuto">
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- LABORATORIO / EVALUATOR LANE -->
+    <bpmn:task id="Task_Evaluate_ST" name="Valutare Security Target">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_STEval</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="Gateway_ST_Acceptable" name="ST accettabile?">
+      <bpmn:incoming>Flow_STEval</bpmn:incoming>
+      <bpmn:outgoing>Flow_ST_OK</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ST_NotOK</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="Task_Evaluate_SAR" name="Valutare requisiti SAR">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Testing_VulnAssess" name="Eseguire test e vulnerability assessment">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="Gateway_Evidence_OK" name="Evidenze sufficienti e nessuna non conformità bloccante?">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_Evidence_OK</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Evidence_NotOK</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="Task_Observation_Report" name="Emettere Observation Report">
+      <bpmn:incoming>Flow_Evidence_NotOK</bpmn:incoming>
+      <bpmn:outgoing>Flow_ObsReport</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Produce_ETR" name="Produrre ETR (Evaluation Technical Report)">
+      <bpmn:incoming>Flow_Evidence_OK</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- CERTIFICATION BODY / SCHEME LANE -->
+    <bpmn:task id="Task_Register_Evaluation" name="Registrare/accettare la valutazione">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Review_ETR" name="Revisionare ETR">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:incoming>Flow_Clarifications</bpmn:incoming>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="Gateway_Approve_Cert" name="Certificazione approvata?">
+      <bpmn:incoming>Flow_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_Approved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_NotApproved</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="Task_Request_Clarifications" name="Richiedere chiarimenti/correzioni">
+      <bpmn:incoming>Flow_NotApproved</bpmn:incoming>
+      <bpmn:outgoing>Flow_Clarifications</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Issue_Certificate" name="Emettere certificato e Certification Report">
+      <bpmn:incoming>Flow_Approved</bpmn:incoming>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- SEQUENCE FLOWS -->
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent" targetRef="Task_Define_TOE" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_Define_TOE" targetRef="Task_Write_ST" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_Write_ST" targetRef="Task_Register_Evaluation" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_Register_Evaluation" targetRef="Task_Evaluate_ST" />
+    <bpmn:sequenceFlow id="Flow_STEval" sourceRef="Task_Evaluate_ST" targetRef="Gateway_ST_Acceptable" />
+    <bpmn:sequenceFlow id="Flow_ST_OK" name="Sì" sourceRef="Gateway_ST_Acceptable" targetRef="Task_Provide_Evidence" />
+    <bpmn:sequenceFlow id="Flow_ST_NotOK" name="No" sourceRef="Gateway_ST_Acceptable" targetRef="Task_Correct_ST" />
+    <bpmn:sequenceFlow id="Flow_ST_Correction" sourceRef="Task_Correct_ST" targetRef="Task_Write_ST" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_Provide_Evidence" targetRef="Task_Evaluate_SAR" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_Evaluate_SAR" targetRef="Task_Testing_VulnAssess" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_Testing_VulnAssess" targetRef="Gateway_Evidence_OK" />
+    <bpmn:sequenceFlow id="Flow_Evidence_OK" name="Sì" sourceRef="Gateway_Evidence_OK" targetRef="Task_Produce_ETR" />
+    <bpmn:sequenceFlow id="Flow_Evidence_NotOK" name="No" sourceRef="Gateway_Evidence_OK" targetRef="Task_Observation_Report" />
+    <bpmn:sequenceFlow id="Flow_ObsReport" sourceRef="Task_Observation_Report" targetRef="Task_Correct_Evidence" />
+    <bpmn:sequenceFlow id="Flow_Evidence_Correction" sourceRef="Task_Correct_Evidence" targetRef="Task_Provide_Evidence" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Task_Produce_ETR" targetRef="Task_Review_ETR" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Task_Review_ETR" targetRef="Gateway_Approve_Cert" />
+    <bpmn:sequenceFlow id="Flow_Approved" name="Sì" sourceRef="Gateway_Approve_Cert" targetRef="Task_Issue_Certificate" />
+    <bpmn:sequenceFlow id="Flow_NotApproved" name="No" sourceRef="Gateway_Approve_Cert" targetRef="Task_Request_Clarifications" />
+    <bpmn:sequenceFlow id="Flow_Clarifications" sourceRef="Task_Request_Clarifications" targetRef="Task_Review_ETR" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_Issue_Certificate" targetRef="Gateway_PostCert_Changes" />
+    <bpmn:sequenceFlow id="Flow_NoChanges" name="No" sourceRef="Gateway_PostCert_Changes" targetRef="EndEvent_Normal" />
+    <bpmn:sequenceFlow id="Flow_HasChanges" name="Sì" sourceRef="Gateway_PostCert_Changes" targetRef="Task_Impact_Analysis" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_Impact_Analysis" targetRef="Gateway_Minor_Change" />
+    <bpmn:sequenceFlow id="Flow_Minor" name="Sì" sourceRef="Gateway_Minor_Change" targetRef="Task_Maintenance" />
+    <bpmn:sequenceFlow id="Flow_Major" name="No" sourceRef="Gateway_Minor_Change" targetRef="Task_Write_ST" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_Maintenance" targetRef="EndEvent_Maintained" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_CC">
+    <bpmndi:BPMNPlane id="BPMNPlane_CC" bpmnElement="Collaboration_CommonCriteria">
+      <bpmndi:BPMNShape id="Participant_CC_di" bpmnElement="Participant_CC" isHorizontal="true">
+        <dc:Bounds x="120" y="80" width="3500" height="720" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Developer_di" bpmnElement="Lane_Developer" isHorizontal="true">
+        <dc:Bounds x="150" y="80" width="3470" height="240" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Lab_di" bpmnElement="Lane_Lab" isHorizontal="true">
+        <dc:Bounds x="150" y="320" width="3470" height="240" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Certifier_di" bpmnElement="Lane_Certifier" isHorizontal="true">
+        <dc:Bounds x="150" y="560" width="3470" height="240" />
+      </bpmndi:BPMNShape>
+
+      <!-- SPONSOR / DEVELOPER LANE -->
+      <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+        <dc:Bounds x="200" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Define_TOE_di" bpmnElement="Task_Define_TOE">
+        <dc:Bounds x="280" y="150" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Write_ST_di" bpmnElement="Task_Write_ST">
+        <dc:Bounds x="440" y="150" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Correct_ST_di" bpmnElement="Task_Correct_ST">
+        <dc:Bounds x="850" y="150" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Provide_Evidence_di" bpmnElement="Task_Provide_Evidence">
+        <dc:Bounds x="1060" y="150" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Correct_Evidence_di" bpmnElement="Task_Correct_Evidence">
+        <dc:Bounds x="1550" y="150" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_PostCert_Changes_di" bpmnElement="Gateway_PostCert_Changes" isMarkerVisible="true">
+        <dc:Bounds x="2625" y="165" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Impact_Analysis_di" bpmnElement="Task_Impact_Analysis">
+        <dc:Bounds x="2740" y="150" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Minor_Change_di" bpmnElement="Gateway_Minor_Change" isMarkerVisible="true">
+        <dc:Bounds x="2975" y="165" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Maintenance_di" bpmnElement="Task_Maintenance">
+        <dc:Bounds x="3080" y="150" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Normal_di" bpmnElement="EndEvent_Normal">
+        <dc:Bounds x="2632" y="252" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Maintained_di" bpmnElement="EndEvent_Maintained">
+        <dc:Bounds x="3270" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- LABORATORIO / EVALUATOR LANE -->
+      <bpmndi:BPMNShape id="Task_Evaluate_ST_di" bpmnElement="Task_Evaluate_ST">
+        <dc:Bounds x="680" y="390" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ST_Acceptable_di" bpmnElement="Gateway_ST_Acceptable" isMarkerVisible="true">
+        <dc:Bounds x="865" y="405" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Evaluate_SAR_di" bpmnElement="Task_Evaluate_SAR">
+        <dc:Bounds x="1290" y="390" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Testing_VulnAssess_di" bpmnElement="Task_Testing_VulnAssess">
+        <dc:Bounds x="1490" y="390" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Evidence_OK_di" bpmnElement="Gateway_Evidence_OK" isMarkerVisible="true">
+        <dc:Bounds x="1725" y="405" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Observation_Report_di" bpmnElement="Task_Observation_Report">
+        <dc:Bounds x="1670" y="490" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Produce_ETR_di" bpmnElement="Task_Produce_ETR">
+        <dc:Bounds x="1840" y="390" width="180" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- CERTIFICATION BODY / SCHEME LANE -->
+      <bpmndi:BPMNShape id="Task_Register_Evaluation_di" bpmnElement="Task_Register_Evaluation">
+        <dc:Bounds x="620" y="630" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Review_ETR_di" bpmnElement="Task_Review_ETR">
+        <dc:Bounds x="2090" y="630" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Approve_Cert_di" bpmnElement="Gateway_Approve_Cert" isMarkerVisible="true">
+        <dc:Bounds x="2285" y="645" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Request_Clarifications_di" bpmnElement="Task_Request_Clarifications">
+        <dc:Bounds x="2230" y="730" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Issue_Certificate_di" bpmnElement="Task_Issue_Certificate">
+        <dc:Bounds x="2410" y="630" width="180" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- EDGES / CONNECTIONS -->
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="236" y="190" />
+        <di:waypoint x="280" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="400" y="190" />
+        <di:waypoint x="440" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="580" y="190" />
+        <di:waypoint x="600" y="190" />
+        <di:waypoint x="600" y="670" />
+        <di:waypoint x="620" y="670" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="700" y="630" />
+        <di:waypoint x="700" y="560" />
+        <di:waypoint x="750" y="560" />
+        <di:waypoint x="750" y="430" />
+        <di:waypoint x="680" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_STEval_di" bpmnElement="Flow_STEval">
+        <di:waypoint x="820" y="430" />
+        <di:waypoint x="865" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ST_OK_di" bpmnElement="Flow_ST_OK">
+        <di:waypoint x="915" y="430" />
+        <di:waypoint x="1150" y="430" />
+        <di:waypoint x="1150" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ST_NotOK_di" bpmnElement="Flow_ST_NotOK">
+        <di:waypoint x="890" y="405" />
+        <di:waypoint x="890" y="320" />
+        <di:waypoint x="920" y="320" />
+        <di:waypoint x="920" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ST_Correction_di" bpmnElement="Flow_ST_Correction">
+        <di:waypoint x="850" y="190" />
+        <di:waypoint x="580" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="1240" y="190" />
+        <di:waypoint x="1265" y="190" />
+        <di:waypoint x="1265" y="320" />
+        <di:waypoint x="1365" y="320" />
+        <di:waypoint x="1365" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="1440" y="430" />
+        <di:waypoint x="1490" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="1670" y="430" />
+        <di:waypoint x="1725" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Evidence_OK_di" bpmnElement="Flow_Evidence_OK">
+        <di:waypoint x="1775" y="430" />
+        <di:waypoint x="1840" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Evidence_NotOK_di" bpmnElement="Flow_Evidence_NotOK">
+        <di:waypoint x="1750" y="455" />
+        <di:waypoint x="1750" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ObsReport_di" bpmnElement="Flow_ObsReport">
+        <di:waypoint x="1670" y="530" />
+        <di:waypoint x="1630" y="530" />
+        <di:waypoint x="1630" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Evidence_Correction_di" bpmnElement="Flow_Evidence_Correction">
+        <di:waypoint x="1550" y="190" />
+        <di:waypoint x="1240" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="2020" y="430" />
+        <di:waypoint x="2055" y="430" />
+        <di:waypoint x="2055" y="560" />
+        <di:waypoint x="2160" y="560" />
+        <di:waypoint x="2160" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9">
+        <di:waypoint x="2230" y="670" />
+        <di:waypoint x="2285" y="670" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Approved_di" bpmnElement="Flow_Approved">
+        <di:waypoint x="2335" y="670" />
+        <di:waypoint x="2410" y="670" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NotApproved_di" bpmnElement="Flow_NotApproved">
+        <di:waypoint x="2310" y="695" />
+        <di:waypoint x="2310" y="730" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Clarifications_di" bpmnElement="Flow_Clarifications">
+        <di:waypoint x="2230" y="770" />
+        <di:waypoint x="2160" y="770" />
+        <di:waypoint x="2160" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="2590" y="670" />
+        <di:waypoint x="2650" y="670" />
+        <di:waypoint x="2650" y="215" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NoChanges_di" bpmnElement="Flow_NoChanges">
+        <di:waypoint x="2650" y="215" />
+        <di:waypoint x="2650" y="252" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_HasChanges_di" bpmnElement="Flow_HasChanges">
+        <di:waypoint x="2675" y="190" />
+        <di:waypoint x="2740" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="2920" y="190" />
+        <di:waypoint x="2975" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Minor_di" bpmnElement="Flow_Minor">
+        <di:waypoint x="3025" y="190" />
+        <di:waypoint x="3080" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Major_di" bpmnElement="Flow_Major">
+        <di:waypoint x="3000" y="165" />
+        <di:waypoint x="3000" y="100" />
+        <di:waypoint x="510" y="100" />
+        <di:waypoint x="510" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <di:waypoint x="3220" y="190" />
+        <di:waypoint x="3270" y="190" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
