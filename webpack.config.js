@@ -2,6 +2,9 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+  optimization: {
+    minimize: false
+  },
   entry: {
     modeler: './src/modeler-entry.js',
     simulation: './src/simulation-entry.js'

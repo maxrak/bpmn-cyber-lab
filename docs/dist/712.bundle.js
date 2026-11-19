@@ -1,1 +1,8093 @@
-(self.webpackChunkbpmn_cyber_lab=self.webpackChunkbpmn_cyber_lab||[]).push([[712],{712:(t,e,n)=>{"use strict";n.r(e),n.d(e,{default:()=>i.A});var i=n(874)},874:(t,e,n)=>{"use strict";n.d(e,{A:()=>An});var i=n(507);const o=Object.freeze({ACTIVATED:1,RUNNING:2,ENDING:4,ENDED:8,DESTROYED:16,FAILED:32,TERMINATED:64,CANCELED:128,COMPLETED:256,COMPENSABLE:512,ACTIVE:7,NOT_DEAD:9}),s={};function r(t,e){throw new Error(`illegal transition: ${t.name} -> ${e}`)}function a(t,e){return t===s?e:t}class c{constructor(t,e,n={}){this.name=t,this.traits=e,this.setTransitions(n)}setTransitions({start:t,cancel:e,complete:n,destroy:i,fail:o,terminate:s,compensable:r}){this._start=a(t,this),this._compensable=a(r,this),this._cancel=a(e,this),this._complete=a(n,this),this._destroy=a(i,this),this._fail=a(o,this),this._terminate=a(s,this)}hasTrait(t){return 0!==(this.traits&t)}complete(){return this._complete||r(this,"complete")}destroy(){return this._destroy||r(this,"destroy")}cancel(){return this._cancel||r(this,"cancel")}fail(){return this._fail||r(this,"fail")}terminate(){return this._terminate||r(this,"terminate")}compensable(){return this._compensable||r(this,"compensable")}start(){return this._start||r(this,"start")}}const l=new c("failed",o.DESTROYED|o.FAILED),p=new c("terminated",o.DESTROYED|o.TERMINATED|o.COMPLETED),h=new c("completed",o.DESTROYED|o.COMPLETED),u=new c("terminating",o.ENDING|o.TERMINATED|o.COMPLETED,{destroy:p}),m=new c("canceling",o.ENDING|o.FAILED|o.CANCELED,{destroy:l,complete:s,terminate:u}),f=new c("completing",o.ENDING|o.COMPLETED,{destroy:h,cancel:m,terminate:u}),d=new c("failing",o.ENDING|o.FAILED,{cancel:m,complete:f,destroy:l,terminate:u}),g=new c("compensable:completed",o.ENDED|o.COMPLETED),v=new c("compensable:completing",o.ENDING|o.COMPLETED,{destroy:g,terminate:u,compensable:s}),_=new c("compensable:failing",o.ENDING|o.FAILED,{complete:v,terminate:u,destroy:l});g.setTransitions({cancel:m,fail:_,destroy:h,compensable:s});const y=new c("compensable:running",o.RUNNING|o.COMPENSABLE,{cancel:m,complete:v,compensable:s,destroy:g,fail:_,terminate:u}),b=new c("running",o.RUNNING,{cancel:m,complete:f,compensable:y,destroy:p,fail:d,terminate:u}),w=new c("activated",o.ACTIVATED,{start:b,destroy:p}),S=Object.freeze({ACTIVATED:w,RUNNING:b,CANCELING:m,COMPLETING:f,COMPLETED:h,FAILING:d,FAILED:l,TERMINATING:u,TERMINATED:p});class E{constructor(t,e,n=null,i=null){this.id=t,this.element=e,this.parent=n,this.initiator=i,this.subscriptions=new Set,this.children=[],this.state=S.ACTIVATED}get running(){return this.hasTrait(o.RUNNING)}get destroyed(){return this.hasTrait(o.DESTROYED)}get completed(){return this.hasTrait(o.COMPLETED)}get canceled(){return this.hasTrait(o.CANCELED)}get failed(){return this.hasTrait(o.FAILED)}get active(){return this.hasTrait(o.ACTIVE)}hasTrait(t){return this.state.hasTrait(t)}start(){return this.state=this.state.start(),this}compensable(){return this.state=this.state.compensable(),this}fail(t){return this.failed||(this.state=this.state.fail(),this.failInitiator=t),this}cancel(t){return this.canceled||(this.state=this.state.cancel(),this.cancelInitiator=t),this}terminate(t){return this.state=this.state.terminate(),this.terminateInitiator=t,this}complete(){return this.state=this.state.complete(),this}destroy(t){return this.state=this.state.destroy(),this.destroyInitiator=t,this}getTokens(){return this.children.filter(t=>!t.destroyed).length}getTokensByElement(t){return this.children.filter(e=>!e.destroyed&&e.element===t).length}}function C(t,e){const n=[];for(const i of t)e(i)&&n.push(i);return n}function x(t,e){for(const n of t)if(e(n))return n;return null}function B(t,e){const n=["type","name","iref"].every(n=>!(n in t)||t[n]===e[n]),i=!e.ref&&("error"===e.type||"escalation"===e.type);return n&&(i||T(t,e))}function T(t,e){const n="ref";return!(n in t)||t[n]===e[n]}var k=n(192),F=n(880),L=n(905);function P(t){return t.filter(t=>(0,k.is)(t,"bpmn:SequenceFlow"))}function I(t){return(0,k.is)(t,"bpmn:MessageFlow")}function $(t){return(0,k.is)(t,"bpmn:SequenceFlow")}function A(t){return R(t)&&Y(t,"bpmn:LinkEventDefinition")}function M(t){return R(t)&&Y(t,"bpmn:CompensateEventDefinition")}function D(t){return(0,k.is)(t,"bpmn:Activity")&&t.businessObject.isForCompensation}function R(t){return((0,k.is)(t,"bpmn:CatchEvent")||(0,k.is)(t,"bpmn:ReceiveTask"))&&!z(t)}function N(t){return(0,k.is)(t,"bpmn:BoundaryEvent")&&!z(t)}function O(t){return G(t)&&!Y(t)}function j(t){return!z(t)&&(!!V(t,["bpmn:Activity","bpmn:IntermediateCatchEvent","bpmn:IntermediateThrowEvent","bpmn:Gateway","bpmn:EndEvent"])&&(!A(t)&&(!t.incoming.find($)&&!D(t)&&!H(t))))}function G(t){return(0,k.is)(t,"bpmn:StartEvent")&&!z(t)}function z(t){return!!t.labelTarget}function H(t){return(0,k.Cf)(t).triggeredByEvent}function q(t){return(0,k.is)(t,"bpmn:StartEvent")&&(0,k.Cf)(t).isInterrupting||(0,k.is)(t,"bpmn:BoundaryEvent")&&(0,k.Cf)(t).cancelActivity}function V(t,e){return e.some(e=>(0,k.is)(t,e))}function Y(t,e){return(0,L.zN)((0,k.Cf)(t).eventDefinitions,t=>!e||(0,k.is)(t,e))}function U(t,e){return t.children&&0!==t.children.length?t.children:(0,k.is)(t,"bpmn:SubProcess")&&!t.di.isExpanded?e.get((0,F.hJ)(t)).children:[]}function J(t,e,n){const s=t.get("scopeIds",!1)||new i.A([32,36]),r={},a={},c=new W,l=new Set,p=[],h=new Set,u=new Set;function m(t,e){if(p.push([e,t]),1!==p.length)return;let n;for(;n=p[0];){const[t,e]=n;e.destroyed||t(),p.shift()}A("tick")}function f(t){return a[t.type]||c}function d(t){const{element:e,parentScope:n,initiator:i=null,scope:o=z({element:e,parent:n,initiator:i})}=t;return m(o,function(){o.running||o.start(),P("signal",{...t,scope:o}),f(e).signal({...t,scope:o}),o.parent&&$(o.parent)}),o}function g(t){const{event:e,initiator:n,scope:i}=t,o=b(e),s=i.subscriptions;let r=C(s,t=>B(o,t.event));if("error"===o.type||"escalation"===o.type){const t=C(r,t=>T(o,t.event));(r.every(t=>t.event.boundary)&&t.some(t=>t.event.boundary)||t.some(t=>!t.event.boundary))&&(r=t)}const a=r.filter(t=>!t.event.interrupting),c=r.filter(t=>t.event.interrupting);if(!c.length)return a.map(t=>t.triggerFn(n)).flat();const l=c.find(t=>!t.event.boundary)||c[0],p=C(s,t=>t.event.persistent||function(t,e){return t.boundary&&!e.boundary}(t.event,l.event));return s.forEach(t=>{p.includes(t)||t.remove()}),[l.triggerFn(n)].flat().filter(t=>t)}function v(t,e,n){const i=(e=b(e)).element,o={scope:t,event:e,element:i,triggerFn:n,remove(){_(o)}};return u.add(o),t.subscriptions.add(o),i&&I(i),o}function _(t){const{scope:e,event:n}=t;u.delete(t),e.subscriptions.delete(t),n.element&&I(n.element)}function y(t){return{element:t,interrupting:!1,boundary:!1,iref:t.id,type:"none"}}function b(t){if(!t.businessObject)return t;const e=q(t),i=N(t),o=function(t){return(0,k.is)(t,"bpmn:StartEvent")||(0,k.is)(t,"bpmn:IntermediateCatchEvent")||(0,k.is)(t,"bpmn:ReceiveTask")||function(t){if(!N(t))return!1;const e=X(t);return!e[0]||V(e[0],["bpmn:ConditionalEventDefinition","bpmn:TimerEventDefinition"])}(t)?(0,k.Cf)(t).name||t.id:null}(t),s={element:t,interrupting:e,boundary:i,...o?{iref:o}:{}},r=X(t)[0];if(!r)return{...s,type:Z(t)?"message":"none"};if((0,k.is)(r,"bpmn:LinkEventDefinition"))return{...s,type:"link",name:r.name};if((0,k.is)(r,"bpmn:SignalEventDefinition"))return{...s,type:"signal",ref:r.signalRef};if((0,k.is)(r,"bpmn:TimerEventDefinition"))return{...s,type:"timer"};if((0,k.is)(r,"bpmn:ConditionalEventDefinition"))return{...s,type:"condition"};if((0,k.is)(r,"bpmn:EscalationEventDefinition"))return{...s,type:"escalation",ref:r.escalationRef};if((0,k.is)(r,"bpmn:CancelEventDefinition"))return{...s,type:"cancel"};if((0,k.is)(r,"bpmn:ErrorEventDefinition"))return{...s,type:"error",ref:r.errorRef};if((0,k.is)(r,"bpmn:MessageEventDefinition"))return{...s,type:"message",ref:r.messageRef};if((0,k.is)(r,"bpmn:CompensateEventDefinition")){let e=r.activityRef&&n.get(r.activityRef.id);return e||(e=G(t)&&H(t.parent)?t.parent.parent:N(t)?t.host:t.parent),{...s,type:"compensate",ref:e,persistent:!0}}throw new Error("unknown event definition",r)}function w(t,e=!0){const{element:n,parent:i,initiator:o}=t;e&&P("createScope",{element:n,scope:i});const r=new E(s.next(),n,i,o);return i&&i.children.push(r),h.add(r),e&&A("createScope",{scope:r}),I(n),i&&I(i.element),r}function S(t){if("function"==typeof t)return t;const{event:e,element:n,scope:i}=t,o=t.elements||n&&[n],s=e&&b(e);return t=>(!s||B(s,t.event))&&(!o||o.includes(t.element))&&(!i||i===t.scope)}function F(t){if("function"==typeof t)return t;const{element:e,waitsOnElement:n,parent:i,trait:s=o.RUNNING,subscribedTo:r}=t,a=r?function(t){const e="function"===t?t:S(t);return t=>Array.from(t.subscriptions).some(e)}(r):()=>!0;return t=>(!e||t.element===e)&&(!i||t.parent===i)&&(!n||t.getTokensByElement(n)>0)&&t.hasTrait(s)&&a(t)}function L(t,e=null){if(!t.destroyed){t.destroy(e);for(const e of t.subscriptions){const n=e.event.traits||o.ACTIVE;t.hasTrait(n)||_(e)}if(t.destroyed){for(const n of t.children)n.destroyed||L(n,e);P("destroyScope",{element:t.element,scope:t}),h.delete(t),A("destroyScope",{scope:t})}I(t.element),t.parent&&I(t.parent.element)}}function P(t,e){A("trace",{...e,action:t})}function I(t){l.add(t),p.length||A("tick")}function $(t){A("scopeChanged",{scope:t})}function A(t,n={}){return e.fire(`tokenSimulation.simulator.${t}`,n)}function D(t,n){e.on("tokenSimulation.simulator."+t,n)}function R(t,n){e.off("tokenSimulation.simulator."+t,n)}function O(t,e){const n=Y(t);r[t.id||t]={...n,...e},I(t)}function z(t){const{element:e}=t,i=w(t),{attachers:o=[]}=e,s=U(e,n);for(const t of s)if(H(t)){const e=U(t,n).filter(t=>G(t)&&!M(t));for(const n of e)v(i,n,e=>d({element:t,parentScope:i,startEvent:n,initiator:e}))}for(const t of o)N(t)&&!M(t)&&v(i,t,e=>d({element:t,parentScope:i.parent,hostScope:i,initiator:e}));return i}function Y(t){return r[t.id||t]||{}}D("tick",function(){for(const t of l)A("elementChanged",{element:t});l.clear()}),this.createScope=w,this.destroyScope=L,this.findScope=function(t){return x(h,F(t))},this.findScopes=function(t){return C(h,F(t))},this.findSubscription=function(t){return x(u,S(t))},this.findSubscriptions=function(t){return C(u,S(t))},this.waitAtElement=function(t,e=!0){O(t,{wait:e})},this.waitForScopes=function(t,e){if(!e.length)return;const n={type:"all-completed",persistent:!1},i=new Set(e),o=e=>{i.delete(e.scope),0===i.size&&(R("destroyScope",o),g({scope:t,event:n}))};return D("destroyScope",o),n},this.setConfig=O,this.getConfig=Y,this.signal=d,this.enter=function(t){const{element:e,scope:n,initiator:i=n}=t,o=z({element:e,parent:n,initiator:i});return m(o,function(){o.running||o.start(),P("enter",t),f(e).enter({...t,initiator:i,scope:o}),o.parent&&$(o.parent)}),o},this.exit=function(t){const{element:e,scope:n,initiator:i=n}=t;m(n,function(){P("exit",t),f(e).exit({...t,initiator:i}),n.running&&n.complete(),L(n,i),n.parent&&$(n.parent)})},this.subscribe=v,this.trigger=g,this.reset=function(){for(const t of h)L(t);for(const t of function(){const t=[];return n.forEach(e=>{if(!V(e,["bpmn:Process","bpmn:Participant"]))return;const n=w({element:e},!1);t.push(n);const i=e.children.filter(G),o=e.children.filter(j);for(const t of i)v(n,{...b(t),interrupting:!1},n=>d({element:e,startEvent:t,initiator:n}));if(!i.length)for(const t of o)v(n,y(t),t=>d({element:e,initiator:t}))}),t}())h.add(t);A("tick"),A("reset")},this.on=D,this.off=R,this.registerBehavior=function(t,e){a[t]=e}}function W(){this.signal=function(t){console.log("ignored #exit",t.element)},this.exit=function(t){console.log("ignored #exit",t.element)},this.enter=function(t){console.log("ignored #enter",t.element)}}function Z(t){return(0,k.is)(t,"bpmn:ReceiveTask")||t.incoming.some(t=>(0,k.is)(t,"bpmn:MessageFlow"))}function X(t){return t.businessObject.get("eventDefinitions")||[]}function K(t,e){this._simulator=t,this._activityBehavior=e,t.registerBehavior("bpmn:StartEvent",this)}function Q(t,e,n){this._intermediateThrowEventBehavior=n,this._scopeBehavior=e,t.registerBehavior("bpmn:EndEvent",this)}function tt(t,e,n){this._simulator=t,this._activityBehavior=e,this._scopeBehavior=n,t.registerBehavior("bpmn:BoundaryEvent",this)}function et(t,e){this._activityBehavior=e,this._simulator=t,t.registerBehavior("bpmn:IntermediateCatchEvent",this),t.registerBehavior("bpmn:ReceiveTask",this)}function nt(t,e,n){this._simulator=t,this._activityBehavior=e,this._eventBehaviors=n,t.registerBehavior("bpmn:IntermediateThrowEvent",this),t.registerBehavior("bpmn:SendTask",this)}function it(t,e){this._scopeBehavior=e,this._simulator=t,t.registerBehavior("bpmn:ExclusiveGateway",this)}function ot(t,e){this._simulator=t,this._activityBehavior=e,t.registerBehavior("bpmn:ParallelGateway",this)}function st(t){this._simulator=t,t.registerBehavior("bpmn:EventBasedGateway",this)}function rt(t,e){return(0,L.I6)((0,k.Cf)(t).eventDefinitions,t=>(0,k.is)(t,e))}function at(t,e){this._simulator=t,this._activityBehavior=e,t.registerBehavior("bpmn:InclusiveGateway",this)}function ct(t){return rt(t,"bpmn:LinkEventDefinition").name}function lt(t,e,n){this._simulator=t,this._scopeBehavior=e,this._transactionBehavior=n;const i=["bpmn:BusinessRuleTask","bpmn:CallActivity","bpmn:ManualTask","bpmn:ScriptTask","bpmn:ServiceTask","bpmn:Task","bpmn:UserTask"];for(const e of i)t.registerBehavior(e,this)}function pt(t,e,n,i,o){this._simulator=t,this._activityBehavior=e,this._scopeBehavior=n,this._transactionBehavior=i,this._elementRegistry=o,t.registerBehavior("bpmn:SubProcess",this),t.registerBehavior("bpmn:Transaction",this),t.registerBehavior("bpmn:AdHocSubProcess",this)}J.$inject=["injector","eventBus","elementRegistry"],K.prototype.signal=function(t){this._simulator.exit(t)},K.prototype.exit=function(t){this._activityBehavior.exit(t)},K.$inject=["simulator","activityBehavior"],Q.$inject=["simulator","scopeBehavior","intermediateThrowEventBehavior"],Q.prototype.enter=function(t){this._intermediateThrowEventBehavior.enter(t)},Q.prototype.signal=function(t){this._intermediateThrowEventBehavior.signal(t)},Q.prototype.exit=function(t){const{scope:e}=t;this._scopeBehavior.tryExit(e.parent,e)},tt.prototype.signal=function(t){const{element:e,scope:n,hostScope:i=this._simulator.findScope({parent:n.parent,element:e.host})}=t;if(!i)throw new Error("host scope not found");if((0,k.Cf)(e).cancelActivity){this._scopeBehavior.interrupt(i,n);const e=this._scopeBehavior.tryExit(i,n);if(e){const n=this._simulator.subscribe(i,e,e=>(n.remove(),this._simulator.exit(t)));return}}this._simulator.exit(t)},tt.prototype.exit=function(t){this._activityBehavior.exit(t)},tt.$inject=["simulator","activityBehavior","scopeBehavior"],et.$inject=["simulator","activityBehavior"],et.prototype.signal=function(t){return this._simulator.exit(t)},et.prototype.enter=function(t){const{element:e}=t;return this._activityBehavior.signalOnEvent(t,e)},et.prototype.exit=function(t){this._activityBehavior.exit(t)},nt.prototype.enter=function(t){const{element:e}=t,n=this._eventBehaviors.get(e);if(n){const e=n(t);if(e)return this._activityBehavior.signalOnEvent(t,e)}this._activityBehavior.enter(t)},nt.prototype.signal=function(t){this._activityBehavior.signal(t)},nt.prototype.exit=function(t){this._activityBehavior.exit(t)},nt.$inject=["simulator","activityBehavior","eventBehaviors"],it.prototype.enter=function(t){this._simulator.exit(t)},it.prototype.exit=function(t){const{element:e,scope:n}=t,i=P(e.outgoing);if(1===i.length)return this._simulator.enter({element:i[0],scope:n.parent});const{activeOutgoing:o}=this._simulator.getConfig(e),s=i.find(t=>t===o);return s?this._simulator.enter({element:s,scope:n.parent}):this._scopeBehavior.tryExit(n.parent,n)},it.$inject=["simulator","scopeBehavior"],ot.prototype.enter=function(t){const{scope:e}=t,n=this._findJoiningScopes(t);if(n.length){for(const t of n)t!==e&&this._simulator.destroyScope(t.complete(),e);this._simulator.exit(t)}},ot.prototype._findJoiningScopes=function(t){const{scope:e,element:n}=t,i=P(n.incoming),{parent:o}=e,s=this._simulator.findScopes({parent:o,element:n}),r=i.map(t=>s.find(e=>e.initiator.element===t)).filter(t=>t);return r.length===i.length?r:[]},ot.prototype.exit=function(t){this._activityBehavior.exit(t)},ot.$inject=["simulator","activityBehavior"],st.$inject=["simulator"],st.prototype.enter=function(t){const{element:e,scope:n}=t,i=n.parent,o=function(t){return t.outgoing.map(t=>t.target).filter(t=>V(t,["bpmn:IntermediateCatchEvent","bpmn:ReceiveTask"]))}(e),s=o.map(t=>this._simulator.subscribe(i,t,e=>(s.forEach(t=>t.remove()),this._simulator.destroyScope(n,e),this._simulator.signal({element:t,parentScope:i,initiator:e}))))},at.prototype.enter=function(t){this._tryJoin(t)},at.prototype.exit=function(t){const{element:e,scope:n}=t;if(P(e.outgoing).length>1){const{activeOutgoing:t=[]}=this._simulator.getConfig(e);if(!t.length)throw new Error("no outgoing configured");for(const e of t)this._simulator.enter({element:e,scope:n.parent})}else this._activityBehavior.exit(t)},at.prototype._tryJoin=function(t){var e=t.exclude||[];const{scope:n,element:i}=t,{parent:o}=n,s=P(i.incoming),r=this._simulator.findScopes({parent:o,element:i}).filter(t=>!e.includes(t)),a=s.filter(t=>!r.find(e=>e.initiator.element===t)),c=s.filter(t=>r.find(e=>e.initiator.element===t)),l=this._getRemainingScopes(t).filter(e=>a.some(n=>this._canReachElement(t,e.element,n))),p=l.filter(e=>!c.some(n=>this._canReachElement(t,e.element,n)));if(p.length||this._join(t,c,r,e),this._simulator.findScopes({parent:o,element:i}).filter(t=>!e.includes(t))[0]!==n)return;const h=this._simulator.waitForScopes(n,p),u=this._simulator.subscribe(n,h,()=>{u.remove(),this._tryJoin(t)})},at.prototype._getRemainingScopes=function(t){const{scope:e,element:n}=t,{parent:i}=e;return this._simulator.findScopes(t=>t.parent===i&&t.element!==n)},at.prototype._join=function(t,e,n,i){const{scope:o}=t,s=e.map(t=>n.find(e=>e.initiator.element===t));for(const t of s)t!==o&&this._simulator.destroyScope(t.complete(),o);this._simulator.exit(t),i.push(o);const r=n.filter(t=>!s.includes(t));r.length&&this._tryJoin({initiator:r[0].initiator,element:r[0].element,scope:r[0],exclude:i})},at.prototype._canReachElement=function(t,e,n,i=new Set){return t.element!==n&&(!i.has(n)&&(i.add(n),e===n||($(n)?this._canReachElement(t,e,n.source,i):A(n)?(o=n.parent.children,s=ct(n),o.filter(t=>{return e=t,(0,k.is)(e,"bpmn:IntermediateThrowEvent")&&Y(e,"bpmn:LinkEventDefinition")&&ct(t)===s;var e})).some(n=>this._canReachElement(t,e,n,i)):P(n.incoming).some(n=>this._canReachElement(t,e,n,i)))));var o,s},at.$inject=["simulator","activityBehavior"],lt.$inject=["simulator","scopeBehavior","transactionBehavior"],lt.prototype.signal=function(t){const e=this._triggerMessages(t);if(e)return this.signalOnEvent(t,e);this._simulator.exit(t)},lt.prototype.enter=function(t){const{element:e}=t,n=this.waitAtElement(e);if(n)return this.signalOnEvent(t,n);const i=this._triggerMessages(t);if(i)return this.signalOnEvent(t,i);this._simulator.exit(t)},lt.prototype.exit=function(t){const{element:e,scope:n}=t,i=n.parent,o=n.active&&!n.failed;o&&!H(e)&&this._transactionBehavior.registerCompensation(n);const s=o?e.outgoing.filter($):[];s.forEach(t=>this._simulator.enter({element:t,scope:i})),0===s.length&&this._scopeBehavior.tryExit(i,n)},lt.prototype.signalOnEvent=function(t,e){const{scope:n,element:i}=t,o=this._simulator.subscribe(n,e,t=>(o.remove(),this._simulator.signal({scope:n,element:i,initiator:t})))},lt.prototype.waitAtElement=function(t){return this._simulator.getConfig(t).wait&&{element:t,type:"continue",interrupting:!1,boundary:!1}},lt.prototype._getMessageContexts=function(t,e=null){const n=e?t=>t.referencePoint.x>e.x:()=>!0;return[...t.incoming.filter(I).map(t=>{return{incoming:t,referencePoint:(e=t.waypoints,e&&e[e.length-1])};var e}),...t.outgoing.filter(I).map(t=>{return{outgoing:t,referencePoint:(e=t.waypoints,e&&e[0])};var e})].sort((t,e)=>t.referencePoint.x-e.referencePoint.x).filter(n)},lt.prototype._triggerMessages=function(t){const{element:e,initiator:n,scope:i}=t;let o=i.messageContexts;o||(o=i.messageContexts=this._getMessageContexts(e));const s=n&&n.element;if(I(s)&&i.expectedIncoming!==s)console.debug("Simulator :: ActivityBehavior :: ignoring out-of-bounds message");else for(;o.length;){const{incoming:t,outgoing:s}=o.shift();if(t){if(!n)continue;return i.expectedIncoming=t,{element:e,type:"message",name:t.id,interrupting:!1,boundary:!1}}this._simulator.signal({element:s})}},pt.$inject=["simulator","activityBehavior","scopeBehavior","transactionBehavior","elementRegistry"],pt.prototype.signal=function(t){this._start(t)},pt.prototype.enter=function(t){const{element:e}=t,n=this._activityBehavior.waitAtElement(e);if(n)return this._activityBehavior.signalOnEvent(t,n);this._start(t)},pt.prototype.exit=function(t){const{scope:e}=t,n=e.parent;n.failInitiator===e&&n.complete(),this._activityBehavior.exit(t)},pt.prototype._start=function(t){const{element:e,startEvent:n,scope:i}=t,o=i.parent;if(H(e)){if(!n)throw new Error("missing <startEvent>: required for event sub-process")}else if(n)throw new Error("unexpected <startEvent>: not allowed for sub-process");if(o.destroyed)throw new Error(`target scope <${o.id}> destroyed`);(function(t){return(0,k.is)(t,"bpmn:Transaction")})(e)&&this._transactionBehavior.setup(t),n&&q(n)&&this._scopeBehavior.interrupt(o,i);const s=this._findStarts(e,n);for(const t of s)G(t)?this._simulator.signal({element:t,parentScope:i,initiator:i}):this._simulator.enter({element:t,scope:i,initiator:i});s.length||this._simulator.exit(t)},pt.prototype._findStarts=function(t,e){const n=e?t=>e===t:t=>O(t);return U(t,this._elementRegistry).filter(t=>n(t)||j(t))};const ht={type:"cancel",interrupting:!0,boundary:!1,persistent:!0};function ut(t,e,n){this._simulator=t,this._scopeBehavior=e,this._elementRegistry=n}function mt(t,e){this._simulator=t,this._scopeBehavior=e,t.registerBehavior("bpmn:SequenceFlow",this)}function ft(t){this._simulator=t,t.registerBehavior("bpmn:MessageFlow",this)}function dt(t,e,n){this._simulator=t,this._elementRegistry=e,this._scopeBehavior=n}function gt(t){return rt(t,"bpmn:LinkEventDefinition")}function vt(t){for(;H(t.parent.element);)t=t.parent;return t.parent}ut.$inject=["simulator","scopeBehavior","elementRegistry"],ut.prototype.setup=function(t){const{scope:e}=t,n=this._simulator.subscribe(e,ht,t=>(n.remove(),this.cancel({scope:e,initiator:t}))),i={type:"compensate",ref:e.element,persistent:!0,traits:o.NOT_DEAD},s=this._simulator.subscribe(e,i,t=>e.canceled?(s.remove(),this.compensate({scope:e,element:e.element,initiator:t})):this._simulator.trigger({event:ht,scope:e}))},ut.prototype.cancel=function(t){const{scope:e,initiator:n}=t;if(!e.destroyed)return e.cancel(n),this._simulator.trigger({event:{type:"compensate",ref:e.element},initiator:n,scope:e}),this._simulator.trigger({scope:e,initiator:n,event:ht})},ut.prototype.registerCompensation=function(t){const{element:e}=t,n=U(e,this._elementRegistry).filter(H).map(t=>U(t,this._elementRegistry).find(t=>G(t)&&M(t))).filter(t=>t),i=e.attachers.filter(M);if(!n.length&&!i.length)return;const s=this.findTransactionScope(t);(0,k.is)(s.element,"bpmn:Transaction")||this.makeCompensable(s);for(const i of n){const n={element:i,type:"compensate",persistent:!0,interrupting:!0,ref:e,traits:o.NOT_DEAD},s=i.parent,r=this._simulator.subscribe(t,n,e=>(r.remove(),this._simulator.signal({initiator:e,element:s,startEvent:i,parentScope:t})))}for(const t of i){const n={element:t,type:"compensate",persistent:!0,ref:e,traits:o.NOT_DEAD},i=t.outgoing.map(t=>t.target).find(D);if(!i)continue;const r=this._simulator.subscribe(s,n,t=>(r.remove(),this._simulator.enter({initiator:t,element:i,scope:s})))}},ut.prototype.makeCompensable=function(t){if(t.hasTrait(o.COMPENSABLE)||!t.parent)return;const e={type:"compensate",ref:t.element,interrupting:!0,persistent:!0,traits:o.NOT_DEAD};t.compensable();const n=this._simulator.subscribe(t,e,e=>(n.remove(),t.fail(e),this.compensate({scope:t,element:t.element,initiator:e}),this._scopeBehavior.tryExit(t,e),t)),i=t.parent;if(!i)return;const s=this._simulator.subscribe(i,e,n=>(s.remove(),this._simulator.trigger({scope:t,event:e,initiator:n})));this.makeCompensable(i)},ut.prototype.findTransactionScope=function(t){let e=t;for(;e;){const t=e.element;if((0,k.is)(t,"bpmn:SubProcess")&&!H(t))return e;if(V(t,["bpmn:Transaction","bpmn:Process","bpmn:Participant"]))return e;e=e.parent}throw function(t){throw new Error(`no transaction context for <${t.id}>`)}(t)},ut.prototype.compensate=function(t){const{scope:e,element:n}=t,i=C(e.subscriptions,t=>B({type:"compensate"},t.event)),o=i.filter(t=>t.event.ref===n),s=i.filter(t=>t.event.ref!==n);for(const t of o)this._scopeBehavior.preExit(e,e=>this._simulator.trigger(t));for(const t of s.reverse())this._scopeBehavior.preExit(e,e=>this._simulator.trigger(t))},mt.prototype.enter=function(t){this._simulator.exit(t)},mt.prototype.exit=function(t){const{element:e,scope:n}=t;this._simulator.enter({initiator:n,element:e.target,scope:n.parent})},mt.$inject=["simulator","scopeBehavior"],ft.$inject=["simulator"],ft.prototype.signal=function(t){this._simulator.exit(t)},ft.prototype.exit=function(t){const{element:e,scope:n}=t,i=e.target,o=R(i)?i:{type:"message",element:e,name:e.id},s=this._simulator.findSubscription({event:o,elements:[i,i.parent]});s&&this._simulator.trigger({event:o,initiator:n,scope:s.scope})},dt.$inject=["simulator","elementRegistry","scopeBehavior"],dt.prototype.get=function(t){const e={"bpmn:LinkEventDefinition":t=>{const{element:e,scope:n}=t,i=gt(e),o=n.parent,s=U(o.element,this._elementRegistry).filter(t=>A(t)&&gt(t).name===i.name);for(const t of s)this._simulator.signal({element:t,parentScope:o,initiator:n})},"bpmn:SignalEventDefinition":t=>{const{element:e,scope:n}=t,i=this._simulator.findSubscriptions({event:e}),o=new Set;for(const t of i){const i=t.scope;o.has(i)||(o.add(i),this._simulator.trigger({event:e,scope:i,initiator:n}))}},"bpmn:EscalationEventDefinition":t=>{const{element:e,scope:n}=t,i=this._simulator.findScopes({subscribedTo:{event:e},trait:o.ACTIVE});let s=n;for(;s=s.parent;)if(i.includes(s)){this._simulator.trigger({event:e,scope:s,initiator:n});break}},"bpmn:ErrorEventDefinition":t=>{const{element:e,scope:n}=t,i=this._simulator.findScopes({subscribedTo:{event:e},trait:o.ACTIVE});let s=n;for(;s=s.parent;)if(i.includes(s)){this._simulator.trigger({event:e,scope:s,initiator:n});break}},"bpmn:TerminateEventDefinition":t=>{const{scope:e}=t;this._scopeBehavior.terminate(e.parent,e)},"bpmn:CancelEventDefinition":t=>{const{scope:e,element:n}=t;this._simulator.trigger({event:n,initiator:e,scope:vt(e)})},"bpmn:CompensateEventDefinition":t=>{const{scope:e,element:n}=t;return this._simulator.waitForScopes(e,this._simulator.trigger({event:n,scope:vt(e)}))}},n=Object.entries(e).find(e=>{return n=t,i=e[0],(0,L.zN)((0,k.Cf)(n).eventDefinitions,t=>(0,k.is)(t,i));var n,i});return n&&n[1]};const _t={type:"pre-exit",persistent:!0,interrupting:!0,boundary:!1},yt={type:"exit",interrupting:!0,boundary:!1,persistent:!0};function bt(t){this._simulator=t}function wt(t){return"function"==typeof t?t:e=>e===t}function St(t,e){this._simulator=t,this._scopeBehavior=e,t.registerBehavior("bpmn:Process",this),t.registerBehavior("bpmn:Participant",this)}bt.$inject=["simulator"],bt.prototype.isFinished=function(t,e=null){return e=wt(e),t.children.every(t=>t.destroyed||t.completed||e(t))},bt.prototype.destroyChildren=function(t,e,n=null){n=wt(n),t.children.filter(t=>!t.destroyed&&!n(t)).map(t=>{this._simulator.destroyScope(t,e)})},bt.prototype.terminate=function(t,e){this.destroyChildren(t,e),t.terminate(e),this.tryExit(t,e)},bt.prototype.interrupt=function(t,e){this.destroyChildren(t,e,e),t.fail(e)},bt.prototype.tryExit=function(t,e){if(!t)throw new Error("missing <scope>");if(e||(e=t),!this.isFinished(t,e))return yt;const n=this._simulator.findSubscriptions({event:_t,scope:t});for(const t of n){const{event:n,scope:i}=t;if(this._simulator.trigger({event:n,scope:i,initiator:e}).length)return yt}this._simulator.trigger({event:yt,scope:t,initiator:e}),this.exit({scope:t,initiator:e})},bt.prototype.exit=function(t){const{scope:e,initiator:n}=t;if(!n)throw new Error("missing <initiator>");this._simulator.exit({element:e.element,scope:e,initiator:n})},bt.prototype.preExit=function(t,e){const n=this._simulator.subscribe(t,_t,t=>(n.remove(),e(t)));return n},St.prototype.signal=function(t){const{element:e,startEvent:n,startNodes:i=this._findStarts(e,n),scope:o}=t;if(!i.length)throw new Error("missing <startNodes> or <startEvent>");for(const t of i)G(t)?this._simulator.signal({element:t,parentScope:o}):this._simulator.enter({element:t,scope:o})},St.prototype.exit=function(t){const{scope:e,initiator:n}=t;this._scopeBehavior.destroyChildren(e,n)},St.prototype._findStarts=function(t,e){const n=e?t=>e===t:t=>O(t);return t.children.filter(t=>n(t)||j(t))},St.$inject=["simulator","scopeBehavior"];const Et={__depends__:[{__init__:["startEventBehavior","endEventBehavior","boundaryEventBehavior","intermediateCatchEventBehavior","intermediateThrowEventBehavior","exclusiveGatewayBehavior","parallelGatewayBehavior","eventBasedGatewayBehavior","inclusiveGatewayBehavior","subProcessBehavior","sequenceFlowBehavior","messageFlowBehavior","processBehavior"],startEventBehavior:["type",K],endEventBehavior:["type",Q],boundaryEventBehavior:["type",tt],intermediateCatchEventBehavior:["type",et],intermediateThrowEventBehavior:["type",nt],exclusiveGatewayBehavior:["type",it],parallelGatewayBehavior:["type",ot],eventBasedGatewayBehavior:["type",st],inclusiveGatewayBehavior:["type",at],activityBehavior:["type",lt],subProcessBehavior:["type",pt],sequenceFlowBehavior:["type",mt],messageFlowBehavior:["type",ft],eventBehaviors:["type",dt],scopeBehavior:["type",bt],processBehavior:["type",St],transactionBehavior:["type",ut]}],__init__:[["eventBus","simulator",function(t,e){t.on(["tokenSimulation.toggleMode","tokenSimulation.resetSimulation"],5e3,t=>{e.reset()})}]],simulator:["type",J]};var Ct=n(591);function xt(t,e){t.invoke(ft,this),this._animation=e}function Bt(t,e){t.invoke(mt,this),this._animation=e}(0,Ct.A)(xt,ft),xt.$inject=["injector","animation"],xt.prototype.signal=function(t){const{element:e,scope:n}=t;this._animation.animate(e,n,()=>{ft.prototype.signal.call(this,t)})},(0,Ct.A)(Bt,mt),Bt.$inject=["injector","animation"],Bt.prototype.enter=function(t){const{element:e,scope:n}=t;this._animation.animate(e,n,()=>{mt.prototype.enter.call(this,t)})};const Tt={sequenceFlowBehavior:["type",Bt],messageFlowBehavior:["type",xt]},kt="tokenSimulation.toggleMode",Ft="tokenSimulation.playSimulation",Lt="tokenSimulation.pauseSimulation",Pt="tokenSimulation.resetSimulation",It="tokenSimulation.animationSpeedChanged",$t="tokenSimulation.simulator.elementChanged",At="tokenSimulation.simulator.destroyScope",Mt="tokenSimulation.simulator.createScope",Dt="tokenSimulation.scopeFilterChanged",Rt="tokenSimulation.simulator.trace",Nt=t=>!0;function Ot(t,e){this._eventBus=t,this._simulator=e,this._filter=Nt,t.on([kt,Pt],()=>{this._filter=Nt}),t.on(At,t=>{const{scope:e}=t;this._scope===e&&e.parent&&this.toggle(e.parent)}),t.on(Mt,t=>{const{scope:e}=t;e.parent||!this._scope||jt(this._scope,e)||this.toggle(null)})}function jt(t,e){do{if(t===e)return!0}while(e=e.parent);return!1}Ot.prototype.toggle=function(t){const e=this._scope!==t;this._scope=e?t:null,this._filter=this._scope?t=>jt(this._scope,t):t=>!0,this._eventBus.fire(Dt,{filter:this._filter,scope:this._scope})},Ot.prototype.isShown=function(t){return"string"==typeof t&&(t=this._simulator.findScope(e=>e.id===t)),t&&this._filter(t)},Ot.prototype.isFocused=function(t){const e=t.id||t;return this._scope?.id===e},Ot.prototype.findScope=function(t){return this._simulator.findScopes(t).filter(t=>this.isShown(t))[0]},Ot.$inject=["eventBus","simulator"];const Gt={scopeFilter:["type",Ot]};var zt=n(2),Ht=n(816);const qt=getComputedStyle(document.documentElement),Vt=qt.getPropertyValue("--token-simulation-green-base-44"),Yt=qt.getPropertyValue("--token-simulation-white");function Ut(){}function Jt(t,e){return 2===e.length?Kt:1===t?Zt:t===e.length-1?Xt:Wt}const Wt=function(t){return t},Zt=function(t){return 1-Math.cos(t*Math.PI/2)},Xt=function(t){return Math.sin(t*Math.PI/2)},Kt=function(t){return-Math.cos(t*Math.PI)/2+.5};function Qt(t,e,n,i){this._eventBus=n,this._scopeFilter=i,this._canvas=e,this._randomize=t&&!1!==t.randomize,this._animations=new Set,this._speed=1,n.on(["diagram.destroy",Pt],()=>{this.clearAnimations()}),n.on(Lt,()=>{this.pause()}),n.on(Ft,()=>{this.play()}),n.on(Dt,t=>{this.each(t=>{this._scopeFilter.isShown(t.scope)?t.show():t.hide()})}),n.on(At,t=>{const{scope:e}=t;this.clearAnimations(e)})}function te(t,e,n,i){this.gfx=t,this.waypoints=e,this.done=i,this.randomize=n,this._paused=!0,this._t=0,this._parts=[],this.create()}Qt.prototype.animate=function(t,e,n){this.createAnimation(t,e,n)},Qt.prototype.pause=function(){this.each(t=>t.pause())},Qt.prototype.play=function(){this.each(t=>t.play())},Qt.prototype.each=function(t){this._animations.forEach(t)},Qt.prototype.createAnimation=function(t,e,n=Ut){const i=this._getGroup(e);if(!i)return;const o=new te(this._createTokenGfx(i,e),t.waypoints,this._randomize,()=>{this._clearAnimation(o),n()});return o.setSpeed(this.getAnimationSpeed()),this._scopeFilter.isShown(e)||o.hide(),o.scope=e,o.element=t,this._animations.add(o),this._eventBus.fire("tokenSimulation.animationCreated",{animation:o}),o.play(),o},Qt.prototype.setAnimationSpeed=function(t){this._speed=t,this.each(e=>e.setSpeed(t)),this._eventBus.fire(It,{speed:t})},Qt.prototype.getAnimationSpeed=function(){return this._speed},Qt.prototype.clearAnimations=function(t){this.each(e=>{t&&e.scope!==t||this._clearAnimation(e)})},Qt.prototype._clearAnimation=function(t){t.remove(),this._animations.delete(t)},Qt.prototype._createTokenGfx=function(t,e){const n=(0,Ht.vt)(this._getTokenSVG(e).trim());return(0,Ht.S2)(n,t)},Qt.prototype._getTokenSVG=function(t){const e=t.colors||{primary:Vt,auxiliary:Yt};return`\n    <g class="bts-token">\n      <circle\n        class="bts-circle"\n        r="10"\n        cx="10"\n        cy="10"\n        fill="${e.primary}"\n      />\n      <text\n        class="bts-text"\n        transform="translate(10, 14)"\n        text-anchor="middle"\n        fill="${e.auxiliary}"\n      >1</text>\n    </g>\n  `},Qt.prototype._getGroup=function(t){var e,n,i=this._canvas;"findRoot"in i?(n=i.findRoot(t.element),e=i._findPlaneForRoot(n).layer):e=(0,zt.P)(".viewport",i._svg);var o=(0,zt.P)(".bts-animation-tokens",e);return o||(o=(0,Ht.vt)('<g class="bts-animation-tokens" />'),(0,Ht.S2)(o,e)),o},Qt.$inject=["config.animation","canvas","eventBus","scopeFilter"],te.prototype.pause=function(){this._paused=!0},te.prototype.play=function(){this._paused&&(this._paused=!1,this.tick(0)),this.schedule()},te.prototype.schedule=function(){if(this._paused)return;if(this._scheduled)return;const t=Date.now();this._scheduled=!0,requestAnimationFrame(()=>{this._scheduled=!1,this._paused||(this.tick((Date.now()-t)*this._speed),this.schedule())})},te.prototype.tick=function(t){const e=this._t=this._t+t,n=this._parts.find(t=>t.startTime<=e&&t.endTime>e);if(!n)return this.completed();const i=e-n.startTime,o=n.length*n.easing(i/n.duration),s=n.startLength+o,r=this._path.getPointAtLength(s);this.move(r.x,r.y)},te.prototype.move=function(t,e){(0,Ht.CF)(this.gfx,"transform",`translate(${t}, ${e})`)},te.prototype.create=function(){const t=this.waypoints,e=t.reduce((e,n,i)=>{const o=t[i-1];if(o){const a=e[e.length-1],c=a&&a.endLength||0,l=(s=o,r=n,Math.sqrt(Math.pow(s.x-r.x,2)+Math.pow(s.y-r.y,2)));e.push({startLength:c,endLength:c+l,length:l,easing:Jt(i,t)})}var s,r;return e},[]),n=e.reduce(function(t,e){return t+e.length},0),i=t.reduce((t,e,n)=>{const i=e.x-10,o=e.y-10;return t.push([n>0?"L":"M",i,o]),t},[]).flat().join(" "),o=function(t,e=!1){return Math.log(t)*(e?250+Math.floor(50*Math.random()):250)}(n,this._randomize);this._parts=e.reduce((t,e,i)=>{const s=o/n*e.length,r=i>0?t[i-1].endTime:0,a=r+s;return[...t,{...e,startTime:r,endTime:a,duration:s}]},[]),this._path=(0,Ht.vt)(`<path d="${i}" />`),this._t=0},te.prototype.show=function(){(0,Ht.CF)(this.gfx,"display","")},te.prototype.hide=function(){(0,Ht.CF)(this.gfx,"display","none")},te.prototype.completed=function(){this.done()},te.prototype.remove=function(){this.pause(),(0,Ht.TF)(this.gfx)},te.prototype.setSpeed=function(t){this._speed=t};const ee={__depends__:[Et,Tt,Gt],animation:["type",Qt]};var ne=n(555),ie=n.n(ne);function oe(t){const e=ie()({count:60}).filter(t=>n(t.substring(1))<200);function n(t){return(299*parseInt(t.substr(0,2),16)+587*parseInt(t.substr(2,2),16)+114*parseInt(t.substr(4,2),16))/1e3}let i=0;t.on(Mt,1500,t=>{const{scope:o}=t;o.colors=function(t){const{element:o}=t;if(o&&"bpmn:MessageFlow"===o.type)return{primary:"#999",auxiliary:"#FFF"};if(t.parent)return t.parent.colors;const s=e[i++%e.length];return{primary:s,auxiliary:n(s)>=128?"#111":"#fff"}}(o)})}oe.$inject=["eventBus"];const se={__init__:["coloredScopes"],coloredScopes:["type",oe]};function re(t){return function(e=""){return`<span class="bts-icon ${e}">${t}</span>`}}const ae=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M12.83 352h262.34A12.82 12.82 0 0 0 288 339.17v-38.34A12.82 12.82 0 0 0 275.17 288H12.83A12.82 12.82 0 0 0 0 300.83v38.34A12.82 12.82 0 0 0 12.83 352zm0-256h262.34A12.82 12.82 0 0 0 288 83.17V44.83A12.82 12.82 0 0 0 275.17 32H12.83A12.82 12.82 0 0 0 0 44.83v38.34A12.82 12.82 0 0 0 12.83 96zM432 160H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0 256H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg>'),ce=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg>'),le=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"/></svg>'),pe=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580.5 448">\n  <path fill="currentColor" d="M112 0C85 0 64 22 64 48v196l192-89V48c0-26-22-48-48-48zm256 0c-27 0-48 22-48 48v77l190-89c-5-21-24-36-46-36Zm144 105-192 89v70l192-89zM256 224 64 314v70l192-90zm256 21-192 89v66c0 27 21 48 48 48h96c26 0 48-21 48-48zM256 364 89 442c7 4 14 6 23 6h96c26 0 48-21 48-48z"/>\n  <rect fill="currentColor" width="63.3" height="618.2" x="311.5" y="-469.4" transform="rotate(65)" rx="10"/>\n</svg>\n'),he=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M384 144c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 36.4 24.3 67.1 57.5 76.8-.6 16.1-4.2 28.5-11 36.9-15.4 19.2-49.3 22.4-85.2 25.7-28.2 2.6-57.4 5.4-81.3 16.9v-144c32.5-10.2 56-40.5 56-76.3 0-44.2-35.8-80-80-80S0 35.8 0 80c0 35.8 23.5 66.1 56 76.3v199.3C23.5 365.9 0 396.2 0 432c0 44.2 35.8 80 80 80s80-35.8 80-80c0-34-21.2-63.1-51.2-74.6 3.1-5.2 7.8-9.8 14.9-13.4 16.2-8.2 40.4-10.4 66.1-12.8 42.2-3.9 90-8.4 118.2-43.4 14-17.4 21.1-39.8 21.6-67.9 31.6-10.8 54.4-40.7 54.4-75.9zM80 64c8.8 0 16 7.2 16 16s-7.2 16-16 16-16-7.2-16-16 7.2-16 16-16zm0 384c-8.8 0-16-7.2-16-16s7.2-16 16-16 16 7.2 16 16-7.2 16-16 16zm224-320c8.8 0 16 7.2 16 16s-7.2 16-16 16-16-7.2-16-16 7.2-16 16-16z"/></svg>'),ue=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></svg>'),me=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M20 424.229h20V279.771H20c-11.046 0-20-8.954-20-20V212c0-11.046 8.954-20 20-20h112c11.046 0 20 8.954 20 20v212.229h20c11.046 0 20 8.954 20 20V492c0 11.046-8.954 20-20 20H20c-11.046 0-20-8.954-20-20v-47.771c0-11.046 8.954-20 20-20zM96 0C56.235 0 24 32.235 24 72s32.235 72 72 72 72-32.235 72-72S135.764 0 96 0z"/></svg>'),fe=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M144 479H48c-26.5 0-48-21.5-48-48V79c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v352c0 26.5-21.5 48-48 48zm304-48V79c0-26.5-21.5-48-48-48h-96c-26.5 0-48 21.5-48 48v352c0 26.5 21.5 48 48 48h96c26.5 0 48-21.5 48-48z"/></svg>'),de=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">\x3c!-- Adapted from Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/></svg>'),ge=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M440.65 12.57l4 82.77A247.16 247.16 0 0 0 255.83 8C134.73 8 33.91 94.92 12.29 209.82A12 12 0 0 0 24.09 224h49.05a12 12 0 0 0 11.67-9.26 175.91 175.91 0 0 1 317-56.94l-101.46-4.86a12 12 0 0 0-12.57 12v47.41a12 12 0 0 0 12 12H500a12 12 0 0 0 12-12V12a12 12 0 0 0-12-12h-47.37a12 12 0 0 0-11.98 12.57zM255.83 432a175.61 175.61 0 0 1-146-77.8l101.8 4.87a12 12 0 0 0 12.57-12v-47.4a12 12 0 0 0-12-12H12a12 12 0 0 0-12 12V500a12 12 0 0 0 12 12h47.35a12 12 0 0 0 12-12.6l-4.15-82.57A247.17 247.17 0 0 0 255.83 504c121.11 0 221.93-86.92 243.55-201.82a12 12 0 0 0-11.8-14.18h-49.05a12 12 0 0 0-11.67 9.26A175.86 175.86 0 0 1 255.83 432z"/></svg>'),ve=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M288 32C128.94 32 0 160.94 0 320c0 52.8 14.25 102.26 39.06 144.8 5.61 9.62 16.3 15.2 27.44 15.2h443c11.14 0 21.83-5.58 27.44-15.2C561.75 422.26 576 372.8 576 320c0-159.06-128.94-288-288-288zm0 64c14.71 0 26.58 10.13 30.32 23.65-1.11 2.26-2.64 4.23-3.45 6.67l-9.22 27.67c-5.13 3.49-10.97 6.01-17.64 6.01-17.67 0-32-14.33-32-32S270.33 96 288 96zM96 384c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32zm48-160c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32zm246.77-72.41l-61.33 184C343.13 347.33 352 364.54 352 384c0 11.72-3.38 22.55-8.88 32H232.88c-5.5-9.45-8.88-20.28-8.88-32 0-33.94 26.5-61.43 59.9-63.59l61.34-184.01c4.17-12.56 17.73-19.45 30.36-15.17 12.57 4.19 19.35 17.79 15.17 30.36zm14.66 57.2l15.52-46.55c3.47-1.29 7.13-2.23 11.05-2.23 17.67 0 32 14.33 32 32s-14.33 32-32 32c-11.38-.01-20.89-6.28-26.57-15.22zM480 384c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32z"/></svg>'),_e=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"/></svg>'),ye=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"/></svg>'),be=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M384 64H192C85.961 64 0 149.961 0 256s85.961 192 192 192h192c106.039 0 192-85.961 192-192S490.039 64 384 64zM64 256c0-70.741 57.249-128 128-128 70.741 0 128 57.249 128 128 0 70.741-57.249 128-128 128-70.741 0-128-57.249-128-128zm320 128h-48.905c65.217-72.858 65.236-183.12 0-256H384c70.741 0 128 57.249 128 128 0 70.74-57.249 128-128 128z"/></svg>'),we=re('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">\x3c!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --\x3e<path fill="currentColor" d="M384 64H192C86 64 0 150 0 256s86 192 192 192h192c106 0 192-86 192-192S490 64 384 64zm0 320c-70.8 0-128-57.3-128-128 0-70.8 57.3-128 128-128 70.8 0 128 57.3 128 128 0 70.8-57.3 128-128 128z"/></svg>');function Se(t){this._exclusiveGatewaySettings=t}function Ee(t){this._inclusiveGatewaySettings=t}function Ce(t){this._simulator=t}function xe(t){this._simulator=t}Se.prototype.createContextPads=function(t){if(t.outgoing.filter(function(t){return(0,k.is)(t,"bpmn:SequenceFlow")}).length<2)return;const e=`\n    <div class="bts-context-pad" title="Set Sequence Flow">\n      ${he()}\n    </div>\n  `;return[{action:()=>{this._exclusiveGatewaySettings.setSequenceFlow(t)},element:t,html:e}]},Se.$inject=["exclusiveGatewaySettings"],Ee.prototype.createContextPads=function(t){const e=t.outgoing.filter($);if(e.length<2)return;const n=e.filter(e=>{const n=(0,k.Cf)(e);return(0,k.Cf)(t).default!==n}),i=`\n    <div class="bts-context-pad" title="Set Sequence Flow">\n      ${he()}\n    </div>\n  `;return n.map(e=>({action:()=>{this._inclusiveGatewaySettings.toggleSequenceFlow(t,e)},element:e,html:i}))},Ee.$inject=["inclusiveGatewaySettings"],Ce.prototype.createContextPads=function(t){return(0,k.is)(t,"bpmn:ReceiveTask")||(0,k.is)(t,"bpmn:SubProcess")&&(0,k.Cf)(t).triggeredByEvent?[]:[this.createPauseContextPad(t)]},Ce.prototype.createPauseContextPad=function(t){const e=this._isPaused(t),n=`\n    <div class="bts-context-pad ${e?"":"show-hover"}" title="${e?"Remove":"Add"} pause point">\n      ${(e?pe:fe)("show-hover")}\n      ${fe("hide-hover")}\n    </div>\n  `;return{action:()=>{this._togglePaused(t)},element:t,hideContexts:()=>this._findSubscriptions({element:t}),html:n}},Ce.prototype._isPaused=function(t){const{wait:e}=this._simulator.getConfig(t);return e},Ce.prototype._togglePaused=function(t){const e=!this._isPaused(t);this._simulator.waitAtElement(t,e)},Ce.prototype._findSubscriptions=function(t){return this._simulator.findSubscriptions(t)},Ce.$inject=["simulator"],xe.$inject=["simulator"],xe.prototype.createContextPads=function(t){return[this.createTriggerContextPad(t)]},xe.prototype.createTriggerContextPad=function(t){const e=`\n    <div class="bts-context-pad" title="Trigger Event">\n      ${de()}\n    </div>\n  `;return{action:t=>{const{event:e,scope:n}=t[0];return this._simulator.trigger({event:e,scope:n})},element:t,html:e,contexts:()=>this._findSubscriptions({element:t}).slice().sort((t,e)=>"none"===t.event.type?1:-1)}},xe.prototype._findSubscriptions=function(t){return this._simulator.findSubscriptions(t)};const Be=500;function Te(t,e,n,i,o,s){this._elementRegistry=e,this._overlays=n,this._injector=i,this._canvas=o,this._scopeFilter=s,this._active=!1,this._overlayCache=new Map,this._handlerIdx=0,this._handlers=[],this.registerHandler("bpmn:ExclusiveGateway",Se),this.registerHandler("bpmn:InclusiveGateway",Ee),this.registerHandler("bpmn:Activity",Ce),this.registerHandler("bpmn:Event",xe),this.registerHandler("bpmn:Gateway",xe),this.registerHandler("bpmn:Activity",xe),t.on(kt,Be,t=>{this._active=t.active,this._active?this.openContextPads():this.closeContextPads()}),t.on(Pt,Be,()=>{this.closeContextPads(),this.openContextPads()}),t.on("root.set",Be,()=>{this._active?this.openContextPads():this.closeContextPads()}),t.on(Dt,t=>{const e=(0,zt.YG)(".djs-overlay-bts-context-menu [data-scope-ids]",n._overlayRoot);for(const t of e){const e=t.dataset.scopeIds.split(",").some(t=>s.isShown(t));(0,zt.Ly)(t).toggle("hidden",!e)}const i=(0,zt.YG)(".djs-overlay-bts-context-menu [data-hide-scope-ids]",n._overlayRoot);for(const t of i){const e=t.dataset.hideScopeIds.split(",").some(t=>s.isShown(t));(0,zt.Ly)(t).toggle("hidden",e)}}),t.on($t,Be,t=>{const{element:e}=t;this.updateElementContextPads(e)})}Te.prototype.registerHandler=function(t,e){const n=this._injector.instantiate(e);n.hash=String(this._handlerIdx++),this._handlers.push({handler:n,type:t})},Te.prototype.getHandlers=function(t){return this._handlers.filter(({type:e})=>(0,k.is)(t,e)).map(({handler:t})=>t)},Te.prototype.openContextPads=function(t){t||(t=this._canvas.getRootElement()),this._elementRegistry.forEach(e=>{(function(t,e){do{if(t===e)return!0;e=e.parent}while(e);return!1})(t,e)&&!(0,F.hC)(e)&&this.updateElementContextPads(e)})},Te.prototype._getOverlays=function(t){return this._overlayCache.get(t)||[]},Te.prototype._addOverlay=function(t,e){const{handlerHash:n}=e;if(!n)throw new Error("<handlerHash> required");const i=this._overlays.add(t,"bts-context-menu",{...e,position:{top:-15,left:-15},show:{minZoom:.5}}),o=this._overlays.get(i),s=this._overlayCache;s.has(n)||s.set(n,[]),s.get(n).push(o)},Te.prototype._removeOverlay=function(t){const{id:e,handlerHash:n}=t;this._overlays.remove(e);const i=this._overlayCache.get(n)||[],o=i.indexOf(t);-1!==o&&i.splice(o,1)},Te.prototype.updateElementContextPads=function(t){for(const e of this.getHandlers(t))this._updateElementContextPads(t,e)},Te.prototype._updateElementContextPads=function(t,e){const n=this._canvas,i=(e.createContextPads(t)||[]).filter(t=>t),o=`${t.id}------${e.hash}`,s=this._getOverlays(o),r=[];for(const t of i){const{element:e,contexts:i,hideContexts:a,action:c,html:l}=t,p=`${t.element.id}-------${l}`;let h=s.find(t=>t.hash===p);const u=h&&h.html||(0,zt.zm)(l);if(i){const t=i();u.dataset.scopeIds=t.map(t=>t.scope.id).join(",");const e=t.filter(t=>this._scopeFilter.isShown(t.scope));(0,zt.Ly)(u).toggle("hidden",0===e.length)}if(a){const t=a();u.dataset.hideScopeIds=t.map(t=>t.scope.id).join(",");const e=t.filter(t=>this._scopeFilter.isShown(t.scope));(0,zt.Ly)(u).toggle("hidden",e.length>0)}h?r.push(h):(c&&zt.f0.bind(u,"click",t=>{t.preventDefault();const e=i?i().filter(t=>this._scopeFilter.isShown(t.scope)):null;c(e),"restoreFocus"in n&&n.restoreFocus()}),this._addOverlay(e,{hash:p,handlerHash:o,html:u}))}for(const t of s)r.includes(t)||this._removeOverlay(t)},Te.prototype.closeContextPads=function(){for(const t of this._overlayCache.values())for(const e of t)this._closeOverlay(e);this._overlayCache.clear()},Te.prototype._closeOverlay=function(t){this._overlays.remove(t.id)},Te.$inject=["eventBus","elementRegistry","overlays","injector","canvas","scopeFilter"];const ke={__depends__:[Gt],__init__:["contextPads"],contextPads:["type",Te]};function Fe(t,e,n){t.on(At,t=>{const{scope:e}=t,{destroyInitiator:i,element:o}=e;e.completed&&i&&["bpmn:Process","bpmn:Participant"].includes(o.type)&&n.addElementNotification(i.element,{type:"success",icon:le(),text:"Finished",scope:e})})}function Le(t,e){this._overlays=t,e.on([Pt,Mt,kt],()=>{this.clear()})}Fe.$inject=["eventBus","simulator","elementNotifications"],Le.prototype.addElementNotification=function(t,e){const{type:n,icon:i,text:o,scope:s={}}=e,r=s.colors,a=r?`style="color: ${r.auxiliary}; background: ${r.primary}"`:"",c=(0,zt.zm)(`\n    <div class="bts-element-notification ${n||""}" ${a}>\n      ${i||""}\n      <span class="bts-text">${o}</span>\n    </div>\n  `);this._overlays.add(t,"bts-element-notification",{position:{top:-15,right:15},html:c,show:{minZoom:.5}})},Le.prototype.clear=function(){this._overlays.remove({type:"bts-element-notification"})},Le.prototype.removeElementNotification=function(t){this._overlays.remove({element:t})},Le.$inject=["overlays","eventBus"];const Pe={elementNotifications:["type",Le]},Ie=2e3,$e=me();function Ae(t,e,n){this._eventBus=t,this._canvas=e,this._scopeFilter=n,this._init(),t.on([kt,Pt],t=>{this.clear()})}Ae.prototype._init=function(){this.container=(0,zt.zm)('<div class="bts-notifications"></div>'),this._canvas.getContainer().appendChild(this.container)},Ae.prototype.showNotification=function(t){const{text:e,type:n="info",icon:i=$e,scope:o,ttl:s=Ie}=t;if(o&&!this._scopeFilter.isShown(o))return;const r=i.startsWith("<")?i:`<i class="${i}"></i>`,a=o&&o.colors,c=a?`style="color: ${a.auxiliary}; background: ${a.primary}"`:"",l=(0,zt.zm)(`\n    <div class="bts-notification ${n}">\n      <span class="bts-icon">${r}</span>\n      <span class="bts-text" title="${e}">${e}</span>\n      ${o?`<span class="bts-scope" ${c}>${o.id}</span>`:""}\n    </div>\n  `);for(this.container.appendChild(l);this.container.children.length>5;)this.container.children[0].remove();setTimeout(function(){l.remove()},s)},Ae.prototype.clear=function(){for(;this.container.children.length;)this.container.children[0].remove()},Ae.$inject=["eventBus","canvas","scopeFilter"];const Me={__depends__:[Gt],notifications:["type",Ae]},De={__depends__:[Pe,Me],__init__:["simulationState"],simulationState:["type",Fe]},Re="show-scopes";function Ne(t,e,n,i,o){this._eventBus=t,this._canvas=e,this._scopeFilter=n,this._elementColors=i,this._simulationStyles=o,this._highlight=null,this._init(),t.on(kt,t=>{t.active?(0,zt.Ly)(this._container).remove("hidden"):((0,zt.Ly)(this._container).add("hidden"),(0,zt.IU)(this._container),this.unhighlightScope())}),t.on(Dt,t=>{const e=this.getScopeElements();for(const t of e){const e=t.dataset.scopeId;(0,zt.Ly)(t).toggle("inactive",!this._scopeFilter.isShown(e)),(0,zt.Ly)(t).toggle("focussed",this._scopeFilter.isFocused(e))}}),t.on(Mt,t=>{this.addScope(t.scope)}),t.on(At,t=>{this.removeScope(t.scope)}),t.on("tokenSimulation.simulator.scopeChanged",t=>{this.updateScope(t.scope)}),t.on(Pt,()=>{this.removeAllInstances()})}function Oe(){this._cache={}}function je(){return{getPropertyValue:()=>""}}Ne.prototype._init=function(){this._container=(0,zt.zm)('<div class="bts-scopes hidden"></div>'),this._canvas.getContainer().appendChild(this._container)},Ne.prototype.addScope=function(t){const{element:e}=t;if(!(0,k.f7)(e,["bpmn:Process","bpmn:SubProcess","bpmn:Participant"]))return;const n=t.colors,i=n?`style="color: ${n.auxiliary}; background: ${n.primary}; outline-color: ${n.primary}"`:"",o=(0,zt.zm)(`\n    <div data-scope-id="${t.id}" class="bts-scope"\n         title="Focus process instance ${t.id}" ${i}>\n      ${t.getTokens()}\n    </div>\n  `);zt.f0.bind(o,"click",()=>{this._scopeFilter.toggle(t)}),zt.f0.bind(o,"mouseenter",()=>{this.highlightScope(e)}),zt.f0.bind(o,"mouseleave",()=>{this.unhighlightScope()}),this._scopeFilter.isShown(t)||(0,zt.Ly)(o).add("inactive"),(0,zt.Ly)(o).toggle("focussed",this._scopeFilter.isFocused(t)),this._container.appendChild(o)},Ne.prototype.getScopeElements=function(){return(0,zt.YG)("[data-scope-id]",this._container)},Ne.prototype.getScopeElement=function(t){return(0,zt.P)(`[data-scope-id="${t.id}"]`,this._container)},Ne.prototype.updateScope=function(t){const e=this.getScopeElement(t);e&&(e.textContent=t.getTokens())},Ne.prototype.removeScope=function(t){const e=this.getScopeElement(t);e&&e.remove()},Ne.prototype.removeAllInstances=function(){this._container.innerHTML=""},Ne.prototype.highlightScope=function(t){this.unhighlightScope(),this._highlight=t,this._elementColors.add(t,Re,this._getHighlightColors(),3e3),t.parent||(0,zt.Ly)(this._canvas.getContainer()).add("highlight")},Ne.prototype.unhighlightScope=function(){if(!this._highlight)return;const t=this._highlight;this._elementColors.remove(t,Re),t.parent||(0,zt.Ly)(this._canvas.getContainer()).remove("highlight"),this._highlight=null},Ne.prototype._getHighlightColors=function(){return{fill:this._simulationStyles.get("--token-simulation-silver-base-97"),stroke:this._simulationStyles.get("--token-simulation-green-base-44")}},Ne.$inject=["eventBus","canvas","scopeFilter","elementColors","simulationStyles"],Oe.$inject=[],Oe.prototype.get=function(t){return this._cache[t]||(this._computedStyle||(this._computedStyle=this._getComputedStyle()),this._cache[t]=this._computedStyle.getPropertyValue(t).trim())},Oe.prototype._getComputedStyle=function(){return("function"==typeof getComputedStyle?getComputedStyle:je)("undefined"!=typeof document?document.documentElement:{})};const Ge={simulationStyles:["type",Oe]},ze={__depends__:[Gt,Ge],__init__:["showScopes"],showScopes:["type",Ne]};var He={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"};const qe=me();function Ve(t){const e=t&&t.businessObject.name;return e&&(n=""+(n=e))&&n.replace(/[&<>"']/g,function(t){return He[t]});var n}function Ye(t,e){const n=Ue(t);return"none"===n?"bpmn-icon-intermediate-event-none":`bpmn-icon-intermediate-event-${e}-${n}`}function Ue(t){const e=(0,k.Cf)(t);if(0===e.get("eventDefinitions").length)return"none";const n=e.eventDefinitions[0];return(0,k.is)(n,"bpmn:MessageEventDefinition")?"message":(0,k.is)(n,"bpmn:TimerEventDefinition")?"timer":(0,k.is)(n,"bpmn:SignalEventDefinition")?"signal":(0,k.is)(n,"bpmn:ErrorEventDefinition")?"error":(0,k.is)(n,"bpmn:EscalationEventDefinition")?"escalation":(0,k.is)(n,"bpmn:CompensateEventDefinition")?"compensation":(0,k.is)(n,"bpmn:ConditionalEventDefinition")?"condition":(0,k.is)(n,"bpmn:LinkEventDefinition")?"link":(0,k.is)(n,"bpmn:CancelEventDefinition")?"cancel":(0,k.is)(n,"bpmn:TerminateEventDefinition")?"terminate":"none"}function Je(t,e,n,i,o,s){this._notifications=e,this._tokenSimulationPalette=n,this._canvas=i,this._scopeFilter=o,this._init(),t.on(Dt,t=>{const e=(0,zt.YG)(".bts-entry[data-scope-id]",this._container);for(const t of e){const e=t.dataset.scopeId;(0,zt.Ly)(t).toggle("inactive",!this._scopeFilter.isShown(e))}}),t.on(At,t=>{const{scope:e}=t,{element:n}=e,i=e.completed;if(!(0,k.f7)(n,["bpmn:Process","bpmn:Participant","bpmn:SubProcess"]))return;const o=`${(0,k.is)(n,"bpmn:SubProcess")?Ve(n)||"SubProcess":"Process"} ${i?"finished":"canceled"}`;this.log({text:o,icon:i?le():_e(),scope:e})}),t.on(Mt,t=>{const{scope:e}=t,{element:n}=e;if(!(0,k.f7)(n,["bpmn:Process","bpmn:Participant","bpmn:SubProcess"]))return;const i=`${(0,k.is)(n,"bpmn:SubProcess")?Ve(n)||"SubProcess":"Process"} started`;this.log({text:i,icon:le(),scope:e})}),t.on(Rt,t=>{const{action:e,scope:n,element:i}=t;if("exit"!==e)return;const o=n.parent,s=Ve(i);return(0,k.is)(i,"bpmn:ServiceTask")?this.log({text:s||"Service Task",icon:"bpmn-icon-service",scope:o}):(0,k.is)(i,"bpmn:UserTask")?this.log({text:s||"User Task",icon:"bpmn-icon-user",scope:o}):(0,k.is)(i,"bpmn:CallActivity")?this.log({text:s||"Call Activity",icon:"bpmn-icon-call-activity",scope:o}):(0,k.is)(i,"bpmn:ScriptTask")?this.log({text:s||"Script Task",icon:"bpmn-icon-script",scope:o}):(0,k.is)(i,"bpmn:BusinessRuleTask")?this.log({text:s||"Business Rule Task",icon:"bpmn-icon-business-rule",scope:o}):(0,k.is)(i,"bpmn:ManualTask")?this.log({text:s||"Manual Task",icon:"bpmn-icon-manual-task",scope:o}):(0,k.is)(i,"bpmn:ReceiveTask")?this.log({text:s||"Receive Task",icon:"bpmn-icon-receive",scope:o}):(0,k.is)(i,"bpmn:SendTask")?this.log({text:s||"Send Task",icon:"bpmn-icon-send",scope:o}):(0,k.is)(i,"bpmn:Task")?this.log({text:s||"Task",icon:"bpmn-icon-task",scope:o}):(0,k.is)(i,"bpmn:ExclusiveGateway")?this.log({text:s||"Exclusive Gateway",icon:"bpmn-icon-gateway-xor",scope:o}):(0,k.is)(i,"bpmn:ParallelGateway")?this.log({text:s||"Parallel Gateway",icon:"bpmn-icon-gateway-parallel",scope:o}):(0,k.is)(i,"bpmn:InclusiveGateway")?this.log({text:s||"Inclusive Gateway",icon:"bpmn-icon-gateway-or",scope:o}):(0,k.is)(i,"bpmn:StartEvent")?this.log({text:s||"Start Event",icon:`bpmn-icon-start-event-${Ue(i)}`,scope:o}):(0,k.is)(i,"bpmn:IntermediateCatchEvent")?this.log({text:s||"Intermediate Event",icon:Ye(i,"catch"),scope:o}):(0,k.is)(i,"bpmn:IntermediateThrowEvent")?this.log({text:s||"Intermediate Event",icon:Ye(i,"throw"),scope:o}):(0,k.is)(i,"bpmn:BoundaryEvent")?this.log({text:s||"Boundary Event",icon:Ye(i,"catch"),scope:o}):(0,k.is)(i,"bpmn:EndEvent")?this.log({text:s||"End Event",icon:`bpmn-icon-end-event-${Ue(i)}`,scope:o}):void 0}),t.on([kt,Pt],t=>{this.clear(),this.toggle(!1)})}Je.prototype._init=function(){this._container=(0,zt.zm)(`\n    <div class="bts-log hidden djs-scrollable">\n      <div class="bts-header">\n        ${ae("bts-log-icon")}\n        Simulation Log\n        <button class="bts-close" aria-label="Close">\n          ${ye()}\n        </button>\n      </div>\n      <div class="bts-content">\n        <p class="bts-entry placeholder">No Entries</p>\n      </div>\n    </div>\n  `),this._placeholder=(0,zt.P)(".bts-placeholder",this._container),this._content=(0,zt.P)(".bts-content",this._container),zt.f0.bind(this._content,"mousedown",t=>{t.stopPropagation()}),this._close=(0,zt.P)(".bts-close",this._container),zt.f0.bind(this._close,"click",()=>{this.toggle(!1)}),this._icon=(0,zt.P)(".bts-log-icon",this._container),zt.f0.bind(this._icon,"click",()=>{this.toggle()}),this._canvas.getContainer().appendChild(this._container),this.paletteEntry=(0,zt.zm)(`\n    <div class="bts-entry" title="Toggle Simulation Log">\n      ${ae()}\n    </div>\n  `),zt.f0.bind(this.paletteEntry,"click",()=>{this.toggle()}),this._tokenSimulationPalette.addEntry(this.paletteEntry,3)},Je.prototype.isShown=function(){const t=this._container;return!(0,zt.Ly)(t).has("hidden")},Je.prototype.toggle=function(t=!this.isShown()){const e=this._container;t?(0,zt.Ly)(e).remove("hidden"):(0,zt.Ly)(e).add("hidden")},Je.prototype.log=function(t){const{text:e,type:n="info",icon:i=qe,scope:o}=t,s=this._content;(0,zt.Ly)(this._placeholder).add("hidden"),this.isShown()||this._notifications.showNotification(t);const r=i.startsWith("<")?i:`<i class="${i}"></i>`,a=o&&o.colors,c=a?`style="background: ${a.primary}; color: ${a.auxiliary}"`:"",l=(0,zt.zm)(`\n    <p class="bts-entry ${n} ${o&&this._scopeFilter.isShown(o)?"":"inactive"}" ${o?`data-scope-id="${o.id}"`:""}>\n      <span class="bts-icon">${r}</span>\n      <span class="bts-text" title="${e}">${e}</span>\n      ${o?`<span class="bts-scope" data-scope-id="${o.id}" ${c}>${o.id}</span>`:""}\n    </p>\n  `);zt.Mm.bind(l,".bts-scope[data-scope-id]","click",t=>{this._scopeFilter.toggle(o)});const p=Math.abs(s.clientHeight+s.scrollTop-s.scrollHeight)<2;s.appendChild(l),p&&(s.scrollTop=s.scrollHeight)},Je.prototype.clear=function(){for(;this._content.firstChild;)this._content.removeChild(this._content.firstChild);this._placeholder=(0,zt.zm)('<p class="bts-entry placeholder">No Entries</p>'),this._content.appendChild(this._placeholder)},Je.$inject=["eventBus","notifications","tokenSimulationPalette","canvas","scopeFilter","simulator"];const We={__depends__:[Me,Gt],__init__:["log"],log:["type",Je]},Ze=["bpmn:ComplexGateway"];function Xe(t,e,n,i,o){this._eventBus=t,this._elementRegistry=e,this._elementNotifications=o,this._notifications=i,this._canvasParent=n.getContainer().parentNode,t.on(kt,t=>{t.active?this.enable():this.clear()})}Xe.prototype.getUnsupportedElements=function(){return this._unsupportedElements},Xe.prototype.enable=function(){const t=[];this._elementRegistry.forEach(e=>{(function(t){return t.labelTarget})(e)||(0,k.f7)(e,Ze)&&(this.showWarning(e),t.push(e))}),t.length&&this._notifications.showNotification({text:"Found unsupported elements",icon:ue(),type:"warning",ttl:5e3}),this._unsupportedElements=t},Xe.prototype.clear=function(){(0,zt.Ly)(this._canvasParent).remove("warning")},Xe.prototype.showWarning=function(t){this._elementNotifications.addElementNotification(t,{type:"warning",icon:ue(),text:"Not supported"})},Xe.$inject=["eventBus","elementRegistry","canvas","notifications","elementNotifications"];const Ke={__depends__:[Pe,Me],__init__:["elementSupport"],elementSupport:["type",Xe]},Qe=de(),tn=fe();function en(t,e,n,i){this._eventBus=t,this._tokenSimulationPalette=e,this._notifications=n,this.canvasParent=i.getContainer().parentNode,this.isActive=!1,this.isPaused=!0,this._init(),t.on(Mt,1500,t=>{this.activate(),this.unpause()}),t.on([Pt,kt],()=>{this.deactivate(),this.pause()}),t.on(Rt,1500,t=>{this.unpause()})}en.prototype._init=function(){this.paletteEntry=(0,zt.zm)(`\n    <div class="bts-entry disabled" title="Play/Pause Simulation">\n      ${Qe}\n    </div>\n  `),zt.f0.bind(this.paletteEntry,"click",this.toggle.bind(this)),this._tokenSimulationPalette.addEntry(this.paletteEntry,1)},en.prototype.toggle=function(){this.isPaused?this.unpause():this.pause()},en.prototype.pause=function(){this.isActive&&((0,zt.Ly)(this.paletteEntry).remove("active"),(0,zt.Ly)(this.canvasParent).add("paused"),this.paletteEntry.innerHTML=Qe,this._eventBus.fire(Lt),this._notifications.showNotification({text:"Pause Simulation"}),this.isPaused=!0)},en.prototype.unpause=function(){this.isActive&&this.isPaused&&((0,zt.Ly)(this.paletteEntry).add("active"),(0,zt.Ly)(this.canvasParent).remove("paused"),this.paletteEntry.innerHTML=tn,this._eventBus.fire(Ft),this._notifications.showNotification({text:"Play Simulation"}),this.isPaused=!1)},en.prototype.activate=function(){this.isActive=!0,(0,zt.Ly)(this.paletteEntry).remove("disabled")},en.prototype.deactivate=function(){this.isActive=!1,(0,zt.Ly)(this.paletteEntry).remove("active"),(0,zt.Ly)(this.paletteEntry).add("disabled")},en.$inject=["eventBus","tokenSimulationPalette","notifications","canvas"];const nn={__depends__:[Me],__init__:["pauseSimulation"],pauseSimulation:["type",en]};function on(t,e,n){this._eventBus=t,this._tokenSimulationPalette=e,this._notifications=n,this._init(),t.on(Mt,()=>{(0,zt.Ly)(this._paletteEntry).remove("disabled")}),t.on(kt,t=>{(this._active=t.active)||this.resetSimulation()})}on.prototype._init=function(){this._paletteEntry=(0,zt.zm)(`\n    <div class="bts-entry disabled" title="Reset Simulation">\n      ${ge()}\n    </div>\n  `),zt.f0.bind(this._paletteEntry,"click",()=>{this.resetSimulation(),this._notifications.showNotification({text:"Reset Simulation",type:"info"})}),this._tokenSimulationPalette.addEntry(this._paletteEntry,2)},on.prototype.resetSimulation=function(){(0,zt.Ly)(this._paletteEntry).add("disabled"),this._eventBus.fire(Pt)},on.$inject=["eventBus","tokenSimulationPalette","notifications"];const sn={__depends__:[Me],__init__:["resetSimulation"],resetSimulation:["type",on]};function rn(t,e,n,i,o){this._overlays=e,this._scopeFilter=i,this._simulator=n,this._simulationStyles=o,this.overlayIds={},t.on($t,500,t=>{const{element:e}=t;this.removeTokenCounts(e),this.addTokenCounts(e)}),t.on(Dt,t=>{const n=(0,zt.YG)(".bts-token-count[data-scope-id]",e._overlayRoot);for(const t of n){const e=t.dataset.scopeId;(0,zt.Ly)(t).toggle("inactive",!this._scopeFilter.isShown(e))}})}rn.prototype.addTokenCounts=function(t){if((0,k.is)(t,"bpmn:MessageFlow")||(0,k.is)(t,"bpmn:SequenceFlow"))return;const e=this._simulator.findScopes(e=>!e.destroyed&&e.children.some(e=>!e.destroyed&&e.element===t));this.addTokenCount(t,e)},rn.prototype.addTokenCount=function(t,e){if(!e.length)return;const n=e.map(e=>this._getTokenHTML(t,e)).join(""),i=(0,zt.zm)(`\n    <div class="bts-token-count-parent">\n      ${n}\n    </div>\n  `),o=this._overlays.add(t,"bts-token-count",{position:{bottom:10,left:-15},html:i,show:{minZoom:.5}});this.overlayIds[t.id]=o},rn.prototype.removeTokenCounts=function(t){this.removeTokenCount(t)},rn.prototype.removeTokenCount=function(t){const e=this.overlayIds[t.id];e&&(this._overlays.remove(e),delete this.overlayIds[t.id])},rn.prototype._getTokenHTML=function(t,e){const n=e.colors||this._getDefaultColors();return`\n    <div data-scope-id="${e.id}" class="bts-token-count waiting ${this._scopeFilter.isShown(e)?"":"inactive"}"\n         style="color: ${n.auxiliary}; background: ${n.primary}">\n      ${e.getTokensByElement(t)}\n    </div>\n  `},rn.prototype._getDefaultColors=function(){return{primary:this._simulationStyles.get("--token-simulation-green-base-44"),auxiliary:this._simuationStyles.get("--token-simulation-white")}},rn.$inject=["eventBus","overlays","simulator","scopeFilter","simulationStyles"];const an={__depends__:[Gt,Ge],__init__:["tokenCount"],tokenCount:["type",rn]},cn=[["Slow",.5],["Normal",1],["Fast",2]];function ln(t,e,n){this._canvas=t,this._animation=e,this._eventBus=n,this._init(e.getAnimationSpeed()),n.on(kt,t=>{t.active?(0,zt.Ly)(this._container).remove("hidden"):(0,zt.Ly)(this._container).add("hidden")}),n.on(It,t=>{this.setActive(t.speed)})}ln.prototype.getToggleSpeed=function(t){return parseFloat(t.dataset.speed)},ln.prototype._init=function(t){this._container=(0,zt.zm)(`\n    <div class="bts-set-animation-speed hidden">\n      ${ve()}\n      <div class="bts-animation-speed-buttons">\n        ${cn.map(([e,n],i)=>`\n            <button title="Set animation speed = ${e}" data-speed="${n}" class="bts-animation-speed-button ${n===t?"active":""}">\n              ${Array.from({length:i+1}).map(()=>ce()).join("")}\n            </button>\n          `).join("")}\n      </div>\n    </div>\n  `),zt.Mm.bind(this._container,"[data-speed]","click",t=>{const e=t.delegateTarget,n=this.getToggleSpeed(e);this._animation.setAnimationSpeed(n)}),this._canvas.getContainer().appendChild(this._container)},ln.prototype.setActive=function(t){(0,zt.YG)("[data-speed]",this._container).forEach(e=>{const n=this.getToggleSpeed(e)===t;(0,zt.Ly)(e)[n?"add":"remove"]("active")})},ln.$inject=["canvas","animation","eventBus"];const pn={__init__:["setAnimationSpeed"],setAnimationSpeed:["type",ln]};function hn(t){return(0,k.is)(t,"bpmn:SequenceFlow")}function un(t,e,n,i,o){this._elementRegistry=e,this._elementColors=n,this._simulator=i,this._simulationStyles=o,t.on(kt,t=>{t.active?this.setSequenceFlowsDefault():this.resetSequenceFlows()})}function mn(t,e,n){this._elementRegistry=t,this._eventBus=e,this._graphicsFactory=n,this._originalColors={},this._customColors={},e.on(kt,5e4,t=>{t.active?this._saveOriginalColors():(this._applyOriginalColors(),this._originalColors={},this._customColors={})}),e.on("saveXML.start",5e4,()=>{this._applyOriginalColors(),e.once("saveXML.done",()=>this._applyCustomColors())})}function fn(t){return"labelTarget"in t}function dn(t={}){const e=Object.values(t).reduce((t,e)=>{const{priority:n=1e3}=e;return!t||n>t.priority?e:t},void 0);if(e){const{priority:t,...n}=e;return n}}un.prototype.setSequenceFlowsDefault=function(){const t=this._elementRegistry.filter(t=>(0,k.is)(t,"bpmn:ExclusiveGateway"));for(const e of t)this.setSequenceFlow(e)},un.prototype.resetSequenceFlows=function(){this._elementRegistry.filter(t=>(0,k.is)(t,"bpmn:ExclusiveGateway")).forEach(t=>{t.outgoing.filter(hn).length&&this.resetSequenceFlow(t)})},un.prototype.resetSequenceFlow=function(t){this._simulator.setConfig(t,{activeOutgoing:void 0})},un.prototype.setSequenceFlow=function(t){const e=t.outgoing.filter(hn);if(e.length<2)return;const{activeOutgoing:n}=this._simulator.getConfig(t);let i;i=n?function(t,e){var n=t.outgoing.filter(hn),i=n.indexOf(e||t.sequenceFlow);return n[i+1]?n[i+1]:n[0]}(t,n):e[0],this._simulator.setConfig(t,{activeOutgoing:i}),t.outgoing.forEach(t=>{const e=t===i?"--token-simulation-grey-darken-30":"--token-simulation-grey-lighten-56",n=this._simulationStyles.get(e);this._elementColors.add(t,"exclusive-gateway-settings",{stroke:n},2e3)})},un.$inject=["eventBus","elementRegistry","elementColors","simulator","simulationStyles"],mn.$inject=["elementRegistry","eventBus","graphicsFactory"],mn.prototype.add=function(t,e,n,i=1e3){let o=this._customColors[t.id];o||(o=this._customColors[t.id]={}),o[e]={...n,priority:i},this._applyHighestPriorityColor(t)},mn.prototype.remove=function(t,e){const n=this._customColors[t.id];n&&(delete n[e],Object.keys(n)||delete this._customColors[t.id]),this._applyHighestPriorityColor(t)},mn.prototype._get=function(t){const e=(0,k.S2)(t);if(e)return fn(t)?{stroke:e.label&&e.label.get("color")}:(0,k.f7)(e,["bpmndi:BPMNEdge","bpmndi:BPMNShape"])?{fill:e.get("background-color"),stroke:e.get("border-color")}:void 0},mn.prototype._set=function(t,e={}){const{fill:n,stroke:i}=e,o=(0,k.S2)(t);o&&(fn(t)?o.label&&o.label.set("color",i):(0,k.f7)(o,["bpmndi:BPMNEdge","bpmndi:BPMNShape"])&&(o.set("background-color",n),o.set("border-color",i)),this._forceRedraw(t))},mn.prototype._saveOriginalColors=function(){this._originalColors={},this._elementRegistry.forEach(t=>{this._originalColors[t.id]=this._get(t)})},mn.prototype._applyOriginalColors=function(){this._elementRegistry.forEach(t=>{const e=this._originalColors[t.id];e&&this._set(t,e)})},mn.prototype._applyCustomColors=function(){this._elementRegistry.forEach(t=>{const e=this._customColors[t.id];e&&this._set(t,dn(e))})},mn.prototype._applyHighestPriorityColor=function(t){const e=this._customColors[t.id];e?this._set(t,dn(e)):this._set(t,this._originalColors[t.id])},mn.prototype._forceRedraw=function(t){const e=this._elementRegistry.getGraphics(t),n=t.waypoints?"connection":"shape";this._graphicsFactory.update(n,t,e)};const gn={elementColors:["type",mn]},vn={__depends__:[gn,Ge],exclusiveGatewaySettings:["type",un]};function _n(t,e,n){this._elementRegistry=e,this._elementColors=n,t.on(kt,t=>{const{active:e}=t;e&&this._setNeutralColors()})}_n.prototype._setNeutralColors=function(){this._elementRegistry.forEach(t=>{this._elementColors.add(t,"neutral-element-colors",{stroke:"#212121",fill:"#fff"})})},_n.$inject=["eventBus","elementRegistry","elementColors"];const yn={__depends__:[gn],__init__:["neutralElementColors"],neutralElementColors:["type",_n]};function bn(t,e,n,i,o){this._elementRegistry=e,this._elementColors=n,this._simulator=i,this._simulationStyles=o,t.on(kt,t=>{t.active?this.setDefaults():this.reset()})}function wn(t){const e=(0,k.Cf)(t).default;if(e)return t.outgoing.find(t=>(0,k.Cf)(t)===e)}function Sn(t,e){return t.filter(t=>t!==e)}bn.prototype.setDefaults=function(){this._elementRegistry.filter(t=>(0,k.is)(t,"bpmn:InclusiveGateway")).forEach(t=>{t.outgoing.filter($).length>1&&this._setGatewayDefaults(t)})},bn.prototype.reset=function(){this._elementRegistry.filter(t=>(0,k.is)(t,"bpmn:InclusiveGateway")).forEach(t=>{t.outgoing.filter($).length>1&&this._resetGateway(t)})},bn.prototype.toggleSequenceFlow=function(t,e){const n=this._getActiveOutgoing(t),i=wn(t),o=function(t){const e=wn(t);return t.outgoing.filter(t=>(0,k.Cf)(t)!==e)}(t);let s;s=n.includes(e)?Sn(n,e):Sn(n,i).concat(e),s.length||(s=i?[i]:[o.find(t=>t!==e)]),this._setActiveOutgoing(t,s)},bn.prototype._getActiveOutgoing=function(t){const{activeOutgoing:e}=this._simulator.getConfig(t);return e},bn.prototype._setActiveOutgoing=function(t,e){this._simulator.setConfig(t,{activeOutgoing:e}),t.outgoing.filter($).forEach(t=>{const n=!e||e.includes(t)?"--token-simulation-grey-darken-30":"--token-simulation-grey-lighten-56",i=this._simulationStyles.get(n);this._elementColors.add(t,"inclusive-gateway-settings",{stroke:i})})},bn.prototype._setGatewayDefaults=function(t){const e=Sn(t.outgoing.filter($),wn(t));this._setActiveOutgoing(t,e)},bn.prototype._resetGateway=function(t){this._simulator.setConfig(t,{activeOutgoing:void 0})},bn.$inject=["eventBus","elementRegistry","elementColors","simulator","simulationStyles"];const En={__depends__:[gn,Ge],inclusiveGatewaySettings:["type",bn]};function Cn(t,e){var n=this;this._canvas=e,this.entries=[],this._init(),t.on(kt,function(t){t.active?(0,zt.Ly)(n.container).remove("hidden"):(0,zt.Ly)(n.container).add("hidden")})}Cn.prototype._init=function(){this.container=(0,zt.zm)('<div class="bts-palette hidden"></div>'),this._canvas.getContainer().appendChild(this.container)},Cn.prototype.addEntry=function(t,e){var n=0;this.entries.forEach(function(t){e>=t.index&&n++}),this.container.insertBefore(t,this.container.childNodes[n]),this.entries.push({entry:t,index:e})},Cn.$inject=["eventBus","canvas"];const xn={__depends__:[Et,ee,se,ke,De,ze,We,Ke,nn,sn,an,pn,vn,yn,En,{__init__:["tokenSimulationPalette"],tokenSimulationPalette:["type",Cn]}]};function Bn(t,e,n,i,o,s,r){let a=!1;function c(t,e,n){const i=t[e];t[e]=function(){return n.call(this,i,arguments)}}function l(t,e){c(t,e,function(t,e){if(!a)return t.apply(this,e)})}function p(t,e){c(t,e,function(t,e){if(a)throw new Error("model is read-only");return t.apply(this,e)})}t.on(kt,10001,t=>{a=t.active,a&&(i.cancel(),n.cancel()),r._update()}),l(n,"init"),l(i,"activate"),l(n,"init"),l(i,"activate"),p(s,"moveShape"),p(s,"updateAttachment"),p(s,"moveElements"),p(s,"moveConnection"),p(s,"layoutConnection"),p(s,"createConnection"),p(s,"createShape"),p(s,"createLabel"),p(s,"appendShape"),p(s,"removeElements"),p(s,"distributeElements"),p(s,"removeShape"),p(s,"removeConnection"),p(s,"replaceShape"),p(s,"pasteElements"),p(s,"alignElements"),p(s,"resizeShape"),p(s,"createSpace"),p(s,"updateWaypoints"),p(s,"reconnectStart"),p(s,"reconnectEnd"),c(o,"trigger",function(t,e){const n=e[0];if(!a||function(t,e){return["toggleTokenSimulation","toggleTokenSimulationLog","togglePauseTokenSimulation","resetTokenSimulation","stepZoom","zoom"].indexOf(e)>-1}(0,n))return t.apply(this,e)})}Bn.$inject=["eventBus","contextPad","dragging","directEditing","editorActions","modeling","palette"];const Tn={__init__:["disableModeling"],disableModeling:["type",Bn]};function kn(t,e,n,i){this._eventBus=t,this._canvas=e,this._selection=n,this._contextPad=i,this._active=!1,t.on("import.parse.start",()=>{this._active&&(this.toggleMode(!1),t.once("import.done",()=>{this.toggleMode(!0)}))}),t.on("diagram.init",()=>{this._canvasParent=this._canvas.getContainer().parentNode,this._palette=(0,zt.P)(".djs-palette",this._canvas.getContainer()),this._init()})}kn.prototype._init=function(){this._container=(0,zt.zm)(`\n    <div class="bts-toggle-mode">\n      Token Simulation <span class="bts-toggle">${be()}</span>\n    </div>\n  `),zt.f0.bind(this._container,"click",()=>this.toggleMode()),this._canvas.getContainer().appendChild(this._container)},kn.prototype.toggleMode=function(t=!this._active){if(t!==this._active){if(t)this._container.innerHTML=`Token Simulation <span class="bts-toggle">${we()}</span>`,(0,zt.Ly)(this._canvasParent).add("simulation"),(0,zt.Ly)(this._palette).add("hidden");else{this._container.innerHTML=`Token Simulation <span class="bts-toggle">${be()}</span>`,(0,zt.Ly)(this._canvasParent).remove("simulation"),(0,zt.Ly)(this._palette).remove("hidden");const t=this._selection.get();1===t.length&&this._contextPad.open(t[0])}this._eventBus.fire(kt,{active:t}),this._active=t}},kn.$inject=["eventBus","canvas","selection","contextPad"];const Fn={__init__:["toggleMode"],toggleMode:["type",kn]};function Ln(t,e,n,i,o,s){var r=!1;o.register({toggleTokenSimulation:function(){e.toggleMode()}}),o.register({togglePauseTokenSimulation:function(){r&&n.toggle()}}),o.register({resetTokenSimulation:function(){r&&i.resetSimulation()}});const a=s.get("log",!1);a&&o.register({toggleTokenSimulationLog:function(){a.toggle()}}),t.on(kt,t=>{r=t.active})}Ln.$inject=["eventBus","toggleMode","pauseSimulation","resetSimulation","editorActions","injector"];const Pn={__init__:["tokenSimulationEditorActions"],tokenSimulationEditorActions:["type",Ln]};function In(t,e){var n=e.get("editorActions",!1),i=e.get("keyboard",!1);if(i&&n){var o=!1;t.on("keyboard.init",function(){i.addListener(1e4,function(t){return $n(["t","T"],e=t.keyEvent)?(n.trigger("toggleTokenSimulation"),!0):o?$n(["l","L"],e)?(n.trigger("toggleTokenSimulationLog"),!0):$n([" ","Spacebar"],e)?(n.trigger("togglePauseTokenSimulation"),!0):$n(["r","R"],e)?(n.trigger("resetTokenSimulation"),!0):void 0:void 0;var e})}),t.on(kt,function(t){var e=t.active;o=!!e})}}function $n(t,e){return t.indexOf(e.key)>-1}In.$inject=["eventBus","injector"];const An={__depends__:[xn,Tn,Fn,Pn,{__init__:["tokenSimulationKeyboardBindings"],tokenSimulationKeyboardBindings:["type",In]}]}},555:function(t,e,n){var i;t=n.nmd(t),i=function(){var t=null,e={};l("monochrome",null,[[0,0],[100,0]]),l("red",[-26,18],[[20,100],[30,92],[40,89],[50,85],[60,78],[70,70],[80,60],[90,55],[100,50]]),l("orange",[18,46],[[20,100],[30,93],[40,88],[50,86],[60,85],[70,70],[100,70]]),l("yellow",[46,62],[[25,100],[40,94],[50,89],[60,86],[70,84],[80,82],[90,80],[100,75]]),l("green",[62,178],[[30,100],[40,90],[50,85],[60,81],[70,74],[80,64],[90,50],[100,40]]),l("blue",[178,257],[[20,100],[30,86],[40,80],[50,74],[60,60],[70,52],[80,44],[90,39],[100,35]]),l("purple",[257,282],[[20,100],[30,87],[40,79],[50,70],[60,65],[70,59],[80,52],[90,45],[100,42]]),l("pink",[282,334],[[20,100],[30,90],[40,86],[60,84],[80,80],[90,75],[100,73]]);var n=[],i=function(e){if(void 0!==(e=e||{}).seed&&null!==e.seed&&e.seed===parseInt(e.seed,10))t=e.seed;else if("string"==typeof e.seed)t=function(t){for(var e=0,n=0;n!==t.length&&!(e>=Number.MAX_SAFE_INTEGER);n++)e+=t.charCodeAt(n);return e}(e.seed);else{if(void 0!==e.seed&&null!==e.seed)throw new TypeError("The seed value must be an integer or string");t=null}var a,c;if(null!==e.count&&void 0!==e.count){for(var l=e.count,h=[],m=0;m<e.count;m++)n.push(!1);for(e.count=null;l>h.length;){var f=i(e);null!==t&&(e.seed=t),h.push(f)}return e.count=l,h}return function(t,e){switch(e.format){case"hsvArray":return t;case"hslArray":return u(t);case"hsl":var n=u(t);return"hsl("+n[0]+", "+n[1]+"%, "+n[2]+"%)";case"hsla":var i=u(t),o=e.alpha||Math.random();return"hsla("+i[0]+", "+i[1]+"%, "+i[2]+"%, "+o+")";case"rgbArray":return p(t);case"rgb":return"rgb("+p(t).join(", ")+")";case"rgba":var s=p(t);return o=e.alpha||Math.random(),"rgba("+s.join(", ")+", "+o+")";default:return function(t){var e=p(t);function n(t){var e=t.toString(16);return 1==e.length?"0"+e:e}return"#"+n(e[0])+n(e[1])+n(e[2])}(t)}}([a=o(e),c=s(a,e),r(a,c,e)],e)};function o(t){if(n.length>0){var i=c(r=function(t){if(isNaN(t)){if("string"==typeof t)if(e[t]){var n=e[t];if(n.hueRange)return n.hueRange}else if(t.match(/^#?([0-9A-F]{3}|[0-9A-F]{6})$/i))return a(h(t)[0]).hueRange}else{var i=parseInt(t);if(i<360&&i>0)return a(t).hueRange}return[0,360]}(t.hue)),o=(r[1]-r[0])/n.length,s=parseInt((i-r[0])/o);return!0===n[s]?s=(s+2)%n.length:n[s]=!0,(i=c(r=[(r[0]+s*o)%359,(r[0]+(s+1)*o)%359]))<0&&(i=360+i),i}var r;return(i=c(r=function(t){if("number"==typeof parseInt(t)){var n=parseInt(t);if(n<360&&n>0)return[n,n]}if("string"==typeof t)if(e[t]){var i=e[t];if(i.hueRange)return i.hueRange}else if(t.match(/^#?([0-9A-F]{3}|[0-9A-F]{6})$/i)){var o=h(t)[0];return[o,o]}return[0,360]}(t.hue)))<0&&(i=360+i),i}function s(t,e){if("monochrome"===e.hue)return 0;if("random"===e.luminosity)return c([0,100]);var n=function(t){return a(t).saturationRange}(t),i=n[0],o=n[1];switch(e.luminosity){case"bright":i=55;break;case"dark":i=o-10;break;case"light":o=55}return c([i,o])}function r(t,e,n){var i=function(t,e){for(var n=a(t).lowerBounds,i=0;i<n.length-1;i++){var o=n[i][0],s=n[i][1],r=n[i+1][0],c=n[i+1][1];if(e>=o&&e<=r){var l=(c-s)/(r-o);return l*e+(s-l*o)}}return 0}(t,e),o=100;switch(n.luminosity){case"dark":o=i+20;break;case"light":i=(o+i)/2;break;case"random":i=0,o=100}return c([i,o])}function a(t){for(var n in t>=334&&t<=360&&(t-=360),e){var i=e[n];if(i.hueRange&&t>=i.hueRange[0]&&t<=i.hueRange[1])return e[n]}return"Color not found"}function c(e){if(null===t){var n=Math.random();return n+=.618033988749895,n%=1,Math.floor(e[0]+n*(e[1]+1-e[0]))}var i=e[1]||1,o=e[0]||0,s=(t=(9301*t+49297)%233280)/233280;return Math.floor(o+s*(i-o))}function l(t,n,i){var o=i[0][0],s=i[i.length-1][0],r=i[i.length-1][1],a=i[0][1];e[t]={hueRange:n,lowerBounds:i,saturationRange:[o,s],brightnessRange:[r,a]}}function p(t){var e=t[0];0===e&&(e=1),360===e&&(e=359),e/=360;var n=t[1]/100,i=t[2]/100,o=Math.floor(6*e),s=6*e-o,r=i*(1-n),a=i*(1-s*n),c=i*(1-(1-s)*n),l=256,p=256,h=256;switch(o){case 0:l=i,p=c,h=r;break;case 1:l=a,p=i,h=r;break;case 2:l=r,p=i,h=c;break;case 3:l=r,p=a,h=i;break;case 4:l=c,p=r,h=i;break;case 5:l=i,p=r,h=a}return[Math.floor(255*l),Math.floor(255*p),Math.floor(255*h)]}function h(t){t=3===(t=t.replace(/^#/,"")).length?t.replace(/(.)/g,"$1$1"):t;var e=parseInt(t.substr(0,2),16)/255,n=parseInt(t.substr(2,2),16)/255,i=parseInt(t.substr(4,2),16)/255,o=Math.max(e,n,i),s=o-Math.min(e,n,i),r=o?s/o:0;switch(o){case e:return[(n-i)/s%6*60||0,r,o];case n:return[60*((i-e)/s+2)||0,r,o];case i:return[60*((e-n)/s+4)||0,r,o]}}function u(t){var e=t[0],n=t[1]/100,i=t[2]/100,o=(2-n)*i;return[e,Math.round(n*i/(o<1?o:2-o)*1e4)/100,o/2*100]}return i}(),t&&t.exports&&(e=t.exports=i),e.randomColor=i}}]);
+(self["webpackChunkbpmn_cyber_lab"] = self["webpackChunkbpmn_cyber_lab"] || []).push([[712],{
+
+/***/ 712:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _modeler__WEBPACK_IMPORTED_MODULE_0__.A)
+/* harmony export */ });
+/* harmony import */ var _modeler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(874);
+
+
+
+/***/ }),
+
+/***/ 874:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  A: () => (/* binding */ lib_modeler)
+});
+
+// EXTERNAL MODULE: ./node_modules/ids/dist/index.esm.js
+var index_esm = __webpack_require__(507);
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/ScopeTraits.js
+/* eslint no-bitwise: off */
+
+const ACTIVATED = 1;
+const RUNNING = 1 << 1;
+const ENDING = 1 << 2;
+const ENDED = 1 << 3;
+const DESTROYED = 1 << 4;
+const FAILED = 1 << 5;
+const TERMINATED = 1 << 6;
+const CANCELED = 1 << 7;
+const COMPLETED = 1 << 8;
+const COMPENSABLE = 1 << 9;
+
+const ACTIVE = ACTIVATED | RUNNING | ENDING;
+const NOT_DEAD = ACTIVATED | ENDED;
+
+const ScopeTraits = Object.freeze({
+  ACTIVATED,
+  RUNNING,
+  ENDING,
+  ENDED,
+  DESTROYED,
+  FAILED,
+  TERMINATED,
+  CANCELED,
+  COMPLETED,
+  COMPENSABLE,
+  ACTIVE,
+  NOT_DEAD
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/ScopeStates.js
+/* eslint no-bitwise: off */
+
+
+
+const SELF = {};
+
+function illegalTransition(state, target) {
+  throw new Error(`illegal transition: ${state.name} -> ${target}`);
+}
+
+function orSelf(state, self) {
+  if (state === SELF) {
+    return self;
+  }
+
+  return state;
+}
+
+/**
+ * A representation of a scopes state with name, traits, and supported
+ * transitions to other states.
+ */
+class ScopeState {
+
+  /**
+   * @param {string} name
+   * @param {number} traits
+   * @param {object} [transitions]
+   * @param {ScopeState} [transitions.start]
+   * @param {ScopeState} [transitions.cancel]
+   * @param {ScopeState} [transitions.complete]
+   * @param {ScopeState} [transitions.destroy]
+   * @param {ScopeState} [transitions.fail]
+   * @param {ScopeState} [transitions.terminate]
+   * @param {ScopeState} [transitions.compensable]
+   */
+  constructor(name, traits, transitions = {}) {
+    this.name = name;
+
+    /**
+     * A bit-wise encoded set of traits
+     * characterizing the scope.
+     *
+     * @type {number}
+     */
+    this.traits = traits;
+
+    this.setTransitions(transitions);
+  }
+
+  /**
+   * @param {object} transitions
+   * @param {ScopeState} [transitions.start]
+   * @param {ScopeState} [transitions.cancel]
+   * @param {ScopeState} [transitions.complete]
+   * @param {ScopeState} [transitions.destroy]
+   * @param {ScopeState} [transitions.fail]
+   * @param {ScopeState} [transitions.terminate]
+   * @param {ScopeState} [transitions.compensable]
+   */
+  setTransitions({
+    start,
+    cancel,
+    complete,
+    destroy,
+    fail,
+    terminate,
+    compensable
+  }) {
+    this._start = orSelf(start, this);
+    this._compensable = orSelf(compensable, this);
+    this._cancel = orSelf(cancel, this);
+    this._complete = orSelf(complete, this);
+    this._destroy = orSelf(destroy, this);
+    this._fail = orSelf(fail, this);
+    this._terminate = orSelf(terminate, this);
+  }
+
+  /**
+   * @param {number} trait
+   * @return {boolean}
+   */
+  hasTrait(trait) {
+    return (this.traits & trait) !== 0;
+  }
+
+  /**
+   * @return {ScopeState}
+   */
+  complete() {
+    return this._complete || illegalTransition(this, 'complete');
+  }
+
+  /**
+   * @return {ScopeState}
+   */
+  destroy() {
+    return this._destroy || illegalTransition(this, 'destroy');
+  }
+
+  /**
+   * @return {ScopeState}
+   */
+  cancel() {
+    return this._cancel || illegalTransition(this, 'cancel');
+  }
+
+  /**
+   * @return {ScopeState}
+   */
+  fail() {
+    return this._fail || illegalTransition(this, 'fail');
+  }
+
+  /**
+   * @return {ScopeState}
+   */
+  terminate() {
+    return this._terminate || illegalTransition(this, 'terminate');
+  }
+
+  /**
+   * @return {ScopeState}
+   */
+  compensable() {
+    return this._compensable || illegalTransition(this, 'compensable');
+  }
+
+  /**
+   * @return {ScopeState}
+   */
+  start() {
+    return this._start || illegalTransition(this, 'start');
+  }
+}
+
+const ScopeStates_FAILED = new ScopeState('failed', ScopeTraits.DESTROYED | ScopeTraits.FAILED);
+
+const ScopeStates_TERMINATED = new ScopeState('terminated', ScopeTraits.DESTROYED | ScopeTraits.TERMINATED | ScopeTraits.COMPLETED);
+
+const ScopeStates_COMPLETED = new ScopeState('completed', ScopeTraits.DESTROYED | ScopeTraits.COMPLETED);
+
+const TERMINATING = new ScopeState('terminating', ScopeTraits.ENDING | ScopeTraits.TERMINATED | ScopeTraits.COMPLETED, {
+  destroy: ScopeStates_TERMINATED
+});
+
+const CANCELING = new ScopeState('canceling', ScopeTraits.ENDING | ScopeTraits.FAILED | ScopeTraits.CANCELED, {
+  destroy: ScopeStates_FAILED,
+  complete: SELF,
+  terminate: TERMINATING
+});
+
+const COMPLETING = new ScopeState('completing', ScopeTraits.ENDING | ScopeTraits.COMPLETED, {
+  destroy: ScopeStates_COMPLETED,
+  cancel: CANCELING,
+  terminate: TERMINATING
+});
+
+const FAILING = new ScopeState('failing', ScopeTraits.ENDING | ScopeTraits.FAILED, {
+  cancel: CANCELING,
+  complete: COMPLETING,
+  destroy: ScopeStates_FAILED,
+  terminate: TERMINATING
+});
+
+const COMPENSABLE_COMPLETED = new ScopeState('compensable:completed', ScopeTraits.ENDED | ScopeTraits.COMPLETED);
+
+const COMPENSABLE_COMPLETING = new ScopeState('compensable:completing', ScopeTraits.ENDING | ScopeTraits.COMPLETED, {
+  destroy: COMPENSABLE_COMPLETED,
+  terminate: TERMINATING,
+  compensable: SELF
+});
+
+const COMPENSABLE_FAILING = new ScopeState('compensable:failing', ScopeTraits.ENDING | ScopeTraits.FAILED, {
+  complete: COMPENSABLE_COMPLETING,
+  terminate: TERMINATING,
+  destroy: ScopeStates_FAILED
+});
+
+COMPENSABLE_COMPLETED.setTransitions({
+  cancel: CANCELING,
+  fail: COMPENSABLE_FAILING,
+  destroy: ScopeStates_COMPLETED,
+  compensable: SELF
+});
+
+const COMPENSABLE_RUNNING = new ScopeState('compensable:running', ScopeTraits.RUNNING | ScopeTraits.COMPENSABLE, {
+  cancel: CANCELING,
+  complete: COMPENSABLE_COMPLETING,
+  compensable: SELF,
+  destroy: COMPENSABLE_COMPLETED,
+  fail: COMPENSABLE_FAILING,
+  terminate: TERMINATING
+});
+
+const ScopeStates_RUNNING = new ScopeState('running', ScopeTraits.RUNNING, {
+  cancel: CANCELING,
+  complete: COMPLETING,
+  compensable: COMPENSABLE_RUNNING,
+  destroy: ScopeStates_TERMINATED,
+  fail: FAILING,
+  terminate: TERMINATING
+});
+
+const ScopeStates_ACTIVATED = new ScopeState('activated', ScopeTraits.ACTIVATED, {
+  start: ScopeStates_RUNNING,
+  destroy: ScopeStates_TERMINATED
+});
+
+const ScopeStates = Object.freeze({
+  ACTIVATED: ScopeStates_ACTIVATED,
+  RUNNING: ScopeStates_RUNNING,
+  CANCELING,
+  COMPLETING,
+  COMPLETED: ScopeStates_COMPLETED,
+  FAILING,
+  FAILED: ScopeStates_FAILED,
+  TERMINATING,
+  TERMINATED: ScopeStates_TERMINATED,
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/Scope.js
+
+
+
+
+/**
+ * A representation of anything runnable in token simulation land.
+ */
+class Scope {
+
+  /**
+   * @param {string} id
+   * @param {Element} element
+   * @param {Scope} parent
+   * @param {Scope} initiator
+   *
+   * @constructor
+   */
+  constructor(id, element, parent = null, initiator = null) {
+    this.id = id;
+    this.element = element;
+    this.parent = parent;
+    this.initiator = initiator;
+
+    this.subscriptions = new Set();
+
+    this.children = [];
+    this.state = ScopeStates.ACTIVATED;
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get running() {
+    return this.hasTrait(ScopeTraits.RUNNING);
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get destroyed() {
+    return this.hasTrait(ScopeTraits.DESTROYED);
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get completed() {
+    return this.hasTrait(ScopeTraits.COMPLETED);
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get canceled() {
+    return this.hasTrait(ScopeTraits.CANCELED);
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get failed() {
+    return this.hasTrait(ScopeTraits.FAILED);
+  }
+
+  get active() {
+    return this.hasTrait(ScopeTraits.ACTIVE);
+  }
+
+  /**
+   * @param {number} phase
+   * @return {boolean}
+   */
+  hasTrait(trait) {
+    return this.state.hasTrait(trait);
+  }
+
+  /**
+   * Start the scope
+   *
+   * @return {Scope}
+   */
+  start() {
+    this.state = this.state.start();
+
+    return this;
+  }
+
+  /**
+   * Make this scope compensable.
+   *
+   * @return {Scope}
+   */
+  compensable() {
+    this.state = this.state.compensable();
+
+    return this;
+  }
+
+  /**
+   * @param {Scope} initiator
+   *
+   * @return {Scope}
+   */
+  fail(initiator) {
+    if (!this.failed) {
+      this.state = this.state.fail();
+
+      this.failInitiator = initiator;
+    }
+
+    return this;
+  }
+
+  cancel(initiator) {
+
+    if (!this.canceled) {
+      this.state = this.state.cancel();
+
+      this.cancelInitiator = initiator;
+    }
+
+    return this;
+  }
+
+  /**
+   * @param {Scope} initiator
+   *
+   * @return {Scope}
+   */
+  terminate(initiator) {
+    this.state = this.state.terminate();
+
+    this.terminateInitiator = initiator;
+
+    return this;
+  }
+
+  /**
+   * @return {Scope}
+   */
+  complete() {
+    this.state = this.state.complete();
+
+    return this;
+  }
+
+  /**
+   * Destroy the scope
+   *
+   * @param {Scope} initiator
+   *
+   * @return {Scope}
+   */
+  destroy(initiator) {
+    this.state = this.state.destroy();
+
+    this.destroyInitiator = initiator;
+
+    return this;
+  }
+
+  /**
+   * @return {number}
+   */
+  getTokens() {
+    return this.children.filter(c => !c.destroyed).length;
+  }
+
+  /**
+   * @param {Element} element
+   *
+   * @return {number}
+   */
+  getTokensByElement(element) {
+    return this.children.filter(c => !c.destroyed && c.element === element).length;
+  }
+
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/util/SetUtil.js
+function filterSet(set, matchFn) {
+
+  const matched = [];
+
+  for (const el of set) {
+    if (matchFn(el)) {
+      matched.push(el);
+    }
+  }
+
+  return matched;
+}
+
+function findSet(set, matchFn) {
+
+  for (const el of set) {
+    if (matchFn(el)) {
+      return el;
+    }
+  }
+
+  return null;
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/util/EventsUtil.js
+function eventsMatch(a, b) {
+  const attrMatch = [ 'type', 'name', 'iref' ].every(attr => !(attr in a) || a[attr] === b[attr]);
+  const catchAllMatch = !b.ref && (b.type === 'error' || b.type === 'escalation');
+
+  return attrMatch && (catchAllMatch || refsMatch(a, b));
+}
+
+function refsMatch(a, b) {
+  const attr = 'ref';
+  return !(attr in a) || a[attr] === b[attr];
+}
+// EXTERNAL MODULE: ./node_modules/bpmn-js/lib/util/ModelUtil.js
+var ModelUtil = __webpack_require__(192);
+// EXTERNAL MODULE: ./node_modules/bpmn-js/lib/util/DrilldownUtil.js
+var DrilldownUtil = __webpack_require__(880);
+// EXTERNAL MODULE: ./node_modules/min-dash/dist/index.esm.js
+var dist_index_esm = __webpack_require__(905);
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/util/ModelUtil.js
+
+
+
+
+
+
+
+
+
+function filterSequenceFlows(flows) {
+  return flows.filter(f => (0,ModelUtil.is)(f, 'bpmn:SequenceFlow'));
+}
+
+function isMessageFlow(element) {
+  return (0,ModelUtil.is)(element, 'bpmn:MessageFlow');
+}
+
+function isSequenceFlow(element) {
+  return (0,ModelUtil.is)(element, 'bpmn:SequenceFlow');
+}
+
+function isMessageCatch(element) {
+  return isCatchEvent(element) && isTypedEvent(element, 'bpmn:MessageEventDefinition');
+}
+
+function isLinkCatch(element) {
+  return isCatchEvent(element) && isTypedEvent(element, 'bpmn:LinkEventDefinition');
+}
+
+function isLinkThrow(element) {
+  return (0,ModelUtil.is)(element, 'bpmn:IntermediateThrowEvent') && isTypedEvent(element, 'bpmn:LinkEventDefinition');
+}
+
+function isCompensationEvent(element) {
+  return isCatchEvent(element) && isTypedEvent(element, 'bpmn:CompensateEventDefinition');
+}
+
+function isCompensationActivity(element) {
+  return (0,ModelUtil.is)(element, 'bpmn:Activity') && element.businessObject.isForCompensation;
+}
+
+function isCatchEvent(element) {
+  return (
+    (0,ModelUtil.is)(element, 'bpmn:CatchEvent') ||
+    (0,ModelUtil.is)(element, 'bpmn:ReceiveTask')
+  ) && !isLabel(element);
+}
+
+function isBoundaryEvent(element) {
+  return (0,ModelUtil.is)(element, 'bpmn:BoundaryEvent') && !isLabel(element);
+}
+
+function isNoneStartEvent(element) {
+  return isStartEvent(element) && !isTypedEvent(element);
+}
+
+function isImplicitStartEvent(element) {
+  if (isLabel(element)) {
+    return false;
+  }
+
+  if (!isAny(element, [
+    'bpmn:Activity',
+    'bpmn:IntermediateCatchEvent',
+    'bpmn:IntermediateThrowEvent',
+    'bpmn:Gateway',
+    'bpmn:EndEvent'
+  ])) {
+    return false;
+  }
+
+  if (isLinkCatch(element)) {
+    return false;
+  }
+
+  const incoming = element.incoming.find(isSequenceFlow);
+
+  if (incoming) {
+    return false;
+  }
+
+  if (isCompensationActivity(element)) {
+    return false;
+  }
+
+  if (isEventSubProcess(element)) {
+    return false;
+  }
+
+  return true;
+}
+
+function isStartEvent(element) {
+  return (0,ModelUtil.is)(element, 'bpmn:StartEvent') && !isLabel(element);
+}
+
+function isLabel(element) {
+  return !!element.labelTarget;
+}
+
+function isEventSubProcess(element) {
+  return (0,ModelUtil/* getBusinessObject */.Cf)(element).triggeredByEvent;
+}
+
+function isInterrupting(element) {
+  return (
+    (0,ModelUtil.is)(element, 'bpmn:StartEvent') && (0,ModelUtil/* getBusinessObject */.Cf)(element).isInterrupting
+  ) || (
+    (0,ModelUtil.is)(element, 'bpmn:BoundaryEvent') && (0,ModelUtil/* getBusinessObject */.Cf)(element).cancelActivity
+  );
+}
+
+function isAny(element, types) {
+  return types.some(type => (0,ModelUtil.is)(element, type));
+}
+
+/**
+ * @param { DiagramElement} event
+ * @param {string|undefined} [eventDefinitionType]
+ *
+ * @return {boolean}
+ */
+function isTypedEvent(event, eventDefinitionType) {
+  return (0,dist_index_esm/* some */.zN)((0,ModelUtil/* getBusinessObject */.Cf)(event).eventDefinitions, definition => {
+    return eventDefinitionType ? (0,ModelUtil.is)(definition, eventDefinitionType) : true;
+  });
+}
+
+function getChildren(element, elementRegistry) {
+  if (element.children && element.children.length !== 0) {
+    return element.children;
+  }
+
+  if ((0,ModelUtil.is)(element, 'bpmn:SubProcess') && !element.di.isExpanded) {
+
+    // ensure bpmn-js@9 compatibility
+    //
+    // sub-process may be collapsed, in this case operate on the plane
+    return elementRegistry.get((0,DrilldownUtil/* getPlaneIdFromShape */.hJ)(element)).children;
+  }
+
+  return [];
+}
+
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/Simulator.js
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * @typedef { any } DiagramElement
+ *
+ * @typedef { {
+ *   element: DiagramElement,
+ *   interrupting: boolean,
+ *   boundary: boolean,
+ *   iref?: string,
+ *   ref: DiagramElement,
+ *   persistent?: boolean,
+ *   type: string
+ * } } SimulatorEvent
+ */
+
+function Simulator(injector, eventBus, elementRegistry) {
+
+  const ids = injector.get('scopeIds', false) || new index_esm/* default */.A([ 32, 36 ]);
+
+  // element configuration
+  const configuration = {};
+
+  const behaviors = {};
+
+  const noopBehavior = new NoopBehavior();
+
+  const changedElements = new Set();
+
+  const jobs = [];
+
+  const scopes = new Set();
+  const subscriptions = new Set();
+
+  on('tick', function() {
+    for (const element of changedElements) {
+      emit('elementChanged', {
+        element
+      });
+    }
+
+    changedElements.clear();
+  });
+
+  function queue(scope, task) {
+
+    // add this task
+    jobs.push([ task, scope ]);
+
+    if (jobs.length !== 1) {
+      return;
+    }
+
+    let next;
+
+    while ((next = jobs[0])) {
+
+      const [ task, scope ] = next;
+
+      if (!scope.destroyed) {
+        task();
+      }
+
+      // remove first task
+      jobs.shift();
+    }
+
+    emit('tick');
+  }
+
+  function getBehavior(element) {
+    return behaviors[element.type] || noopBehavior;
+  }
+
+  function signal(context) {
+
+    const {
+      element,
+      parentScope,
+      initiator = null,
+      scope = initializeScope({
+        element,
+        parent: parentScope,
+        initiator
+      })
+    } = context;
+
+    queue(scope, function() {
+
+      if (!scope.running) {
+        scope.start();
+      }
+
+      trace('signal', {
+        ...context,
+        scope
+      });
+
+      getBehavior(element).signal({
+        ...context,
+        scope
+      });
+
+      if (scope.parent) {
+        scopeChanged(scope.parent);
+      }
+    });
+
+    return scope;
+  }
+
+  function enter(context) {
+
+    const {
+      element,
+      scope: parentScope,
+      initiator = parentScope
+    } = context;
+
+    const scope = initializeScope({
+      element,
+      parent: parentScope,
+      initiator
+    });
+
+    queue(scope, function() {
+
+      if (!scope.running) {
+        scope.start();
+      }
+
+      trace('enter', context);
+
+      getBehavior(element).enter({
+        ...context,
+        initiator,
+        scope
+      });
+
+      if (scope.parent) {
+        scopeChanged(scope.parent);
+      }
+    });
+
+    return scope;
+  }
+
+  function exit(context) {
+
+    const {
+      element,
+      scope,
+      initiator = scope
+    } = context;
+
+    queue(scope, function() {
+
+      trace('exit', context);
+
+      getBehavior(element).exit({
+        ...context,
+        initiator
+      });
+
+      if (scope.running) {
+        scope.complete();
+      }
+
+      destroyScope(scope, initiator);
+
+      scope.parent && scopeChanged(scope.parent);
+    });
+  }
+
+  function trigger(context) {
+    const {
+      event: _event,
+      initiator,
+      scope
+    } = context;
+
+    // behavior depends on available event subscriptions
+    //
+    // interrupt (one-off, clear all events)
+    //   => keep interrupting boundary event sub-scriptions of same type, if available
+    //
+    // continue (one-off signal)
+    //
+    // non-interrupting (as many as needed)
+
+    const event = getEvent(_event);
+
+    const subscriptions = scope.subscriptions;
+
+    let matchingSubscriptions = filterSet(
+      subscriptions, subscription => eventsMatch(event, subscription.event)
+    );
+
+    if (event.type === 'error' || event.type === 'escalation') {
+      const referenceSubscriptions = filterSet(
+        matchingSubscriptions, subscription => refsMatch(event, subscription.event)
+      );
+
+      if (matchingSubscriptions.every(subscription => subscription.event.boundary)
+          && referenceSubscriptions.some(subscription => subscription.event.boundary)
+          || referenceSubscriptions.some(subscription => !subscription.event.boundary)) {
+        matchingSubscriptions = referenceSubscriptions;
+      }
+    }
+
+    const nonInterrupting = matchingSubscriptions.filter(
+      subscription => !subscription.event.interrupting
+    );
+
+    const interrupting = matchingSubscriptions.filter(
+      subscription => subscription.event.interrupting
+    );
+
+    if (!interrupting.length) {
+      return nonInterrupting.map(
+        subscription => subscription.triggerFn(initiator)
+      ).flat();
+    }
+
+    const interrupt = interrupting.find(subscription => !subscription.event.boundary) || interrupting[0];
+
+    const remainingSubscriptions = filterSet(
+      subscriptions,
+      subscription => subscription.event.persistent || isRethrow(subscription.event, interrupt.event)
+    );
+
+    subscriptions.forEach(subscription => {
+      if (!remainingSubscriptions.includes(subscription)) {
+        subscription.remove();
+      }
+    });
+
+    return [ interrupt.triggerFn(initiator) ].flat().filter(s => s);
+  }
+
+  function subscribe(scope, event, triggerFn) {
+
+    event = getEvent(event);
+
+    const element = event.element;
+
+    const subscription = {
+      scope,
+      event,
+      element,
+      triggerFn,
+      remove() {
+        unsubscribe(subscription);
+      }
+    };
+
+    subscriptions.add(subscription);
+
+    scope.subscriptions.add(subscription);
+
+    if (element) {
+      elementChanged(element);
+    }
+
+    return subscription;
+  }
+
+  function unsubscribe(subscription) {
+    const {
+      scope,
+      event
+    } = subscription;
+
+    subscriptions.delete(subscription);
+
+    scope.subscriptions.delete(subscription);
+
+    if (event.element) {
+      elementChanged(event.element);
+    }
+  }
+
+  function createInternalRef(element) {
+    if (
+      (0,ModelUtil.is)(element, 'bpmn:StartEvent') ||
+      (0,ModelUtil.is)(element, 'bpmn:IntermediateCatchEvent') ||
+      (0,ModelUtil.is)(element, 'bpmn:ReceiveTask') ||
+      isSpecialBoundaryEvent(element)
+    ) {
+      return (0,ModelUtil/* getBusinessObject */.Cf)(element).name || element.id;
+    }
+
+    return null;
+  }
+
+  /**
+   * @param { any } element
+   *
+   * @return {SimulatorEvent}
+   */
+  function getNoneEvent(element) {
+    return {
+      element,
+      interrupting: false,
+      boundary: false,
+      iref: element.id,
+      type: 'none'
+    };
+  }
+
+  /**
+   * @param { any } element
+   *
+   * @return {SimulatorEvent}
+   */
+  function getEvent(element) {
+
+    // do not double-return element
+    if (!element.businessObject) {
+      return element;
+    }
+
+    const interrupting = isInterrupting(element);
+    const boundary = isBoundaryEvent(element);
+
+    // we do create an internal reference for
+    // catch-like events to ensure these can
+    // be triggered via the UI exclusively
+    const iref = createInternalRef(element);
+
+    const baseEvent = {
+      element,
+      interrupting,
+      boundary,
+      ...(iref ? { iref } : {})
+    };
+
+    const eventDefinition = getEventDefinitions(element)[0];
+
+    if (!eventDefinition) {
+
+      return {
+        ...baseEvent,
+        type: isImplicitMessageCatch(element) ? 'message' : 'none'
+      };
+    }
+
+    if ((0,ModelUtil.is)(eventDefinition, 'bpmn:LinkEventDefinition')) {
+      return {
+        ...baseEvent,
+        type: 'link',
+        name: eventDefinition.name
+      };
+    }
+
+    if ((0,ModelUtil.is)(eventDefinition, 'bpmn:SignalEventDefinition')) {
+      return {
+        ...baseEvent,
+        type: 'signal',
+        ref: eventDefinition.signalRef
+      };
+    }
+
+    if ((0,ModelUtil.is)(eventDefinition, 'bpmn:TimerEventDefinition')) {
+      return {
+        ...baseEvent,
+        type: 'timer'
+      };
+    }
+
+    if ((0,ModelUtil.is)(eventDefinition, 'bpmn:ConditionalEventDefinition')) {
+      return {
+        ...baseEvent,
+        type: 'condition',
+      };
+    }
+
+    if ((0,ModelUtil.is)(eventDefinition, 'bpmn:EscalationEventDefinition')) {
+      return {
+        ...baseEvent,
+        type: 'escalation',
+        ref: eventDefinition.escalationRef
+      };
+    }
+
+    if ((0,ModelUtil.is)(eventDefinition, 'bpmn:CancelEventDefinition')) {
+      return {
+        ...baseEvent,
+        type: 'cancel'
+      };
+    }
+
+    if ((0,ModelUtil.is)(eventDefinition, 'bpmn:ErrorEventDefinition')) {
+      return {
+        ...baseEvent,
+        type: 'error',
+        ref: eventDefinition.errorRef
+      };
+    }
+
+    if ((0,ModelUtil.is)(eventDefinition, 'bpmn:MessageEventDefinition')) {
+      return {
+        ...baseEvent,
+        type: 'message',
+        ref: eventDefinition.messageRef
+      };
+    }
+
+    if ((0,ModelUtil.is)(eventDefinition, 'bpmn:CompensateEventDefinition')) {
+
+      let ref = eventDefinition.activityRef && elementRegistry.get(eventDefinition.activityRef.id);
+
+      if (!ref) {
+
+        if (isStartEvent(element) && isEventSubProcess(element.parent)) {
+
+          // start event in event sub-process compensates
+          // parent process (or participant)
+          ref = element.parent.parent;
+        } else if (isBoundaryEvent(element)) {
+
+          // boundary event compensates activity it is attached to
+          ref = element.host;
+        } else {
+
+          // parent is cancel scope
+          ref = element.parent;
+        }
+      }
+
+      return {
+        ...baseEvent,
+        type: 'compensate',
+        ref,
+        persistent: true
+      };
+    }
+
+    throw new Error('unknown event definition', eventDefinition);
+  }
+
+  function createScope(context, emitEvent = true) {
+
+    const {
+      element,
+      parent: parentScope,
+      initiator
+    } = context;
+
+    emitEvent && trace('createScope', {
+      element,
+      scope: parentScope
+    });
+
+    const scope = new Scope(ids.next(), element, parentScope, initiator);
+
+    if (parentScope) {
+      parentScope.children.push(scope);
+    }
+
+    scopes.add(scope);
+
+    emitEvent && emit('createScope', {
+      scope
+    });
+
+    elementChanged(element);
+
+    if (parentScope) {
+      elementChanged(parentScope.element);
+    }
+
+    return scope;
+  }
+
+  function subscriptionFilter(filter) {
+
+    if (typeof filter === 'function') {
+      return filter;
+    }
+
+    const {
+      event: _event,
+      element,
+      scope
+    } = filter;
+
+    const elements = filter.elements || (element && [ element ]);
+    const event = _event && getEvent(_event);
+
+    return (
+      (subscription) =>
+        (!event || eventsMatch(event, subscription.event)) &&
+        (!elements || elements.includes(subscription.element)) &&
+        (!scope || scope === subscription.scope)
+    );
+  }
+
+  function scopeSubscriptionFilter(event) {
+    const matchesSubscription = event === 'function' ? event : subscriptionFilter(event);
+
+    return (
+      scope => Array.from(scope.subscriptions).some(matchesSubscription)
+    );
+  }
+
+  function scopeFilter(filter) {
+
+    if (typeof filter === 'function') {
+      return filter;
+    }
+
+    const {
+      element,
+      waitsOnElement,
+      parent,
+      trait = ScopeTraits.RUNNING,
+      subscribedTo
+    } = filter;
+
+    const isSubscribed = subscribedTo ? scopeSubscriptionFilter(subscribedTo) : () => true;
+
+    return (
+      scope =>
+        (!element || scope.element === element) &&
+        (!parent || scope.parent === parent) &&
+        (!waitsOnElement || scope.getTokensByElement(waitsOnElement) > 0) &&
+        scope.hasTrait(trait) &&
+        isSubscribed(scope)
+    );
+  }
+
+  function findSubscriptions(filter) {
+    return filterSet(subscriptions, subscriptionFilter(filter));
+  }
+
+  function findSubscription(filter) {
+    return findSet(subscriptions, subscriptionFilter(filter));
+  }
+
+  function findScopes(filter) {
+    return filterSet(scopes, scopeFilter(filter));
+  }
+
+  function findScope(filter) {
+    return findSet(scopes, scopeFilter(filter));
+  }
+
+  function destroyScope(scope, initiator = null) {
+
+    if (scope.destroyed) {
+      return;
+    }
+
+    scope.destroy(initiator);
+
+    // remove outdated subscriptions
+    for (const subscription of scope.subscriptions) {
+      const trait = subscription.event.traits || ScopeTraits.ACTIVE;
+
+      if (!scope.hasTrait(trait)) {
+        unsubscribe(subscription);
+      }
+    }
+
+    // depending on taken transition scope many not actually
+    // be destroyed but in an inactive / completed state
+    //
+    // only perform additional destructive operations in case we're
+    // actually DEAD.
+    if (scope.destroyed) {
+
+      // destroy child scopes
+      for (const childScope of scope.children) {
+        if (!childScope.destroyed) {
+          destroyScope(childScope, initiator);
+        }
+      }
+
+      trace('destroyScope', {
+        element: scope.element,
+        scope
+      });
+
+      // remove dead scope
+      scopes.delete(scope);
+
+      emit('destroyScope', {
+        scope
+      });
+    }
+
+    elementChanged(scope.element);
+
+    if (scope.parent) {
+      elementChanged(scope.parent.element);
+    }
+  }
+
+  function trace(action, context) {
+
+    emit('trace', {
+      ...context,
+      action
+    });
+  }
+
+  function elementChanged(element) {
+    changedElements.add(element);
+
+    // tick, unless jobs are queued
+    // (and tick is going to happen naturally)
+    if (!jobs.length) {
+      emit('tick');
+    }
+  }
+
+  function scopeChanged(scope) {
+    emit('scopeChanged', {
+      scope
+    });
+  }
+
+  function emit(event, payload = {}) {
+    return eventBus.fire(`tokenSimulation.simulator.${event}`, payload);
+  }
+
+  function on(event, callback) {
+    eventBus.on('tokenSimulation.simulator.' + event, callback);
+  }
+
+  function off(event, callback) {
+    eventBus.off('tokenSimulation.simulator.' + event, callback);
+  }
+
+  function setConfig(element, updatedConfig) {
+
+    const existingConfig = getConfig(element);
+
+    configuration[element.id || element] = {
+      ...existingConfig,
+      ...updatedConfig
+    };
+
+    elementChanged(element);
+  }
+
+  function initializeRootScopes() {
+
+    const rootScopes = [];
+
+    elementRegistry.forEach(element => {
+
+      if (!isAny(element, [ 'bpmn:Process', 'bpmn:Participant' ])) {
+        return;
+      }
+
+      const scope = createScope({
+        element
+      }, false);
+
+      rootScopes.push(scope);
+
+      const startEvents = element.children.filter(isStartEvent);
+
+      const implicitStartEvents = element.children.filter(isImplicitStartEvent);
+
+      for (const startEvent of startEvents) {
+
+        const event = {
+          ...getEvent(startEvent),
+          interrupting: false
+        };
+
+        // start events can always be triggered
+        subscribe(scope, event, initiator => signal({
+          element,
+          startEvent: startEvent,
+          initiator
+        }));
+      }
+
+      if (!startEvents.length) {
+
+        for (const implicitStartEvent of implicitStartEvents) {
+
+          const event = getNoneEvent(implicitStartEvent);
+
+          // start events can always be triggered
+          subscribe(scope, event, initiator => signal({
+            element,
+            initiator
+          }));
+        }
+      }
+    });
+
+    return rootScopes;
+  }
+
+  function initializeScope(context) {
+
+    const {
+      element
+    } = context;
+
+    const scope = createScope(context);
+
+    const {
+      attachers = []
+    } = element;
+
+    const children = getChildren(element, elementRegistry);
+
+    for (const childElement of children) {
+
+      // event sub-process start events
+      if (isEventSubProcess(childElement)) {
+        const startEvents = getChildren(childElement, elementRegistry).filter(
+          element => isStartEvent(element) && !isCompensationEvent(element)
+        );
+
+        for (const startEvent of startEvents) {
+          subscribe(scope, startEvent, initiator => {
+
+            return signal({
+              element: childElement,
+              parentScope: scope,
+              startEvent,
+              initiator
+            });
+          });
+        }
+      }
+    }
+
+    for (const attacher of attachers) {
+
+      // boundary events
+      if (isBoundaryEvent(attacher) && !isCompensationEvent(attacher)) {
+
+        subscribe(scope, attacher, initiator => {
+          return signal({
+            element: attacher,
+            parentScope: scope.parent,
+            hostScope: scope,
+            initiator
+          });
+        });
+      }
+    }
+
+    return scope;
+  }
+
+  function getConfig(element) {
+    return configuration[element.id || element] || {};
+  }
+
+  function waitForScopes(scope, scopes) {
+
+    if (!scopes.length) {
+      return;
+    }
+
+    const event = {
+      type: 'all-completed',
+      persistent: false
+    };
+
+    const remainingScopes = new Set(scopes);
+
+    const destroyListener = (destroyEvent) => {
+      remainingScopes.delete(destroyEvent.scope);
+
+      if (remainingScopes.size === 0) {
+        off('destroyScope', destroyListener);
+
+        trigger({
+          scope,
+          event
+        });
+      }
+    };
+
+    on('destroyScope', destroyListener);
+
+    return event;
+  }
+
+  function waitAtElement(element, wait = true) {
+    setConfig(element, {
+      wait
+    });
+  }
+
+  function reset() {
+    for (const scope of scopes) {
+      destroyScope(scope);
+    }
+
+    for (const rootScope of initializeRootScopes()) {
+      scopes.add(rootScope);
+    }
+
+    // TODO(nikku): clear configuration?
+
+    emit('tick');
+    emit('reset');
+  }
+
+  // utilties
+  this.createScope = createScope;
+  this.destroyScope = destroyScope;
+
+  // inspection
+  this.findScope = findScope;
+  this.findScopes = findScopes;
+
+  this.findSubscription = findSubscription;
+  this.findSubscriptions = findSubscriptions;
+
+  // configuration
+  this.waitAtElement = waitAtElement;
+
+  this.waitForScopes = waitForScopes;
+
+  this.setConfig = setConfig;
+  this.getConfig = getConfig;
+
+  // driving simulation forward
+  this.signal = signal;
+  this.enter = enter;
+  this.exit = exit;
+
+  // BPMN event subscriptions and triggers
+  this.subscribe = subscribe;
+  this.trigger = trigger;
+
+  // life-cycle
+  this.reset = reset;
+
+  // emitter
+  this.on = on;
+  this.off = off;
+
+  // extension
+  this.registerBehavior = function(element, behavior) {
+    behaviors[element] = behavior;
+  };
+}
+
+Simulator.$inject = [
+  'injector',
+  'eventBus',
+  'elementRegistry'
+];
+
+
+// helpers /////////////////
+
+function NoopBehavior() {
+
+  this.signal = function(context) {
+    console.log('ignored #exit', context.element);
+  };
+
+  this.exit = function(context) {
+    console.log('ignored #exit', context.element);
+  };
+
+  this.enter = function(context) {
+    console.log('ignored #enter', context.element);
+  };
+
+}
+
+function isRethrow(event, interrupt) {
+  return (
+    event.boundary && !interrupt.boundary
+  );
+}
+
+function isImplicitMessageCatch(element) {
+  return (0,ModelUtil.is)(element, 'bpmn:ReceiveTask') || element.incoming.some(element => (0,ModelUtil.is)(element, 'bpmn:MessageFlow'));
+}
+
+function isSpecialBoundaryEvent(element) {
+  if (!isBoundaryEvent(element)) {
+    return false;
+  }
+
+  const eventDefinitions = getEventDefinitions(element);
+
+  return !eventDefinitions[0] || isAny(eventDefinitions[0], [
+    'bpmn:ConditionalEventDefinition', 'bpmn:TimerEventDefinition'
+  ]);
+}
+
+function getEventDefinitions(element) {
+  return element.businessObject.get('eventDefinitions') || [];
+}
+
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/StartEventBehavior.js
+function StartEventBehavior(
+    simulator,
+    activityBehavior) {
+
+  this._simulator = simulator;
+  this._activityBehavior = activityBehavior;
+
+  simulator.registerBehavior('bpmn:StartEvent', this);
+}
+
+StartEventBehavior.prototype.signal = function(context) {
+  this._simulator.exit(context);
+};
+
+StartEventBehavior.prototype.exit = function(context) {
+  this._activityBehavior.exit(context);
+};
+
+StartEventBehavior.$inject = [
+  'simulator',
+  'activityBehavior'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/EndEventBehavior.js
+function EndEventBehavior(
+    simulator,
+    scopeBehavior,
+    intermediateThrowEventBehavior) {
+
+  this._intermediateThrowEventBehavior = intermediateThrowEventBehavior;
+  this._scopeBehavior = scopeBehavior;
+
+  simulator.registerBehavior('bpmn:EndEvent', this);
+}
+
+EndEventBehavior.$inject = [
+  'simulator',
+  'scopeBehavior',
+  'intermediateThrowEventBehavior'
+];
+
+EndEventBehavior.prototype.enter = function(context) {
+  this._intermediateThrowEventBehavior.enter(context);
+};
+
+EndEventBehavior.prototype.signal = function(context) {
+  this._intermediateThrowEventBehavior.signal(context);
+};
+
+EndEventBehavior.prototype.exit = function(context) {
+
+  const {
+    scope
+  } = context;
+
+  this._scopeBehavior.tryExit(scope.parent, scope);
+};
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/BoundaryEventBehavior.js
+
+
+
+function BoundaryEventBehavior(
+    simulator,
+    activityBehavior,
+    scopeBehavior) {
+
+  this._simulator = simulator;
+  this._activityBehavior = activityBehavior;
+  this._scopeBehavior = scopeBehavior;
+
+  simulator.registerBehavior('bpmn:BoundaryEvent', this);
+}
+
+BoundaryEventBehavior.prototype.signal = function(context) {
+
+  const {
+    element,
+    scope,
+    hostScope = this._simulator.findScope({
+      parent: scope.parent,
+      element: element.host
+    })
+  } = context;
+
+  if (!hostScope) {
+    throw new Error('host scope not found');
+  }
+
+  const cancelActivity = (0,ModelUtil/* getBusinessObject */.Cf)(element).cancelActivity;
+
+  if (cancelActivity) {
+    this._scopeBehavior.interrupt(hostScope, scope);
+
+    // activities are pending completion before actual exit
+    const event = this._scopeBehavior.tryExit(hostScope, scope);
+
+    if (event) {
+      const subscription = this._simulator.subscribe(hostScope, event, initiator => {
+        subscription.remove();
+
+        return this._simulator.exit(context);
+      });
+
+      return;
+    }
+  }
+
+  this._simulator.exit(context);
+};
+
+BoundaryEventBehavior.prototype.exit = function(context) {
+  this._activityBehavior.exit(context);
+};
+
+BoundaryEventBehavior.$inject = [
+  'simulator',
+  'activityBehavior',
+  'scopeBehavior'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/IntermediateCatchEventBehavior.js
+function IntermediateCatchEventBehavior(
+    simulator,
+    activityBehavior) {
+
+  this._activityBehavior = activityBehavior;
+  this._simulator = simulator;
+
+  simulator.registerBehavior('bpmn:IntermediateCatchEvent', this);
+  simulator.registerBehavior('bpmn:ReceiveTask', this);
+}
+
+IntermediateCatchEventBehavior.$inject = [
+  'simulator',
+  'activityBehavior'
+];
+
+IntermediateCatchEventBehavior.prototype.signal = function(context) {
+  return this._simulator.exit(context);
+};
+
+IntermediateCatchEventBehavior.prototype.enter = function(context) {
+  const {
+    element
+  } = context;
+
+  // adapt special wait semantics; user must manually
+  // trigger to indicate message received
+  return this._activityBehavior.signalOnEvent(context, element);
+};
+
+IntermediateCatchEventBehavior.prototype.exit = function(context) {
+  this._activityBehavior.exit(context);
+};
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/IntermediateThrowEventBehavior.js
+function IntermediateThrowEventBehavior(
+    simulator,
+    activityBehavior,
+    eventBehaviors) {
+
+  this._simulator = simulator;
+  this._activityBehavior = activityBehavior;
+  this._eventBehaviors = eventBehaviors;
+
+  simulator.registerBehavior('bpmn:IntermediateThrowEvent', this);
+  simulator.registerBehavior('bpmn:SendTask', this);
+}
+
+IntermediateThrowEventBehavior.prototype.enter = function(context) {
+  const {
+    element
+  } = context;
+
+  const eventBehavior = this._eventBehaviors.get(element);
+
+  if (eventBehavior) {
+    const event = eventBehavior(context);
+
+    if (event) {
+      return this._activityBehavior.signalOnEvent(context, event);
+    }
+  }
+
+  this._activityBehavior.enter(context);
+};
+
+IntermediateThrowEventBehavior.prototype.signal = function(context) {
+  this._activityBehavior.signal(context);
+};
+
+IntermediateThrowEventBehavior.prototype.exit = function(context) {
+  this._activityBehavior.exit(context);
+};
+
+IntermediateThrowEventBehavior.$inject = [
+  'simulator',
+  'activityBehavior',
+  'eventBehaviors'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/ExclusiveGatewayBehavior.js
+
+
+
+function ExclusiveGatewayBehavior(simulator, scopeBehavior) {
+  this._scopeBehavior = scopeBehavior;
+  this._simulator = simulator;
+
+  simulator.registerBehavior('bpmn:ExclusiveGateway', this);
+}
+
+ExclusiveGatewayBehavior.prototype.enter = function(context) {
+  this._simulator.exit(context);
+};
+
+ExclusiveGatewayBehavior.prototype.exit = function(context) {
+
+  const {
+    element,
+    scope
+  } = context;
+
+  // depends on UI to properly configure activeOutgoing for
+  // each exclusive gateway
+
+  const outgoings = filterSequenceFlows(element.outgoing);
+
+  if (outgoings.length === 1) {
+    return this._simulator.enter({
+      element: outgoings[0],
+      scope: scope.parent
+    });
+  }
+
+  const {
+    activeOutgoing
+  } = this._simulator.getConfig(element);
+
+  const outgoing = outgoings.find(o => o === activeOutgoing);
+
+  if (!outgoing) {
+    return this._scopeBehavior.tryExit(scope.parent, scope);
+  }
+
+  return this._simulator.enter({
+    element: outgoing,
+    scope: scope.parent
+  });
+};
+
+ExclusiveGatewayBehavior.$inject = [
+  'simulator',
+  'scopeBehavior'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/ParallelGatewayBehavior.js
+
+
+
+function ParallelGatewayBehavior(
+    simulator,
+    activityBehavior) {
+
+  this._simulator = simulator;
+  this._activityBehavior = activityBehavior;
+
+  simulator.registerBehavior('bpmn:ParallelGateway', this);
+}
+
+ParallelGatewayBehavior.prototype.enter = function(context) {
+
+  const {
+    scope
+  } = context;
+
+  const joiningScopes = this._findJoiningScopes(context);
+
+  if (joiningScopes.length) {
+
+    for (const childScope of joiningScopes) {
+
+      if (childScope !== scope) {
+
+        // complete joining child scope
+        this._simulator.destroyScope(childScope.complete(), scope);
+      }
+    }
+
+    this._simulator.exit(context);
+  }
+};
+
+/**
+ * Find scopes that will be joined by this transition.
+ *
+ * @param {Object} enterContext
+ * @return {Scope[]} scopes joined by this transition
+ */
+ParallelGatewayBehavior.prototype._findJoiningScopes = function(enterContext) {
+
+  const {
+    scope,
+    element
+  } = enterContext;
+
+  const sequenceFlows = filterSequenceFlows(element.incoming);
+
+  const {
+    parent: parentScope
+  } = scope;
+
+  const elementScopes = this._simulator.findScopes({
+    parent: parentScope,
+    element: element
+  });
+
+  const matchingScopes = sequenceFlows
+    .map(
+      flow => elementScopes
+        .find(scope => scope.initiator.element === flow)
+    )
+    .filter(scope => scope);
+
+  if (matchingScopes.length === sequenceFlows.length) {
+    return matchingScopes;
+  } else {
+    return [];
+  }
+};
+
+ParallelGatewayBehavior.prototype.exit = function(context) {
+  this._activityBehavior.exit(context);
+};
+
+ParallelGatewayBehavior.$inject = [
+  'simulator',
+  'activityBehavior'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/EventBasedGatewayBehavior.js
+
+
+
+function EventBasedGatewayBehavior(simulator) {
+  this._simulator = simulator;
+
+  simulator.registerBehavior('bpmn:EventBasedGateway', this);
+}
+
+EventBasedGatewayBehavior.$inject = [
+  'simulator'
+];
+
+EventBasedGatewayBehavior.prototype.enter = function(context) {
+
+  const {
+    element,
+    scope
+  } = context;
+
+  const parentScope = scope.parent;
+
+  const triggerElements = getTriggers(element);
+
+  // create subscriptions for outgoing event triggers
+  // do nothing else beyond that
+  const subscriptions = triggerElements.map(
+    triggerElement => this._simulator.subscribe(parentScope, triggerElement, initiator => {
+
+      // cancel all subscriptions
+      subscriptions.forEach(subscription => subscription.remove());
+
+      // destroy this scope
+      this._simulator.destroyScope(scope, initiator);
+
+      // signal triggered event
+      return this._simulator.signal({
+        element: triggerElement,
+        parentScope,
+        initiator
+      });
+    })
+  );
+
+};
+
+
+// helpers ////////////////
+
+function getTriggers(element) {
+  return element.outgoing.map(
+    outgoing => outgoing.target
+  ).filter(activity => isAny(activity, [
+    'bpmn:IntermediateCatchEvent',
+    'bpmn:ReceiveTask'
+  ]));
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/util/ElementHelper.js
+
+
+
+
+function getEventDefinition(event, eventDefinitionType) {
+  return (0,dist_index_esm/* find */.I6)((0,ModelUtil/* getBusinessObject */.Cf)(event).eventDefinitions, definition => {
+    return (0,ModelUtil.is)(definition, eventDefinitionType);
+  });
+}
+
+function ElementHelper_isTypedEvent(event, eventDefinitionType) {
+  return (0,dist_index_esm/* some */.zN)((0,ModelUtil/* getBusinessObject */.Cf)(event).eventDefinitions, definition => {
+    return (0,ModelUtil.is)(definition, eventDefinitionType);
+  });
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/InclusiveGatewayBehavior.js
+
+
+
+
+function InclusiveGatewayBehavior(
+    simulator,
+    activityBehavior) {
+
+  this._simulator = simulator;
+  this._activityBehavior = activityBehavior;
+
+  simulator.registerBehavior('bpmn:InclusiveGateway', this);
+}
+
+InclusiveGatewayBehavior.prototype.enter = function(context) {
+  this._tryJoin(context);
+};
+
+InclusiveGatewayBehavior.prototype.exit = function(context) {
+
+  const {
+    element,
+    scope
+  } = context;
+
+  // depends on UI to properly configure activeOutgoing for
+  // each inclusive gateway
+
+  const outgoings = filterSequenceFlows(element.outgoing);
+
+  // fork based on configured active outgoings
+  if (outgoings.length > 1) {
+
+    const {
+      activeOutgoing = []
+    } = this._simulator.getConfig(element);
+
+    if (!activeOutgoing.length) {
+      throw new Error('no outgoing configured');
+    }
+
+    for (const outgoing of activeOutgoing) {
+      this._simulator.enter({
+        element: outgoing,
+        scope: scope.parent
+      });
+    }
+
+  } else {
+
+    // exit like any activity
+    this._activityBehavior.exit(context);
+  }
+
+};
+
+InclusiveGatewayBehavior.prototype._tryJoin = function(context) {
+
+  var exclude = context.exclude || [];
+
+  const {
+    scope,
+    element
+  } = context;
+
+  const {
+    parent: parentScope
+  } = scope;
+
+  const incomingSequenceFlows = filterSequenceFlows(element.incoming);
+
+  const gatewayScopes = this._simulator.findScopes({
+    parent: parentScope,
+    element
+  }).filter(s => !exclude.includes(s));
+
+  const incomingFlowsWithoutToken = incomingSequenceFlows.filter(
+    flow => !gatewayScopes.find(s => s.initiator.element === flow)
+  );
+
+  const incomingFlowsWithToken = incomingSequenceFlows.filter(
+    flow => gatewayScopes.find(s => s.initiator.element === flow)
+  );
+
+  const remainingScopes = this._getRemainingScopes(context);
+
+  const incomingScopes = remainingScopes.filter(
+    scope => incomingFlowsWithoutToken.some(
+      flow => this._canReachElement(context, scope.element, flow)
+    )
+  );
+
+  const requiredScopes = incomingScopes.filter(
+    scope => !incomingFlowsWithToken.some(
+      flow => this._canReachElement(context, scope.element, flow)
+    )
+  );
+
+  if (!requiredScopes.length) {
+    this._join(context, incomingFlowsWithToken, gatewayScopes, exclude);
+  }
+
+  const remainingReceivedScopes = this._simulator.findScopes({
+    parent: parentScope,
+    element
+  }).filter(s => !exclude.includes(s));
+
+  // only subscribe to changes with the first
+  // element scope; prevent unneeded computation
+  if (remainingReceivedScopes[0] !== scope) {
+    return;
+  }
+
+  const event = this._simulator.waitForScopes(scope, requiredScopes);
+
+  const subscription = this._simulator.subscribe(scope, event, () => {
+    subscription.remove();
+
+    this._tryJoin(context);
+  });
+};
+
+/**
+ * Get scopes that may potentially be waited for,
+ * in the context of an inclusive gateway.
+ *
+ * @param {object} context
+ * @return {object[]}
+ */
+InclusiveGatewayBehavior.prototype._getRemainingScopes = function(context) {
+  const {
+    scope,
+    element
+  } = context;
+
+  const {
+    parent: parentScope
+  } = scope;
+
+  return this._simulator.findScopes(
+    scope => scope.parent === parentScope && scope.element !== element
+  );
+};
+
+/**
+ * Activates the inclusive gateway join.
+ *
+ * @param {object} context
+ * @param {object[]} incomingFlowsWithToken
+ * @param {object[]} gatewayScopes
+ * @param {object[]} exclude
+ *
+ * @return {object[]} scopes
+ */
+InclusiveGatewayBehavior.prototype._join = function(context, incomingFlowsWithToken, gatewayScopes, exclude) {
+
+  const {
+    scope
+  } = context;
+
+  // only consume one token per flow
+  const consumeScopes = incomingFlowsWithToken.map(
+    flow => gatewayScopes.find(s => s.initiator.element === flow)
+  );
+
+  for (const childScope of consumeScopes) {
+
+    if (childScope !== scope) {
+
+      // complete joining child scope
+      this._simulator.destroyScope(childScope.complete(), scope);
+    }
+  }
+
+  this._simulator.exit(context);
+
+  // the current scope is still running, but has already
+  // participated in joining
+  exclude.push(scope);
+
+  const stayingScopes = gatewayScopes.filter(
+    s => !consumeScopes.includes(s)
+  );
+
+  if (stayingScopes.length) {
+    this._tryJoin({
+      initiator: stayingScopes[0].initiator,
+      element: stayingScopes[0].element,
+      scope: stayingScopes[0],
+      exclude
+    });
+  }
+};
+
+/**
+ * Return true if the target element can be reached
+ * from the current element, searching the execution
+ * graph backwards.
+ *
+ * @param {object[]} context
+ * @param {object} targetElement
+ * @param {object} currentElement
+ * @param {Set<object>} traversed
+ *
+ * @return {boolean}
+ */
+InclusiveGatewayBehavior.prototype._canReachElement = function(context, targetElement, currentElement, traversed = new Set()) {
+
+  // do not visit the gateway
+  if (context.element === currentElement) {
+    return false;
+  }
+
+  // avoid infinite recursion
+  if (traversed.has(currentElement)) {
+    return false;
+  }
+
+  traversed.add(currentElement);
+
+  if (targetElement === currentElement) {
+    return true;
+  }
+
+  if (isSequenceFlow(currentElement)) {
+    return this._canReachElement(context, targetElement, currentElement.source, traversed);
+  }
+
+  if (isLinkCatch(currentElement)) {
+    const linkThrowEvents = filterLinkThrowEvents(
+      currentElement.parent.children,
+      getLinkName(currentElement)
+    );
+
+    return linkThrowEvents.some(
+      linkThrowEvent => this._canReachElement(context, targetElement, linkThrowEvent, traversed)
+    );
+  }
+
+  const incomingFlows = filterSequenceFlows(currentElement.incoming);
+
+  return incomingFlows.some(
+    flow => this._canReachElement(context, targetElement, flow, traversed)
+  );
+};
+
+
+// helpers ///////////////
+
+function getLinkName(element) {
+  return getEventDefinition(element, 'bpmn:LinkEventDefinition').name;
+}
+
+function filterLinkThrowEvents(elements, linkName) {
+  return elements.filter(
+    e => isLinkThrow(e) && getLinkName(e) === linkName
+  );
+}
+
+InclusiveGatewayBehavior.$inject = [
+  'simulator',
+  'activityBehavior'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/ActivityBehavior.js
+
+
+
+function ActivityBehavior(
+    simulator,
+    scopeBehavior,
+    transactionBehavior
+) {
+  this._simulator = simulator;
+  this._scopeBehavior = scopeBehavior;
+  this._transactionBehavior = transactionBehavior;
+
+  const elements = [
+    'bpmn:BusinessRuleTask',
+    'bpmn:CallActivity',
+    'bpmn:ManualTask',
+    'bpmn:ScriptTask',
+    'bpmn:ServiceTask',
+    'bpmn:Task',
+    'bpmn:UserTask'
+  ];
+
+  for (const element of elements) {
+    simulator.registerBehavior(element, this);
+  }
+}
+
+ActivityBehavior.$inject = [
+  'simulator',
+  'scopeBehavior',
+  'transactionBehavior'
+];
+
+ActivityBehavior.prototype.signal = function(context) {
+
+  // trigger messages that are pending send
+  const event = this._triggerMessages(context);
+
+  if (event) {
+    return this.signalOnEvent(context, event);
+  }
+
+  this._simulator.exit(context);
+};
+
+ActivityBehavior.prototype.enter = function(context) {
+
+  const {
+    element
+  } = context;
+
+  const continueEvent = this.waitAtElement(element);
+
+  if (continueEvent) {
+    return this.signalOnEvent(context, continueEvent);
+  }
+
+  // trigger messages that are pending send
+  const event = this._triggerMessages(context);
+
+  if (event) {
+    return this.signalOnEvent(context, event);
+  }
+
+  this._simulator.exit(context);
+};
+
+ActivityBehavior.prototype.exit = function(context) {
+
+  const {
+    element,
+    scope
+  } = context;
+
+  const parentScope = scope.parent;
+
+  // TODO(nikku): if a outgoing flow is conditional,
+  //              task has exclusive gateway semantics,
+  //              else, task has parallel gateway semantics
+
+  const completing = scope.active && !scope.failed;
+
+  // compensation is registered AFTER successful completion
+  // of normal scope activities (non event sub-processes).
+  //
+  // we must register it now, not earlier
+  if (completing && !isEventSubProcess(element)) {
+    this._transactionBehavior.registerCompensation(scope);
+  }
+
+  // if exception flow is active,
+  // do not activate any outgoing flows
+  const activatedFlows = completing
+    ? element.outgoing.filter(isSequenceFlow)
+    : [];
+
+  activatedFlows.forEach(
+    element => this._simulator.enter({
+      element,
+      scope: parentScope
+    })
+  );
+
+  // element has token sink semantics
+  if (activatedFlows.length === 0) {
+    this._scopeBehavior.tryExit(parentScope, scope);
+  }
+};
+
+ActivityBehavior.prototype.signalOnEvent = function(context, event) {
+
+  const {
+    scope,
+    element
+  } = context;
+
+  const subscription = this._simulator.subscribe(scope, event, initiator => {
+
+    subscription.remove();
+
+    return this._simulator.signal({
+      scope,
+      element,
+      initiator
+    });
+  });
+};
+
+/**
+ * Returns an event to subscribe to if wait on element is configured.
+ *
+ * @param {Element} element
+ *
+ * @return {Object|null} event
+ */
+ActivityBehavior.prototype.waitAtElement = function(element) {
+  const wait = this._simulator.getConfig(element).wait;
+
+  return wait && {
+    element,
+    type: 'continue',
+    interrupting: false,
+    boundary: false
+  };
+};
+
+ActivityBehavior.prototype._getMessageContexts = function(element, after = null) {
+
+  const filterAfter = after ? ctx => ctx.referencePoint.x > after.x : () => true;
+  const sortByReference = (a, b) => a.referencePoint.x - b.referencePoint.x;
+
+  return [
+    ...element.incoming.filter(isMessageFlow).map(flow => ({
+      incoming: flow,
+      referencePoint: last(flow.waypoints)
+    })),
+    ...element.outgoing.filter(isMessageFlow).map(flow => ({
+      outgoing: flow,
+      referencePoint: first(flow.waypoints)
+    }))
+  ].sort(sortByReference).filter(filterAfter);
+};
+
+/**
+ * @param {any} context
+ *
+ * @return {Object} event to subscribe to proceed
+ */
+ActivityBehavior.prototype._triggerMessages = function(context) {
+
+  // check for the next message flows to either
+  // trigger or wait for; this implements intuitive,
+  // as-you-would expect message flow execution in modeling
+  // direction (left-to-right).
+
+  const {
+    element,
+    initiator,
+    scope
+  } = context;
+
+  let messageContexts = scope.messageContexts;
+
+  if (!messageContexts) {
+    messageContexts = scope.messageContexts = this._getMessageContexts(element);
+  }
+
+  const initiatingFlow = initiator && initiator.element;
+
+  if (isMessageFlow(initiatingFlow)) {
+
+    // ignore out of bounds messages received;
+    // user may manually advance and force send all outgoing
+    // messages
+    if (scope.expectedIncoming !== initiatingFlow) {
+      console.debug('Simulator :: ActivityBehavior :: ignoring out-of-bounds message');
+
+      return;
+    }
+  }
+
+  while (messageContexts.length) {
+    const {
+      incoming,
+      outgoing
+    } = messageContexts.shift();
+
+    if (incoming) {
+
+      // force sending of all remaining messages,
+      // as the user triggered the task manually (for demonstration
+      // purposes
+      if (!initiator) {
+        continue;
+      }
+
+      // remember expected incoming for future use
+      scope.expectedIncoming = incoming;
+
+      return {
+        element,
+        type: 'message',
+        name: incoming.id,
+        interrupting: false,
+        boundary: false
+      };
+    }
+
+    this._simulator.signal({
+      element: outgoing
+    });
+  }
+
+};
+
+
+// helpers //////////////////
+
+function first(arr) {
+  return arr && arr[0];
+}
+
+function last(arr) {
+  return arr && arr[arr.length - 1];
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/SubProcessBehavior.js
+
+
+
+function SubProcessBehavior(
+    simulator,
+    activityBehavior,
+    scopeBehavior,
+    transactionBehavior,
+    elementRegistry) {
+
+  this._simulator = simulator;
+  this._activityBehavior = activityBehavior;
+  this._scopeBehavior = scopeBehavior;
+  this._transactionBehavior = transactionBehavior;
+  this._elementRegistry = elementRegistry;
+
+  simulator.registerBehavior('bpmn:SubProcess', this);
+  simulator.registerBehavior('bpmn:Transaction', this);
+  simulator.registerBehavior('bpmn:AdHocSubProcess', this);
+}
+
+SubProcessBehavior.$inject = [
+  'simulator',
+  'activityBehavior',
+  'scopeBehavior',
+  'transactionBehavior',
+  'elementRegistry'
+];
+
+SubProcessBehavior.prototype.signal = function(context) {
+  this._start(context);
+};
+
+SubProcessBehavior.prototype.enter = function(context) {
+
+  const {
+    element
+  } = context;
+
+  const continueEvent = this._activityBehavior.waitAtElement(element);
+
+  if (continueEvent) {
+    return this._activityBehavior.signalOnEvent(context, continueEvent);
+  }
+
+  this._start(context);
+};
+
+SubProcessBehavior.prototype.exit = function(context) {
+
+  const {
+    scope
+  } = context;
+
+  const parentScope = scope.parent;
+
+  // successful completion of the fail initiator (event sub-process)
+  // recovers the parent, so that the normal flow is being executed
+  if (parentScope.failInitiator === scope) {
+    parentScope.complete();
+  }
+
+  this._activityBehavior.exit(context);
+};
+
+SubProcessBehavior.prototype._start = function(context) {
+  const {
+    element,
+    startEvent,
+    scope
+  } = context;
+
+  const targetScope = scope.parent;
+
+  if (isEventSubProcess(element)) {
+
+    if (!startEvent) {
+      throw new Error('missing <startEvent>: required for event sub-process');
+    }
+  } else {
+    if (startEvent) {
+      throw new Error('unexpected <startEvent>: not allowed for sub-process');
+    }
+  }
+
+  if (targetScope.destroyed) {
+    throw new Error(`target scope <${targetScope.id}> destroyed`);
+  }
+
+  if (isTransaction(element)) {
+    this._transactionBehavior.setup(context);
+  }
+
+  if (startEvent && isInterrupting(startEvent)) {
+    this._scopeBehavior.interrupt(targetScope, scope);
+  }
+
+  const startNodes = this._findStarts(element, startEvent);
+
+  for (const element of startNodes) {
+
+    if (isStartEvent(element)) {
+      this._simulator.signal({
+        element,
+        parentScope: scope,
+        initiator: scope
+      });
+    } else {
+      this._simulator.enter({
+        element,
+        scope,
+        initiator: scope
+      });
+    }
+  }
+
+  if (!startNodes.length) {
+    this._simulator.exit(context);
+  }
+};
+
+SubProcessBehavior.prototype._findStarts = function(element, startEvent) {
+  const isStartEvent = startEvent
+    ? (node) => startEvent === node
+    : (node) => isNoneStartEvent(node);
+
+  return getChildren(element, this._elementRegistry).filter(
+    node => (
+      isStartEvent(node) || isImplicitStartEvent(node)
+    )
+  );
+};
+
+function isTransaction(element) {
+  return (0,ModelUtil.is)(element, 'bpmn:Transaction');
+}
+
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/TransactionBehavior.js
+
+
+
+
+
+
+
+
+
+const CANCEL_EVENT = {
+  type: 'cancel',
+  interrupting: true,
+  boundary: false,
+  persistent: true
+};
+
+
+function TransactionBehavior(simulator, scopeBehavior, elementRegistry) {
+  this._simulator = simulator;
+  this._scopeBehavior = scopeBehavior;
+  this._elementRegistry = elementRegistry;
+}
+
+TransactionBehavior.$inject = [
+  'simulator',
+  'scopeBehavior',
+  'elementRegistry'
+];
+
+TransactionBehavior.prototype.setup = function(context) {
+
+  const {
+    scope
+  } = context;
+
+  const cancelSubscription = this._simulator.subscribe(scope, CANCEL_EVENT, (initiator) => {
+
+    cancelSubscription.remove();
+
+    return this.cancel({
+      scope,
+      initiator
+    });
+  });
+
+  const compensateEvent = {
+    type: 'compensate',
+    ref: scope.element,
+    persistent: true,
+    traits: ScopeTraits.NOT_DEAD
+  };
+
+  const compensateSubscription = this._simulator.subscribe(scope, compensateEvent, (initiator) => {
+
+    // need to trigger ordinary
+    // transaction cancelation
+    if (!scope.canceled) {
+      return this._simulator.trigger({
+        event: CANCEL_EVENT,
+        scope
+      });
+    }
+
+    compensateSubscription.remove();
+
+    return this.compensate({
+      scope,
+      element: scope.element,
+      initiator
+    });
+  });
+};
+
+TransactionBehavior.prototype.cancel = function(context) {
+
+  const {
+    scope,
+    initiator
+  } = context;
+
+  // bail out on double cancel
+  if (scope.destroyed) {
+    return;
+  }
+
+  // mark scope as canceled
+  scope.cancel(initiator);
+
+  // trigger compensation on element
+  this._simulator.trigger({
+    event: {
+      type: 'compensate',
+      ref: scope.element
+    },
+    initiator,
+    scope
+  });
+
+  // re-trigger cancel (to trigger boundary cancel events)
+  return this._simulator.trigger({
+    scope,
+    initiator,
+    event: CANCEL_EVENT
+  });
+};
+
+TransactionBehavior.prototype.registerCompensation = function(scope) {
+
+  const {
+    element
+  } = scope;
+
+  // check for compensation triggers
+  //
+  // * embedded compensation event sub-processes
+  // * compensation boundary events
+
+  const children = getChildren(element, this._elementRegistry);
+
+  const compensateStartEvents = children.filter(
+    isEventSubProcess
+  ).map(
+    element => getChildren(element, this._elementRegistry).find(
+      element => isStartEvent(element) && isCompensationEvent(element)
+    )
+  ).filter(s => s);
+
+  const compensateBoundaryEvents = element.attachers.filter(isCompensationEvent);
+
+  if (!compensateStartEvents.length && !compensateBoundaryEvents.length) {
+    return;
+  }
+
+  const transactionScope = this.findTransactionScope(scope);
+
+  // sub processes may enter a <compensable> state
+  // in that state they are kept alive on exit
+  // until the parent gets destroyed; as long as they are kept alive
+  // compensation can happen on them
+  //
+  if (!(0,ModelUtil.is)(transactionScope.element, 'bpmn:Transaction')) {
+    this.makeCompensable(transactionScope);
+  }
+
+  for (const startEvent of compensateStartEvents) {
+
+    const compensationEvent = {
+      element: startEvent,
+      type: 'compensate',
+      persistent: true,
+      interrupting: true,
+      ref: element,
+      traits: ScopeTraits.NOT_DEAD
+    };
+
+    const compensateEventSub = startEvent.parent;
+
+    const subscription = this._simulator.subscribe(scope, compensationEvent, initiator => {
+
+      subscription.remove();
+
+      return this._simulator.signal({
+        initiator,
+        element: compensateEventSub,
+        startEvent,
+        parentScope: scope
+      });
+    });
+  }
+
+  for (const boundaryEvent of compensateBoundaryEvents) {
+
+    const compensationEvent = {
+      element: boundaryEvent,
+      type: 'compensate',
+      persistent: true,
+      ref: element,
+      traits: ScopeTraits.NOT_DEAD
+    };
+
+    const compensateActivity = boundaryEvent.outgoing.map(
+      outgoing => outgoing.target
+    ).find(
+      isCompensationActivity
+    );
+
+    if (!compensateActivity) {
+      continue;
+    }
+
+    const subscription = this._simulator.subscribe(transactionScope, compensationEvent, initiator => {
+
+      subscription.remove();
+
+      // enter compensate activity like normal task
+      return this._simulator.enter({
+        initiator,
+        element: compensateActivity,
+        scope: transactionScope
+      });
+    });
+  }
+};
+
+TransactionBehavior.prototype.makeCompensable = function(scope) {
+
+  if (scope.hasTrait(ScopeTraits.COMPENSABLE) || !scope.parent) {
+    return;
+  }
+
+  const compensateEvent = {
+    type: 'compensate',
+    ref: scope.element,
+    interrupting: true,
+    persistent: true,
+    traits: ScopeTraits.NOT_DEAD
+  };
+
+  scope.compensable();
+
+  const scopeSub = this._simulator.subscribe(scope, compensateEvent, (initiator) => {
+
+    scopeSub.remove();
+
+    scope.fail(initiator);
+
+    this.compensate({
+      scope,
+      element: scope.element,
+      initiator
+    });
+
+    this._scopeBehavior.tryExit(scope, initiator);
+
+    return scope;
+  });
+
+  const parentScope = scope.parent;
+
+  if (!parentScope) {
+    return;
+  }
+
+  const parentSub = this._simulator.subscribe(parentScope, compensateEvent, initiator => {
+
+    parentSub.remove();
+
+    return this._simulator.trigger({
+      scope,
+      event: compensateEvent,
+      initiator
+    });
+
+  });
+
+  this.makeCompensable(parentScope);
+};
+
+
+TransactionBehavior.prototype.findTransactionScope = function(scope) {
+
+  let parentScope = scope;
+
+  while (parentScope) {
+    const element = parentScope.element;
+
+    if ((0,ModelUtil.is)(element, 'bpmn:SubProcess') && !isEventSubProcess(element)) {
+      return parentScope;
+    }
+
+    if (isAny(element, [
+      'bpmn:Transaction',
+      'bpmn:Process',
+      'bpmn:Participant'
+    ])) {
+      return parentScope;
+    }
+
+    parentScope = parentScope.parent;
+  }
+
+  throw noTransactionContext(scope);
+};
+
+TransactionBehavior.prototype.compensate = function(context) {
+
+  const {
+    scope,
+    element
+  } = context;
+
+  // compensate all
+  const compensateSubscriptions = filterSet(
+    scope.subscriptions,
+    subscription => eventsMatch({ type: 'compensate' }, subscription.event)
+  );
+
+  const localSubscriptions = compensateSubscriptions.filter(subscription => subscription.event.ref === element);
+
+  const otherSubscriptions = compensateSubscriptions.filter(subscription => subscription.event.ref !== element);
+
+  for (const subscription of localSubscriptions) {
+    this._scopeBehavior.preExit(scope, initiator => {
+      return this._simulator.trigger(subscription);
+    });
+  }
+
+  for (const subscription of otherSubscriptions.reverse()) {
+    this._scopeBehavior.preExit(scope, initiator => {
+      return this._simulator.trigger(subscription);
+    });
+  }
+};
+
+
+// helpers ///////////////
+
+function noTransactionContext(scope) {
+  throw new Error(`no transaction context for <${scope.id}>`);
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/SequenceFlowBehavior.js
+function SequenceFlowBehavior(
+    simulator,
+    scopeBehavior) {
+
+  this._simulator = simulator;
+  this._scopeBehavior = scopeBehavior;
+
+  simulator.registerBehavior('bpmn:SequenceFlow', this);
+}
+
+SequenceFlowBehavior.prototype.enter = function(context) {
+  this._simulator.exit(context);
+};
+
+SequenceFlowBehavior.prototype.exit = function(context) {
+  const {
+    element,
+    scope
+  } = context;
+
+  this._simulator.enter({
+    initiator: scope,
+    element: element.target,
+    scope: scope.parent
+  });
+};
+
+SequenceFlowBehavior.$inject = [
+  'simulator',
+  'scopeBehavior'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/MessageFlowBehavior.js
+
+
+
+function MessageFlowBehavior(simulator) {
+  this._simulator = simulator;
+
+  simulator.registerBehavior('bpmn:MessageFlow', this);
+}
+
+MessageFlowBehavior.$inject = [ 'simulator' ];
+
+MessageFlowBehavior.prototype.signal = function(context) {
+  this._simulator.exit(context);
+};
+
+MessageFlowBehavior.prototype.exit = function(context) {
+  const {
+    element,
+    scope: initiator
+  } = context;
+
+  const target = element.target;
+
+  // the event triggered is either the message event
+  // represented by the target message start or catch event _or_
+  // an event that uses { name: messageFlow.id } as an identifier
+  const event = isCatchEvent(target) ? target : {
+    type: 'message',
+    element,
+    name: element.id
+  };
+
+  const subscription = this._simulator.findSubscription({
+    event,
+    elements: [ target, target.parent ]
+  });
+
+  if (subscription) {
+    this._simulator.trigger({
+      event,
+      initiator,
+      scope: subscription.scope
+    });
+  }
+};
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/EventBehaviors.js
+
+
+
+
+
+
+
+function EventBehaviors(
+    simulator,
+    elementRegistry,
+    scopeBehavior) {
+
+  this._simulator = simulator;
+  this._elementRegistry = elementRegistry;
+  this._scopeBehavior = scopeBehavior;
+}
+
+EventBehaviors.$inject = [
+  'simulator',
+  'elementRegistry',
+  'scopeBehavior'
+];
+
+
+EventBehaviors.prototype.get = function(element) {
+
+  const behaviors = {
+    'bpmn:LinkEventDefinition': (context) => {
+
+      const {
+        element,
+        scope
+      } = context;
+
+      const link = getLinkDefinition(element);
+
+      const parentScope = scope.parent;
+      const parentElement = parentScope.element;
+      const children = getChildren(parentElement, this._elementRegistry);
+
+      const linkTargets = children.filter(element =>
+        isLinkCatch(element) &&
+        getLinkDefinition(element).name === link.name
+      );
+
+      for (const linkTarget of linkTargets) {
+        this._simulator.signal({
+          element: linkTarget,
+          parentScope,
+          initiator: scope
+        });
+      }
+    },
+
+    'bpmn:SignalEventDefinition': (context) => {
+
+      // HINT: signals work only within the whole diagram,
+      //       triggers start events, boundary events and
+      //       intermediate catch events
+
+      const {
+        element,
+        scope
+      } = context;
+
+      const subscriptions = this._simulator.findSubscriptions({
+        event: element
+      });
+
+      const signaledScopes = new Set();
+
+      for (const subscription of subscriptions) {
+
+        const signaledScope = subscription.scope;
+
+        if (signaledScopes.has(signaledScope)) {
+          continue;
+        }
+
+        signaledScopes.add(signaledScope);
+
+        this._simulator.trigger({
+          event: element,
+          scope: signaledScope,
+          initiator: scope
+        });
+      }
+    },
+
+    'bpmn:EscalationEventDefinition': (context) => {
+
+      // HINT: escalations are propagated up the scope
+      //       chain and caught by the first matching boundary event
+      //       or event sub-process
+
+      const {
+        element,
+        scope
+      } = context;
+
+      const scopes = this._simulator.findScopes({
+        subscribedTo: {
+          event: element
+        },
+        trait: ScopeTraits.ACTIVE
+      });
+
+      let triggerScope = scope;
+
+      while ((triggerScope = triggerScope.parent)) {
+
+        if (scopes.includes(triggerScope)) {
+          this._simulator.trigger({
+            event: element,
+            scope: triggerScope,
+            initiator: scope
+          });
+
+          break;
+        }
+      }
+
+    },
+
+    'bpmn:ErrorEventDefinition': (context) => {
+
+      // HINT: errors are propagated up the scope
+      //       chain and caught by the first matching boundary event
+      //       or event sub-process
+
+      const {
+        element,
+        scope
+      } = context;
+
+      const scopes = this._simulator.findScopes({
+        subscribedTo: {
+          event: element
+        },
+        trait: ScopeTraits.ACTIVE
+      });
+
+      let triggerScope = scope;
+
+      // TODO(nikku): ensure error always interrupts, also if no error
+      //              catch is present
+      while ((triggerScope = triggerScope.parent)) {
+
+        if (scopes.includes(triggerScope)) {
+          this._simulator.trigger({
+            event: element,
+            scope: triggerScope,
+            initiator: scope
+          });
+
+          break;
+        }
+      }
+    },
+
+    'bpmn:TerminateEventDefinition': (context) => {
+      const {
+        scope
+      } = context;
+
+      this._scopeBehavior.terminate(scope.parent, scope);
+    },
+
+    'bpmn:CancelEventDefinition': (context) => {
+
+      // HINT: cancels the surrounding transaction scope (does not bubble)
+
+      const {
+        scope,
+        element
+      } = context;
+
+      this._simulator.trigger({
+        event: element,
+        initiator: scope,
+        scope: findSubscriptionScope(scope)
+      });
+    },
+
+    'bpmn:CompensateEventDefinition': (context) => {
+
+      const {
+        scope,
+        element
+      } = context;
+
+      return this._simulator.waitForScopes(
+        scope,
+        this._simulator.trigger({
+          event: element,
+          scope: findSubscriptionScope(scope)
+        })
+      );
+    }
+  };
+
+  const entry = Object.entries(behaviors).find(
+    entry => ElementHelper_isTypedEvent(element, entry[0])
+  );
+
+  return entry && entry[1];
+};
+
+
+// helpers ///////////////
+
+function getLinkDefinition(element) {
+  return getEventDefinition(element, 'bpmn:LinkEventDefinition');
+}
+
+function findSubscriptionScope(scope) {
+
+  // the scope is the first non event sub-process
+  while (isEventSubProcess(scope.parent.element)) {
+    scope = scope.parent;
+  }
+
+  return scope.parent;
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/ScopeBehavior.js
+const PRE_EXIT_EVENT = {
+  type: 'pre-exit',
+  persistent: true,
+  interrupting: true,
+  boundary: false
+};
+
+const EXIT_EVENT = {
+  type: 'exit',
+  interrupting: true,
+  boundary: false,
+  persistent: true
+};
+
+
+function ScopeBehavior(simulator) {
+  this._simulator = simulator;
+}
+
+ScopeBehavior.$inject = [
+  'simulator'
+];
+
+/**
+ * Is the given scope finished?
+ *
+ * @param {Scope}  scope
+ * @param {Scope|Function} [excludeScope=null]
+ *
+ * @return {boolean}
+ */
+ScopeBehavior.prototype.isFinished = function(scope, excludeScope = null) {
+
+  excludeScope = matchScope(excludeScope);
+
+  return scope.children.every(c => c.destroyed || c.completed || excludeScope(c));
+};
+
+/**
+ * Destroy all scope children.
+ *
+ * @param {Scope} scope
+ * @param {Scope} initiator
+ * @param {Scope|Function} [excludeScope=null]
+ */
+ScopeBehavior.prototype.destroyChildren = function(scope, initiator, excludeScope = null) {
+
+  excludeScope = matchScope(excludeScope);
+
+  scope.children.filter(c => !c.destroyed && !excludeScope(c)).map(c => {
+    this._simulator.destroyScope(c, initiator);
+  });
+};
+
+ScopeBehavior.prototype.terminate = function(scope, initiator) {
+
+  // kill all child scopes
+  this.destroyChildren(scope, initiator);
+
+  // mark as terminated
+  scope.terminate(initiator);
+
+  // exit immediately
+  this.tryExit(scope, initiator);
+};
+
+ScopeBehavior.prototype.interrupt = function(scope, initiator) {
+
+  // kill children but initiator
+  this.destroyChildren(scope, initiator, initiator);
+
+  // mark as failed
+  scope.fail(initiator);
+};
+
+ScopeBehavior.prototype.tryExit = function(scope, initiator) {
+  if (!scope) {
+    throw new Error('missing <scope>');
+  }
+
+  if (!initiator) {
+    initiator = scope;
+  }
+
+  if (!this.isFinished(scope, initiator)) {
+    return EXIT_EVENT;
+  }
+
+  const preExitSubscriptions = this._simulator.findSubscriptions({
+    event: PRE_EXIT_EVENT,
+    scope
+  });
+
+  for (const subscription of preExitSubscriptions) {
+
+    const {
+      event,
+      scope
+    } = subscription;
+
+    const scopes = this._simulator.trigger({
+      event,
+      scope,
+      initiator
+    });
+
+    if (scopes.length) {
+      return EXIT_EVENT;
+    }
+  }
+
+  this._simulator.trigger({
+    event: EXIT_EVENT,
+    scope,
+    initiator
+  });
+
+  this.exit({
+    scope,
+    initiator
+  });
+};
+
+ScopeBehavior.prototype.exit = function(context) {
+
+  const {
+    scope,
+    initiator
+  } = context;
+
+  if (!initiator) {
+    throw new Error('missing <initiator>');
+  }
+
+  this._simulator.exit({
+    element: scope.element,
+    scope: scope,
+    initiator
+  });
+};
+
+ScopeBehavior.prototype.preExit = function(scope, triggerFn) {
+  const subscription = this._simulator.subscribe(scope, PRE_EXIT_EVENT, (initiator) => {
+
+    subscription.remove();
+
+    return triggerFn(initiator);
+  });
+
+  return subscription;
+};
+
+
+// helpers ////////////////
+
+/**
+ * Create a scope matcher.
+ *
+ * @param {Scope|Function} fnOrScope
+ *
+ * @return { (Scope) => boolean }
+ */
+function matchScope(fnOrScope) {
+
+  if (typeof fnOrScope === 'function') {
+    return fnOrScope;
+  }
+
+  return (scope) => scope === fnOrScope;
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/ProcessBehavior.js
+
+
+
+function ProcessBehavior(
+    simulator,
+    scopeBehavior) {
+
+  this._simulator = simulator;
+  this._scopeBehavior = scopeBehavior;
+
+  simulator.registerBehavior('bpmn:Process', this);
+  simulator.registerBehavior('bpmn:Participant', this);
+}
+
+ProcessBehavior.prototype.signal = function(context) {
+
+  const {
+    element,
+    startEvent,
+    startNodes = this._findStarts(element, startEvent),
+    scope
+  } = context;
+
+  if (!startNodes.length) {
+    throw new Error('missing <startNodes> or <startEvent>');
+  }
+
+  for (const startNode of startNodes) {
+
+    if (isStartEvent(startNode)) {
+      this._simulator.signal({
+        element: startNode,
+        parentScope: scope
+      });
+    } else {
+      this._simulator.enter({
+        element: startNode,
+        scope
+      });
+    }
+  }
+
+};
+
+ProcessBehavior.prototype.exit = function(context) {
+
+  const {
+    scope,
+    initiator
+  } = context;
+
+  // ensure that all sub-scopes are destroyed
+
+  this._scopeBehavior.destroyChildren(scope, initiator);
+};
+
+ProcessBehavior.prototype._findStarts = function(element, startEvent) {
+
+  const isStartEvent = startEvent
+    ? (node) => startEvent === node
+    : (node) => isNoneStartEvent(node);
+
+  return element.children.filter(
+    node => (
+      isStartEvent(node) || isImplicitStartEvent(node)
+    )
+  );
+};
+
+ProcessBehavior.$inject = [
+  'simulator',
+  'scopeBehavior'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/behaviors/index.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* harmony default export */ const behaviors = ({
+  __init__: [
+    'startEventBehavior',
+    'endEventBehavior',
+    'boundaryEventBehavior',
+    'intermediateCatchEventBehavior',
+    'intermediateThrowEventBehavior',
+    'exclusiveGatewayBehavior',
+    'parallelGatewayBehavior',
+    'eventBasedGatewayBehavior',
+    'inclusiveGatewayBehavior',
+    'subProcessBehavior',
+    'sequenceFlowBehavior',
+    'messageFlowBehavior',
+    'processBehavior'
+  ],
+  startEventBehavior: [ 'type', StartEventBehavior ],
+  endEventBehavior: [ 'type', EndEventBehavior ],
+  boundaryEventBehavior: [ 'type', BoundaryEventBehavior ],
+  intermediateCatchEventBehavior: [ 'type', IntermediateCatchEventBehavior ],
+  intermediateThrowEventBehavior: [ 'type', IntermediateThrowEventBehavior ],
+  exclusiveGatewayBehavior: [ 'type', ExclusiveGatewayBehavior ],
+  parallelGatewayBehavior: [ 'type', ParallelGatewayBehavior ],
+  eventBasedGatewayBehavior: [ 'type', EventBasedGatewayBehavior ],
+  inclusiveGatewayBehavior: [ 'type', InclusiveGatewayBehavior ],
+  activityBehavior: [ 'type', ActivityBehavior ],
+  subProcessBehavior: [ 'type', SubProcessBehavior ],
+  sequenceFlowBehavior: [ 'type', SequenceFlowBehavior ],
+  messageFlowBehavior: [ 'type', MessageFlowBehavior ],
+  eventBehaviors: [ 'type', EventBehaviors ],
+  scopeBehavior: [ 'type', ScopeBehavior ],
+  processBehavior: [ 'type', ProcessBehavior ],
+  transactionBehavior: [ 'type', TransactionBehavior ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/simulator/index.js
+
+
+
+const HIGH_PRIORITY = 5000;
+
+/* harmony default export */ const simulator = ({
+  __depends__: [
+    behaviors
+  ],
+  __init__: [
+    [ 'eventBus', 'simulator', function(eventBus, simulator) {
+      eventBus.on([
+        'tokenSimulation.toggleMode',
+        'tokenSimulation.resetSimulation'
+      ], HIGH_PRIORITY, event => {
+        simulator.reset();
+      });
+    } ]
+  ],
+  simulator: [ 'type', Simulator ]
+});
+// EXTERNAL MODULE: ./node_modules/inherits-browser/dist/index.es.js
+var index_es = __webpack_require__(591);
+;// ./node_modules/bpmn-js-token-simulation/lib/animation/behaviors/AnimatedMessageFlowBehavior.js
+
+
+
+
+
+function AnimatedMessageFlowBehavior(injector, animation) {
+  injector.invoke(MessageFlowBehavior, this);
+
+  this._animation = animation;
+}
+
+(0,index_es/* default */.A)(AnimatedMessageFlowBehavior, MessageFlowBehavior);
+
+AnimatedMessageFlowBehavior.$inject = [
+  'injector',
+  'animation'
+];
+
+AnimatedMessageFlowBehavior.prototype.signal = function(context) {
+
+  const {
+    element,
+    scope
+  } = context;
+
+  this._animation.animate(element, scope, () => {
+    MessageFlowBehavior.prototype.signal.call(this, context);
+  });
+};
+
+;// ./node_modules/bpmn-js-token-simulation/lib/animation/behaviors/AnimatedSequenceFlowBehavior.js
+
+
+
+
+
+function AnimatedSequenceFlowBehavior(injector, animation) {
+  injector.invoke(SequenceFlowBehavior, this);
+
+  this._animation = animation;
+}
+
+(0,index_es/* default */.A)(AnimatedSequenceFlowBehavior, SequenceFlowBehavior);
+
+AnimatedSequenceFlowBehavior.$inject = [
+  'injector',
+  'animation'
+];
+
+AnimatedSequenceFlowBehavior.prototype.enter = function(context) {
+
+  const {
+    element,
+    scope
+  } = context;
+
+  this._animation.animate(element, scope, () => {
+    SequenceFlowBehavior.prototype.enter.call(this, context);
+  });
+};
+;// ./node_modules/bpmn-js-token-simulation/lib/animation/behaviors/index.js
+
+
+
+/* harmony default export */ const animation_behaviors = ({
+  sequenceFlowBehavior: [ 'type', AnimatedSequenceFlowBehavior ],
+  messageFlowBehavior: [ 'type', AnimatedMessageFlowBehavior ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/util/EventHelper.js
+const TOGGLE_MODE_EVENT = 'tokenSimulation.toggleMode';
+const PLAY_SIMULATION_EVENT = 'tokenSimulation.playSimulation';
+const PAUSE_SIMULATION_EVENT = 'tokenSimulation.pauseSimulation';
+const RESET_SIMULATION_EVENT = 'tokenSimulation.resetSimulation';
+const ANIMATION_CREATED_EVENT = 'tokenSimulation.animationCreated';
+const ANIMATION_SPEED_CHANGED_EVENT = 'tokenSimulation.animationSpeedChanged';
+const ELEMENT_CHANGED_EVENT = 'tokenSimulation.simulator.elementChanged';
+const SCOPE_DESTROYED_EVENT = 'tokenSimulation.simulator.destroyScope';
+const SCOPE_CHANGED_EVENT = 'tokenSimulation.simulator.scopeChanged';
+const SCOPE_CREATE_EVENT = 'tokenSimulation.simulator.createScope';
+const SCOPE_FILTER_CHANGED_EVENT = 'tokenSimulation.scopeFilterChanged';
+const TRACE_EVENT = 'tokenSimulation.simulator.trace';
+
+
+;// ./node_modules/bpmn-js-token-simulation/lib/features/scope-filter/ScopeFilter.js
+
+
+const DEFAULT_SCOPE_FILTER = (s) => true;
+
+
+function ScopeFilter(eventBus, simulator) {
+  this._eventBus = eventBus;
+  this._simulator = simulator;
+
+  this._filter = DEFAULT_SCOPE_FILTER;
+
+  eventBus.on([
+    TOGGLE_MODE_EVENT,
+    RESET_SIMULATION_EVENT
+  ], () => {
+    this._filter = DEFAULT_SCOPE_FILTER;
+  });
+
+  eventBus.on(SCOPE_DESTROYED_EVENT, event => {
+
+    const {
+      scope
+    } = event;
+
+    // if we're currently filtering, ensure newly
+    // created instance is shown
+
+    if (this._scope === scope && scope.parent) {
+      this.toggle(scope.parent);
+    }
+  });
+
+
+  eventBus.on(SCOPE_CREATE_EVENT, event => {
+
+    const {
+      scope
+    } = event;
+
+    // if we're currently filtering, ensure newly
+    // created instance is shown
+
+    if (!scope.parent && this._scope && !isAncestor(this._scope, scope)) {
+      this.toggle(null);
+    }
+  });
+}
+
+ScopeFilter.prototype.toggle = function(scope) {
+
+  const setFilter = this._scope !== scope;
+
+  this._scope = setFilter ? scope : null;
+
+  this._filter =
+    this._scope
+      ? s => isAncestor(this._scope, s)
+      : s => true;
+
+  this._eventBus.fire(SCOPE_FILTER_CHANGED_EVENT, {
+    filter: this._filter,
+    scope: this._scope
+  });
+};
+
+ScopeFilter.prototype.isShown = function(scope) {
+
+  if (typeof scope === 'string') {
+    scope = this._simulator.findScope(s => s.id === scope);
+  }
+
+  return scope && this._filter(scope);
+};
+
+ScopeFilter.prototype.isFocused = function(scope) {
+  const id = scope.id || scope;
+
+  return this._scope?.id === id;
+};
+
+ScopeFilter.prototype.findScope = function(options) {
+  return this._simulator.findScopes(options).filter(s => this.isShown(s))[0];
+};
+
+ScopeFilter.$inject = [
+  'eventBus',
+  'simulator'
+];
+
+function isAncestor(parent, scope) {
+  do {
+    if (parent === scope) {
+      return true;
+    }
+  } while ((scope = scope.parent));
+
+  return false;
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/features/scope-filter/index.js
+
+
+/* harmony default export */ const scope_filter = ({
+  scopeFilter: [ 'type', ScopeFilter ]
+});
+// EXTERNAL MODULE: ./node_modules/min-dom/dist/index.esm.js
+var min_dom_dist_index_esm = __webpack_require__(2);
+// EXTERNAL MODULE: ./node_modules/tiny-svg/dist/index.esm.js
+var tiny_svg_dist_index_esm = __webpack_require__(816);
+;// ./node_modules/bpmn-js-token-simulation/lib/animation/Animation.js
+
+
+
+
+
+
+const STYLE = getComputedStyle(document.documentElement);
+
+const DEFAULT_PRIMARY_COLOR = STYLE.getPropertyValue('--token-simulation-green-base-44');
+const DEFAULT_AUXILIARY_COLOR = STYLE.getPropertyValue('--token-simulation-white');
+
+function noop() {}
+
+function getSegmentEasing(index, waypoints) {
+
+  // only a single segment
+  if (waypoints.length === 2) {
+    return EASE_IN_OUT;
+  }
+
+  // first segment
+  if (index === 1) {
+    return EASE_IN;
+  }
+
+  // last segment
+  if (index === waypoints.length - 1) {
+    return EASE_OUT;
+  }
+
+  return EASE_LINEAR;
+}
+
+const EASE_LINEAR = function(pos) {
+  return pos;
+};
+const EASE_IN = function(pos) {
+  return -Math.cos(pos * Math.PI / 2) + 1;
+};
+const EASE_OUT = function(pos) {
+  return Math.sin(pos * Math.PI / 2);
+};
+const EASE_IN_OUT = function(pos) {
+  return -Math.cos(pos * Math.PI) / 2 + 0.5;
+};
+
+const TOKEN_SIZE = 20;
+
+
+/**
+ * @param { { randomize?: boolean } | null } [config]
+ * @param { import('diagram-js/lib/core/Canvas').default } canvas
+ * @param { import('diagram-js/lib/core/EventBus').default } eventBus
+ * @param { import('../features/scope-filter/ScopeFilter').default } scopeFilter
+ */
+function Animation(config, canvas, eventBus, scopeFilter) {
+  this._eventBus = eventBus;
+  this._scopeFilter = scopeFilter;
+  this._canvas = canvas;
+
+  this._randomize = config && config.randomize !== false;
+
+  this._animations = new Set();
+  this._speed = 1;
+
+  eventBus.on([
+    'diagram.destroy',
+    RESET_SIMULATION_EVENT
+  ], () => {
+    this.clearAnimations();
+  });
+
+  eventBus.on(PAUSE_SIMULATION_EVENT, () => {
+    this.pause();
+  });
+
+  eventBus.on(PLAY_SIMULATION_EVENT, () => {
+    this.play();
+  });
+
+  eventBus.on(SCOPE_FILTER_CHANGED_EVENT, event => {
+
+    this.each(animation => {
+      if (this._scopeFilter.isShown(animation.scope)) {
+        animation.show();
+      } else {
+        animation.hide();
+      }
+    });
+  });
+
+  eventBus.on(SCOPE_DESTROYED_EVENT, event => {
+    const {
+      scope
+    } = event;
+
+    this.clearAnimations(scope);
+  });
+}
+
+Animation.prototype.animate = function(connection, scope, done) {
+  this.createAnimation(connection, scope, done);
+};
+
+Animation.prototype.pause = function() {
+  this.each(animation => animation.pause());
+};
+
+Animation.prototype.play = function() {
+  this.each(animation => animation.play());
+};
+
+Animation.prototype.each = function(fn) {
+  this._animations.forEach(fn);
+};
+
+Animation.prototype.createAnimation = function(connection, scope, done = noop) {
+  const group = this._getGroup(scope);
+
+  if (!group) {
+    return;
+  }
+
+  const tokenGfx = this._createTokenGfx(group, scope);
+
+  const animation = new TokenAnimation(tokenGfx, connection.waypoints, this._randomize, () => {
+    this._clearAnimation(animation);
+
+    done();
+  });
+
+  animation.setSpeed(this.getAnimationSpeed());
+
+  if (!this._scopeFilter.isShown(scope)) {
+    animation.hide();
+  }
+
+  animation.scope = scope;
+  animation.element = connection;
+
+  this._animations.add(animation);
+
+  this._eventBus.fire(ANIMATION_CREATED_EVENT, {
+    animation
+  });
+
+  animation.play();
+
+  return animation;
+};
+
+Animation.prototype.setAnimationSpeed = function(speed) {
+  this._speed = speed;
+
+  this.each(animation => animation.setSpeed(speed));
+
+  this._eventBus.fire(ANIMATION_SPEED_CHANGED_EVENT, {
+    speed
+  });
+};
+
+Animation.prototype.getAnimationSpeed = function() {
+  return this._speed;
+};
+
+Animation.prototype.clearAnimations = function(scope) {
+  this.each(animation => {
+    if (!scope || animation.scope === scope) {
+      this._clearAnimation(animation);
+    }
+  });
+};
+
+Animation.prototype._clearAnimation = function(animation) {
+  animation.remove();
+
+  this._animations.delete(animation);
+};
+
+Animation.prototype._createTokenGfx = function(group, scope) {
+  const parent = (0,tiny_svg_dist_index_esm/* create */.vt)(this._getTokenSVG(scope).trim());
+
+  return (0,tiny_svg_dist_index_esm/* appendTo */.S2)(parent, group);
+};
+
+Animation.prototype._getTokenSVG = function(scope) {
+
+  const colors = scope.colors || {
+    primary: DEFAULT_PRIMARY_COLOR,
+    auxiliary: DEFAULT_AUXILIARY_COLOR
+  };
+
+  return `
+    <g class="bts-token">
+      <circle
+        class="bts-circle"
+        r="${TOKEN_SIZE / 2}"
+        cx="${TOKEN_SIZE / 2}"
+        cy="${TOKEN_SIZE / 2}"
+        fill="${ colors.primary }"
+      />
+      <text
+        class="bts-text"
+        transform="translate(10, 14)"
+        text-anchor="middle"
+        fill="${ colors.auxiliary }"
+      >1</text>
+    </g>
+  `;
+};
+
+Animation.prototype._getGroup = function(scope) {
+
+  var canvas = this._canvas;
+
+  var layer, root;
+
+  // bpmn-js@9 compatibility:
+  // show animation tokens on plane layers
+  if ('findRoot' in canvas) {
+    root = canvas.findRoot(scope.element);
+    layer = canvas._findPlaneForRoot(root).layer;
+  } else {
+    layer = (0,min_dom_dist_index_esm/* query */.P)('.viewport', canvas._svg);
+  }
+
+  var group = (0,min_dom_dist_index_esm/* query */.P)('.bts-animation-tokens', layer);
+
+  if (!group) {
+    group = (0,tiny_svg_dist_index_esm/* create */.vt)('<g class="bts-animation-tokens" />');
+
+    (0,tiny_svg_dist_index_esm/* appendTo */.S2)(
+      group,
+      layer
+    );
+  }
+
+  return group;
+};
+
+Animation.$inject = [
+  'config.animation',
+  'canvas',
+  'eventBus',
+  'scopeFilter'
+];
+
+
+function TokenAnimation(gfx, waypoints, randomize, done) {
+  this.gfx = gfx;
+  this.waypoints = waypoints;
+  this.done = done;
+  this.randomize = randomize;
+
+  this._paused = true;
+  this._t = 0;
+  this._parts = [];
+
+  this.create();
+}
+
+TokenAnimation.prototype.pause = function() {
+  this._paused = true;
+};
+
+TokenAnimation.prototype.play = function() {
+
+  if (this._paused) {
+    this._paused = false;
+
+    this.tick(0);
+  }
+
+  this.schedule();
+};
+
+TokenAnimation.prototype.schedule = function() {
+
+  if (this._paused) {
+    return;
+  }
+
+  if (this._scheduled) {
+    return;
+  }
+
+  const last = Date.now();
+
+  this._scheduled = true;
+
+  requestAnimationFrame(() => {
+    this._scheduled = false;
+
+    if (this._paused) {
+      return;
+    }
+
+    this.tick((Date.now() - last) * this._speed);
+    this.schedule();
+  });
+};
+
+
+TokenAnimation.prototype.tick = function(tElapsed) {
+
+  const t = this._t = this._t + tElapsed;
+
+  const part = this._parts.find(
+    p => p.startTime <= t && p.endTime > t
+  );
+
+  // completed
+  if (!part) {
+    return this.completed();
+  }
+
+  const segmentTime = t - part.startTime;
+  const segmentLength = part.length * part.easing(segmentTime / part.duration);
+
+  const currentLength = part.startLength + segmentLength;
+
+  const point = this._path.getPointAtLength(currentLength);
+
+  this.move(point.x, point.y);
+};
+
+TokenAnimation.prototype.move = function(x, y) {
+  (0,tiny_svg_dist_index_esm/* attr */.CF)(this.gfx, 'transform', `translate(${x}, ${y})`);
+};
+
+TokenAnimation.prototype.create = function() {
+  const waypoints = this.waypoints;
+
+  const parts = waypoints.reduce((parts, point, index) => {
+
+    const lastPoint = waypoints[index - 1];
+
+    if (lastPoint) {
+      const lastPart = parts[parts.length - 1];
+
+      const startLength = lastPart && lastPart.endLength || 0;
+      const length = distance(lastPoint, point);
+
+      parts.push({
+        startLength,
+        endLength: startLength + length,
+        length,
+        easing: getSegmentEasing(index, waypoints)
+      });
+    }
+
+    return parts;
+  }, []);
+
+  const totalLength = parts.reduce(function(length, part) {
+    return length + part.length;
+  }, 0);
+
+  const d = waypoints.reduce((d, waypoint, index) => {
+
+    const x = waypoint.x - TOKEN_SIZE / 2,
+          y = waypoint.y - TOKEN_SIZE / 2;
+
+    d.push([ index > 0 ? 'L' : 'M', x, y ]);
+
+    return d;
+  }, []).flat().join(' ');
+
+  const totalDuration = getAnimationDuration(totalLength, this._randomize);
+
+  this._parts = parts.reduce((parts, part, index) => {
+    const duration = totalDuration / totalLength * part.length;
+    const startTime = index > 0 ? parts[index - 1].endTime : 0;
+    const endTime = startTime + duration;
+
+    return [
+      ...parts,
+      {
+        ...part,
+        startTime,
+        endTime,
+        duration
+      }
+    ];
+  }, []);
+
+  this._path = (0,tiny_svg_dist_index_esm/* create */.vt)(`<path d="${d}" />`);
+  this._t = 0;
+};
+
+TokenAnimation.prototype.show = function() {
+  (0,tiny_svg_dist_index_esm/* attr */.CF)(this.gfx, 'display', '');
+};
+
+TokenAnimation.prototype.hide = function() {
+  (0,tiny_svg_dist_index_esm/* attr */.CF)(this.gfx, 'display', 'none');
+};
+
+TokenAnimation.prototype.completed = function() {
+  this.done();
+};
+
+TokenAnimation.prototype.remove = function() {
+  this.pause();
+
+  (0,tiny_svg_dist_index_esm/* remove */.TF)(this.gfx);
+};
+
+TokenAnimation.prototype.setSpeed = function(speed) {
+  this._speed = speed;
+};
+
+function getAnimationDuration(length, randomize = false) {
+  return Math.log(length) * (randomize ? randomBetween(250, 300) : 250);
+}
+
+function randomBetween(min, max) {
+  return min + Math.floor(Math.random() * (max - min));
+}
+
+function distance(a, b) {
+  return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/animation/index.js
+
+
+
+
+
+
+/* harmony default export */ const animation = ({
+  __depends__: [
+    simulator,
+    animation_behaviors,
+    scope_filter
+  ],
+  animation: [ 'type', Animation ]
+});
+// EXTERNAL MODULE: ./node_modules/randomcolor/randomColor.js
+var randomColor = __webpack_require__(555);
+var randomColor_default = /*#__PURE__*/__webpack_require__.n(randomColor);
+;// ./node_modules/bpmn-js-token-simulation/lib/features/colored-scopes/ColoredScopes.js
+
+
+
+
+const ColoredScopes_HIGH_PRIORITY = 1500;
+
+
+function ColoredScopes(eventBus) {
+
+  const colors = randomColor_default()({
+    count: 60
+  }).filter(c => getContrastYIQ(c.substring(1)) < 200);
+
+  function getContrastYIQ(hexcolor) {
+    var r = parseInt(hexcolor.substr(0,2),16);
+    var g = parseInt(hexcolor.substr(2,2),16);
+    var b = parseInt(hexcolor.substr(4,2),16);
+    var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return yiq;
+  }
+
+  let colorsIdx = 0;
+
+  function getColors(scope) {
+    const {
+      element
+    } = scope;
+
+    if (element && element.type === 'bpmn:MessageFlow') {
+      return {
+        primary: '#999',
+        auxiliary: '#FFF'
+      };
+    }
+
+    if (scope.parent) {
+      return scope.parent.colors;
+    }
+
+    const primary = colors[ (colorsIdx++) % colors.length ];
+
+    return {
+      primary,
+      auxiliary: getContrastYIQ(primary) >= 128 ? '#111' : '#fff'
+    };
+  }
+
+  eventBus.on(SCOPE_CREATE_EVENT, ColoredScopes_HIGH_PRIORITY, event => {
+
+    const {
+      scope
+    } = event;
+
+    scope.colors = getColors(scope);
+  });
+}
+
+ColoredScopes.$inject = [
+  'eventBus'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/colored-scopes/index.js
+
+
+/* harmony default export */ const colored_scopes = ({
+  __init__: [
+    'coloredScopes'
+  ],
+  coloredScopes: [ 'type', ColoredScopes ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/icons/index.js
+var LogSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M12.83 352h262.34A12.82 12.82 0 0 0 288 339.17v-38.34A12.82 12.82 0 0 0 275.17 288H12.83A12.82 12.82 0 0 0 0 300.83v38.34A12.82 12.82 0 0 0 12.83 352zm0-256h262.34A12.82 12.82 0 0 0 288 83.17V44.83A12.82 12.82 0 0 0 275.17 32H12.83A12.82 12.82 0 0 0 0 44.83v38.34A12.82 12.82 0 0 0 12.83 96zM432 160H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0 256H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z\"/></svg>";
+
+var AngleRightSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 256 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z\"/></svg>";
+
+var CheckCircleSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z\"/></svg>";
+
+var ForkSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 384 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M384 144c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 36.4 24.3 67.1 57.5 76.8-.6 16.1-4.2 28.5-11 36.9-15.4 19.2-49.3 22.4-85.2 25.7-28.2 2.6-57.4 5.4-81.3 16.9v-144c32.5-10.2 56-40.5 56-76.3 0-44.2-35.8-80-80-80S0 35.8 0 80c0 35.8 23.5 66.1 56 76.3v199.3C23.5 365.9 0 396.2 0 432c0 44.2 35.8 80 80 80s80-35.8 80-80c0-34-21.2-63.1-51.2-74.6 3.1-5.2 7.8-9.8 14.9-13.4 16.2-8.2 40.4-10.4 66.1-12.8 42.2-3.9 90-8.4 118.2-43.4 14-17.4 21.1-39.8 21.6-67.9 31.6-10.8 54.4-40.7 54.4-75.9zM80 64c8.8 0 16 7.2 16 16s-7.2 16-16 16-16-7.2-16-16 7.2-16 16-16zm0 384c-8.8 0-16-7.2-16-16s7.2-16 16-16 16 7.2 16 16-7.2 16-16 16zm224-320c8.8 0 16 7.2 16 16s-7.2 16-16 16-16-7.2-16-16 7.2-16 16-16z\"/></svg>";
+
+var ExclamationTriangleSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 576 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z\"/></svg>";
+
+var InfoSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 192 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M20 424.229h20V279.771H20c-11.046 0-20-8.954-20-20V212c0-11.046 8.954-20 20-20h112c11.046 0 20 8.954 20 20v212.229h20c11.046 0 20 8.954 20 20V492c0 11.046-8.954 20-20 20H20c-11.046 0-20-8.954-20-20v-47.771c0-11.046 8.954-20 20-20zM96 0C56.235 0 24 32.235 24 72s32.235 72 72 72 72-32.235 72-72S135.764 0 96 0z\"/></svg>";
+
+var PauseSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M144 479H48c-26.5 0-48-21.5-48-48V79c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v352c0 26.5-21.5 48-48 48zm304-48V79c0-26.5-21.5-48-48-48h-96c-26.5 0-48 21.5-48 48v352c0 26.5 21.5 48 48 48h96c26.5 0 48-21.5 48-48z\"/></svg>";
+
+var RemovePauseSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 580.5 448\">\n  <path fill=\"currentColor\" d=\"M112 0C85 0 64 22 64 48v196l192-89V48c0-26-22-48-48-48zm256 0c-27 0-48 22-48 48v77l190-89c-5-21-24-36-46-36Zm144 105-192 89v70l192-89zM256 224 64 314v70l192-90zm256 21-192 89v66c0 27 21 48 48 48h96c26 0 48-21 48-48zM256 364 89 442c7 4 14 6 23 6h96c26 0 48-21 48-48z\"/>\n  <rect fill=\"currentColor\" width=\"63.3\" height=\"618.2\" x=\"311.5\" y=\"-469.4\" transform=\"rotate(65)\" rx=\"10\"/>\n</svg>\n";
+
+var PlaySVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 448 512\"><!-- Adapted from Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z\"/></svg>";
+
+var ResetSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M440.65 12.57l4 82.77A247.16 247.16 0 0 0 255.83 8C134.73 8 33.91 94.92 12.29 209.82A12 12 0 0 0 24.09 224h49.05a12 12 0 0 0 11.67-9.26 175.91 175.91 0 0 1 317-56.94l-101.46-4.86a12 12 0 0 0-12.57 12v47.41a12 12 0 0 0 12 12H500a12 12 0 0 0 12-12V12a12 12 0 0 0-12-12h-47.37a12 12 0 0 0-11.98 12.57zM255.83 432a175.61 175.61 0 0 1-146-77.8l101.8 4.87a12 12 0 0 0 12.57-12v-47.4a12 12 0 0 0-12-12H12a12 12 0 0 0-12 12V500a12 12 0 0 0 12 12h47.35a12 12 0 0 0 12-12.6l-4.15-82.57A247.17 247.17 0 0 0 255.83 504c121.11 0 221.93-86.92 243.55-201.82a12 12 0 0 0-11.8-14.18h-49.05a12 12 0 0 0-11.67 9.26A175.86 175.86 0 0 1 255.83 432z\"/></svg>";
+
+var TachometerSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 576 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M288 32C128.94 32 0 160.94 0 320c0 52.8 14.25 102.26 39.06 144.8 5.61 9.62 16.3 15.2 27.44 15.2h443c11.14 0 21.83-5.58 27.44-15.2C561.75 422.26 576 372.8 576 320c0-159.06-128.94-288-288-288zm0 64c14.71 0 26.58 10.13 30.32 23.65-1.11 2.26-2.64 4.23-3.45 6.67l-9.22 27.67c-5.13 3.49-10.97 6.01-17.64 6.01-17.67 0-32-14.33-32-32S270.33 96 288 96zM96 384c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32zm48-160c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32zm246.77-72.41l-61.33 184C343.13 347.33 352 364.54 352 384c0 11.72-3.38 22.55-8.88 32H232.88c-5.5-9.45-8.88-20.28-8.88-32 0-33.94 26.5-61.43 59.9-63.59l61.34-184.01c4.17-12.56 17.73-19.45 30.36-15.17 12.57 4.19 19.35 17.79 15.17 30.36zm14.66 57.2l15.52-46.55c3.47-1.29 7.13-2.23 11.05-2.23 17.67 0 32 14.33 32 32s-14.33 32-32 32c-11.38-.01-20.89-6.28-26.57-15.22zM480 384c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32z\"/></svg>";
+
+var TimesCircleSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z\"/></svg>";
+
+var TimesSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 352 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z\"/></svg>";
+
+var ToggleOffSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 576 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M384 64H192C85.961 64 0 149.961 0 256s85.961 192 192 192h192c106.039 0 192-85.961 192-192S490.039 64 384 64zM64 256c0-70.741 57.249-128 128-128 70.741 0 128 57.249 128 128 0 70.741-57.249 128-128 128-70.741 0-128-57.249-128-128zm320 128h-48.905c65.217-72.858 65.236-183.12 0-256H384c70.741 0 128 57.249 128 128 0 70.74-57.249 128-128 128z\"/></svg>";
+
+var ToggleOnSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 576 512\"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path fill=\"currentColor\" d=\"M384 64H192C86 64 0 150 0 256s86 192 192 192h192c106 0 192-86 192-192S490 64 384 64zm0 320c-70.8 0-128-57.3-128-128 0-70.8 57.3-128 128-128 70.8 0 128 57.3 128 128 0 70.8-57.3 128-128 128z\"/></svg>";
+
+function createIcon(svg) {
+  return function Icon(className = '') {
+    return `<span class="bts-icon ${ className }">${svg}</span>`;
+  };
+}
+
+const LogIcon = createIcon(LogSVG);
+const AngleRightIcon = createIcon(AngleRightSVG);
+const CheckCircleIcon = createIcon(CheckCircleSVG);
+const RemovePauseIcon = createIcon(RemovePauseSVG);
+const ForkIcon = createIcon(ForkSVG);
+const ExclamationTriangleIcon = createIcon(ExclamationTriangleSVG);
+const InfoIcon = createIcon(InfoSVG);
+const PauseIcon = createIcon(PauseSVG);
+const PlayIcon = createIcon(PlaySVG);
+const ResetIcon = createIcon(ResetSVG);
+const TachometerIcon = createIcon(TachometerSVG);
+const TimesCircleIcon = createIcon(TimesCircleSVG);
+const TimesIcon = createIcon(TimesSVG);
+const ToggleOffIcon = createIcon(ToggleOffSVG);
+const ToggleOnIcon = createIcon(ToggleOnSVG);
+
+
+
+;// ./node_modules/bpmn-js-token-simulation/lib/features/context-pads/handler/ExclusiveGatewayHandler.js
+
+
+
+
+
+function ExclusiveGatewayHandler(exclusiveGatewaySettings) {
+  this._exclusiveGatewaySettings = exclusiveGatewaySettings;
+}
+
+ExclusiveGatewayHandler.prototype.createContextPads = function(element) {
+
+  const outgoingFlows = element.outgoing.filter(function(outgoing) {
+    return (0,ModelUtil.is)(outgoing, 'bpmn:SequenceFlow');
+  });
+
+  if (outgoingFlows.length < 2) {
+    return;
+  }
+
+  const html = `
+    <div class="bts-context-pad" title="Set Sequence Flow">
+      ${ForkIcon()}
+    </div>
+  `;
+
+  const action = () => {
+    this._exclusiveGatewaySettings.setSequenceFlow(element);
+  };
+
+  return [
+    {
+      action,
+      element,
+      html
+    }
+  ];
+};
+
+ExclusiveGatewayHandler.$inject = [
+  'exclusiveGatewaySettings'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/context-pads/handler/InclusiveGatewayHandler.js
+
+
+
+
+
+
+function InclusiveGatewayHandler(inclusiveGatewaySettings) {
+  this._inclusiveGatewaySettings = inclusiveGatewaySettings;
+}
+
+InclusiveGatewayHandler.prototype.createContextPads = function(element) {
+  const outgoingFlows = element.outgoing.filter(isSequenceFlow);
+
+  if (outgoingFlows.length < 2) {
+    return;
+  }
+
+  const nonDefaultFlows = outgoingFlows.filter(outgoing => {
+    const flowBo = (0,ModelUtil/* getBusinessObject */.Cf)(outgoing),
+          gatewayBo = (0,ModelUtil/* getBusinessObject */.Cf)(element);
+
+    return gatewayBo.default !== flowBo;
+  });
+
+  const html = `
+    <div class="bts-context-pad" title="Set Sequence Flow">
+      ${ForkIcon()}
+    </div>
+  `;
+
+  return nonDefaultFlows.map(sequenceFlow => {
+    const action = () => {
+      this._inclusiveGatewaySettings.toggleSequenceFlow(element, sequenceFlow);
+    };
+
+    return {
+      action,
+      element: sequenceFlow,
+      html
+    };
+  });
+};
+
+InclusiveGatewayHandler.$inject = [
+  'inclusiveGatewaySettings'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/context-pads/handler/PauseHandler.js
+
+
+
+
+
+
+function PauseHandler(simulator) {
+  this._simulator = simulator;
+}
+
+PauseHandler.prototype.createContextPads = function(element) {
+
+  if (
+    (0,ModelUtil.is)(element, 'bpmn:ReceiveTask') || (
+      (0,ModelUtil.is)(element, 'bpmn:SubProcess') && (0,ModelUtil/* getBusinessObject */.Cf)(element).triggeredByEvent
+    )
+  ) {
+    return [];
+  }
+
+  return [
+    this.createPauseContextPad(element)
+  ];
+};
+
+PauseHandler.prototype.createPauseContextPad = function(element) {
+
+  const contexts = () => this._findSubscriptions({
+    element
+  });
+
+  const wait = this._isPaused(element);
+
+  const html = `
+    <div class="bts-context-pad ${ wait ? '' : 'show-hover' }" title="${ wait ? 'Remove' : 'Add' } pause point">
+      ${ (wait ? RemovePauseIcon : PauseIcon)('show-hover') }
+      ${ PauseIcon('hide-hover') }
+    </div>
+  `;
+
+  const action = () => {
+    this._togglePaused(element);
+  };
+
+  return {
+    action,
+    element,
+    hideContexts: contexts,
+    html
+  };
+};
+
+PauseHandler.prototype._isPaused = function(element) {
+
+  const {
+    wait
+  } = this._simulator.getConfig(element);
+
+  return wait;
+};
+
+PauseHandler.prototype._togglePaused = function(element) {
+  const wait = !this._isPaused(element);
+
+  this._simulator.waitAtElement(element, wait);
+};
+
+PauseHandler.prototype._findSubscriptions = function(options) {
+  return this._simulator.findSubscriptions(options);
+};
+
+PauseHandler.$inject = [
+  'simulator'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/context-pads/handler/TriggerHandler.js
+
+
+
+function TriggerHandler(simulator) {
+  this._simulator = simulator;
+}
+
+TriggerHandler.$inject = [
+  'simulator'
+];
+
+TriggerHandler.prototype.createContextPads = function(element) {
+  return [
+    this.createTriggerContextPad(element)
+  ];
+};
+
+TriggerHandler.prototype.createTriggerContextPad = function(element) {
+
+  const contexts = () => {
+    const subscriptions = this._findSubscriptions({
+      element
+    });
+
+    const sortedSubscriptions = subscriptions.slice().sort((a, b) => {
+      return a.event.type === 'none' ? 1 : -1;
+    });
+
+    return sortedSubscriptions;
+  };
+
+  const html = `
+    <div class="bts-context-pad" title="Trigger Event">
+      ${PlayIcon()}
+    </div>
+  `;
+
+  const action = (subscriptions) => {
+
+    const {
+      event,
+      scope
+    } = subscriptions[0];
+
+    return this._simulator.trigger({
+      event,
+      scope
+    });
+  };
+
+  return {
+    action,
+    element,
+    html,
+    contexts
+  };
+};
+
+TriggerHandler.prototype._findSubscriptions = function(options) {
+  return this._simulator.findSubscriptions(options);
+};
+;// ./node_modules/bpmn-js-token-simulation/lib/features/context-pads/ContextPads.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const LOW_PRIORITY = 500;
+
+const OFFSET_TOP = -15;
+const OFFSET_LEFT = -15;
+
+
+function ContextPads(
+    eventBus, elementRegistry,
+    overlays, injector,
+    canvas, scopeFilter) {
+
+  this._elementRegistry = elementRegistry;
+  this._overlays = overlays;
+  this._injector = injector;
+  this._canvas = canvas;
+  this._scopeFilter = scopeFilter;
+
+  this._active = false;
+
+  this._overlayCache = new Map();
+
+  this._handlerIdx = 0;
+
+  this._handlers = [];
+
+  this.registerHandler('bpmn:ExclusiveGateway', ExclusiveGatewayHandler);
+  this.registerHandler('bpmn:InclusiveGateway', InclusiveGatewayHandler);
+
+  this.registerHandler('bpmn:Activity', PauseHandler);
+
+  this.registerHandler('bpmn:Event', TriggerHandler);
+  this.registerHandler('bpmn:Gateway', TriggerHandler);
+  this.registerHandler('bpmn:Activity', TriggerHandler);
+
+  eventBus.on(TOGGLE_MODE_EVENT, LOW_PRIORITY, context => {
+    this._active = context.active;
+
+    if (this._active) {
+      this.openContextPads();
+    } else {
+      this.closeContextPads();
+    }
+  });
+
+  eventBus.on(RESET_SIMULATION_EVENT, LOW_PRIORITY, () => {
+    this.closeContextPads();
+    this.openContextPads();
+  });
+
+  eventBus.on('root.set', LOW_PRIORITY, () => {
+    if (this._active) {
+      this.openContextPads();
+    } else {
+      this.closeContextPads();
+    }
+  });
+
+  eventBus.on(SCOPE_FILTER_CHANGED_EVENT, event => {
+
+    const showElements = (0,min_dom_dist_index_esm/* queryAll */.YG)(
+      '.djs-overlay-bts-context-menu [data-scope-ids]',
+      overlays._overlayRoot
+    );
+
+    for (const element of showElements) {
+
+      const scopeIds = element.dataset.scopeIds.split(',');
+
+      const shown = scopeIds.some(id => scopeFilter.isShown(id));
+
+      (0,min_dom_dist_index_esm/* classes */.Ly)(element).toggle('hidden', !shown);
+    }
+
+    const hideElements = (0,min_dom_dist_index_esm/* queryAll */.YG)(
+      '.djs-overlay-bts-context-menu [data-hide-scope-ids]',
+      overlays._overlayRoot
+    );
+
+    for (const element of hideElements) {
+
+      const scopeIds = element.dataset.hideScopeIds.split(',');
+
+      const shown = scopeIds.some(id => scopeFilter.isShown(id));
+
+      (0,min_dom_dist_index_esm/* classes */.Ly)(element).toggle('hidden', shown);
+    }
+  });
+
+  eventBus.on(ELEMENT_CHANGED_EVENT, LOW_PRIORITY, event => {
+    const {
+      element
+    } = event;
+
+    this.updateElementContextPads(element);
+  });
+}
+
+/**
+ * Register a handler for an element type.
+ * An element type can have multiple handlers.
+ *
+ * @param {String} type
+ * @param {Object} handlerCls
+ */
+ContextPads.prototype.registerHandler = function(type, handlerCls) {
+  const handler = this._injector.instantiate(handlerCls);
+
+  handler.hash = String(this._handlerIdx++);
+
+  this._handlers.push({ handler, type });
+};
+
+ContextPads.prototype.getHandlers = function(element) {
+
+  return (
+    this._handlers.filter(
+      ({ type }) => (0,ModelUtil.is)(element, type)
+    ).map(
+      ({ handler }) => handler
+    )
+  );
+};
+
+ContextPads.prototype.openContextPads = function(parent) {
+
+  if (!parent) {
+    parent = this._canvas.getRootElement();
+  }
+
+  this._elementRegistry.forEach((element) => {
+    if (ContextPads_isAncestor(parent, element) && !(0,DrilldownUtil/* isPlane */.hC)(element)) {
+      this.updateElementContextPads(element);
+    }
+  });
+};
+
+ContextPads.prototype._getOverlays = function(hash) {
+  return this._overlayCache.get(hash) || [];
+};
+
+ContextPads.prototype._addOverlay = function(element, options) {
+
+  const {
+    handlerHash
+  } = options;
+
+  if (!handlerHash) {
+    throw new Error('<handlerHash> required');
+  }
+
+  const overlayId = this._overlays.add(element, 'bts-context-menu', {
+    ...options,
+    position: {
+      top: OFFSET_TOP,
+      left: OFFSET_LEFT
+    },
+    show: {
+      minZoom: 0.5
+    }
+  });
+
+  const overlay = this._overlays.get(overlayId);
+
+  const overlayCache = this._overlayCache;
+
+  if (!overlayCache.has(handlerHash)) {
+    overlayCache.set(handlerHash, []);
+  }
+
+  overlayCache.get(handlerHash).push(overlay);
+};
+
+ContextPads.prototype._removeOverlay = function(overlay) {
+
+  const {
+    id,
+    handlerHash
+  } = overlay;
+
+  // remove overlay
+  this._overlays.remove(id);
+
+  // remove from overlay cache
+  const overlays = this._overlayCache.get(handlerHash) || [];
+
+  const idx = overlays.indexOf(overlay);
+
+  if (idx !== -1) {
+    overlays.splice(idx, 1);
+  }
+};
+
+ContextPads.prototype.updateElementContextPads = function(element) {
+  for (const handler of this.getHandlers(element)) {
+    this._updateElementContextPads(element, handler);
+  }
+};
+
+ContextPads.prototype._updateElementContextPads = function(element, handler) {
+
+  const canvas = this._canvas;
+
+  const contextPads = (handler.createContextPads(element) || []).filter(p => p);
+
+  const handlerHash = `${element.id}------${handler.hash}`;
+
+  const existingOverlays = this._getOverlays(handlerHash);
+
+  const updatedOverlays = [];
+
+  for (const contextPad of contextPads) {
+
+    const {
+      element,
+      contexts: _contexts,
+      hideContexts: _hideContexts,
+      action: _action,
+      html: _html
+    } = contextPad;
+
+
+    const hash = `${contextPad.element.id}-------${_html}`;
+
+    let existingOverlay = existingOverlays.find(
+      o => o.hash === hash
+    );
+
+    const html = existingOverlay && existingOverlay.html || (0,min_dom_dist_index_esm/* domify */.zm)(_html);
+
+    if (_contexts) {
+      const contexts = _contexts();
+
+      html.dataset.scopeIds = contexts.map(c => c.scope.id).join(',');
+
+      const shownScopes = contexts.filter(c => this._scopeFilter.isShown(c.scope));
+
+      (0,min_dom_dist_index_esm/* classes */.Ly)(html).toggle('hidden', shownScopes.length === 0);
+    }
+
+    if (_hideContexts) {
+      const contexts = _hideContexts();
+
+      html.dataset.hideScopeIds = contexts.map(c => c.scope.id).join(',');
+
+      const shownScopes = contexts.filter(c => this._scopeFilter.isShown(c.scope));
+
+      (0,min_dom_dist_index_esm/* classes */.Ly)(html).toggle('hidden', shownScopes.length > 0);
+    }
+
+    if (existingOverlay) {
+      updatedOverlays.push(existingOverlay);
+
+      continue;
+    }
+
+    if (_action) {
+
+      min_dom_dist_index_esm/* event */.f0.bind(html, 'click', event => {
+        event.preventDefault();
+
+        const contexts = _contexts
+          ? _contexts().filter(c => this._scopeFilter.isShown(c.scope))
+          : null;
+
+        _action(contexts);
+
+        if ('restoreFocus' in canvas) {
+          canvas.restoreFocus();
+        }
+      });
+    }
+
+    this._addOverlay(element, {
+      hash,
+      handlerHash,
+      html
+    });
+  }
+
+  for (const existingOverlay of existingOverlays) {
+    if (!updatedOverlays.includes(existingOverlay)) {
+      this._removeOverlay(existingOverlay);
+    }
+  }
+};
+
+ContextPads.prototype.closeContextPads = function() {
+  for (const overlays of this._overlayCache.values()) {
+
+    for (const overlay of overlays) {
+      this._closeOverlay(overlay);
+    }
+  }
+
+  this._overlayCache.clear();
+};
+
+ContextPads.prototype._closeOverlay = function(overlay) {
+  this._overlays.remove(overlay.id);
+};
+
+ContextPads.$inject = [
+  'eventBus',
+  'elementRegistry',
+  'overlays',
+  'injector',
+  'canvas',
+  'scopeFilter'
+];
+
+
+// helpers ///////////////
+
+function ContextPads_isAncestor(ancestor, descendant) {
+
+  do {
+    if (ancestor === descendant) {
+      return true;
+    }
+
+    descendant = descendant.parent;
+  } while (descendant);
+
+  return false;
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/features/context-pads/index.js
+
+
+
+
+/* harmony default export */ const context_pads = ({
+  __depends__: [
+    scope_filter
+  ],
+  __init__: [
+    'contextPads'
+  ],
+  contextPads: [ 'type', ContextPads ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/simulation-state/SimulationState.js
+
+
+
+
+
+function SimulationState(
+    eventBus,
+    simulator,
+    elementNotifications) {
+
+  eventBus.on(SCOPE_DESTROYED_EVENT, event => {
+    const {
+      scope
+    } = event;
+
+    const {
+      destroyInitiator,
+      element: scopeElement
+    } = scope;
+
+    if (!scope.completed || !destroyInitiator) {
+      return;
+    }
+
+    const processScopes = [
+      'bpmn:Process',
+      'bpmn:Participant'
+    ];
+
+    if (!processScopes.includes(scopeElement.type)) {
+      return;
+    }
+
+    elementNotifications.addElementNotification(destroyInitiator.element, {
+      type: 'success',
+      icon: CheckCircleIcon(),
+      text: 'Finished',
+      scope
+    });
+  });
+}
+
+SimulationState.$inject = [
+  'eventBus',
+  'simulator',
+  'elementNotifications'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/element-notifications/ElementNotifications.js
+
+
+
+
+const ElementNotifications_OFFSET_TOP = -15;
+const OFFSET_RIGHT = 15;
+
+
+function ElementNotifications(overlays, eventBus) {
+  this._overlays = overlays;
+
+  eventBus.on([
+    RESET_SIMULATION_EVENT,
+    SCOPE_CREATE_EVENT,
+    TOGGLE_MODE_EVENT
+  ], () => {
+    this.clear();
+  });
+}
+
+ElementNotifications.prototype.addElementNotification = function(element, options) {
+  const position = {
+    top: ElementNotifications_OFFSET_TOP,
+    right: OFFSET_RIGHT
+  };
+
+  const {
+    type,
+    icon,
+    text,
+    scope = {}
+  } = options;
+
+  const colors = scope.colors;
+
+  const colorMarkup = colors
+    ? `style="color: ${colors.auxiliary}; background: ${colors.primary}"`
+    : '';
+
+  const html = (0,min_dom_dist_index_esm/* domify */.zm)(`
+    <div class="bts-element-notification ${ type || '' }" ${colorMarkup}>
+      ${ icon || '' }
+      <span class="bts-text">${ text }</span>
+    </div>
+  `);
+
+  this._overlays.add(element, 'bts-element-notification', {
+    position,
+    html: html,
+    show: {
+      minZoom: 0.5
+    }
+  });
+};
+
+ElementNotifications.prototype.clear = function() {
+  this._overlays.remove({ type: 'bts-element-notification' });
+};
+
+ElementNotifications.prototype.removeElementNotification = function(element) {
+  this._overlays.remove({ element: element });
+};
+
+ElementNotifications.$inject = [ 'overlays', 'eventBus' ];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/element-notifications/index.js
+
+
+/* harmony default export */ const element_notifications = ({
+  elementNotifications: [ 'type', ElementNotifications ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/notifications/Notifications.js
+
+
+
+
+
+
+
+const NOTIFICATION_TIME_TO_LIVE = 2000; // ms
+
+const INFO_ICON = InfoIcon();
+
+
+function Notifications(eventBus, canvas, scopeFilter) {
+  this._eventBus = eventBus;
+  this._canvas = canvas;
+  this._scopeFilter = scopeFilter;
+
+  this._init();
+
+  eventBus.on([
+    TOGGLE_MODE_EVENT,
+    RESET_SIMULATION_EVENT
+  ], event => {
+    this.clear();
+  });
+}
+
+Notifications.prototype._init = function() {
+  this.container = (0,min_dom_dist_index_esm/* domify */.zm)('<div class="bts-notifications"></div>');
+
+  this._canvas.getContainer().appendChild(this.container);
+};
+
+Notifications.prototype.showNotification = function(options) {
+
+  const {
+    text,
+    type = 'info',
+    icon = INFO_ICON,
+    scope,
+    ttl = NOTIFICATION_TIME_TO_LIVE
+  } = options;
+
+  if (scope && !this._scopeFilter.isShown(scope)) {
+    return;
+  }
+
+  const iconMarkup = icon.startsWith('<')
+    ? icon
+    : `<i class="${ icon }"></i>`;
+
+  const colors = scope && scope.colors;
+
+  const colorMarkup = colors ? `style="color: ${colors.auxiliary}; background: ${colors.primary}"` : '';
+
+  const notification = (0,min_dom_dist_index_esm/* domify */.zm)(`
+    <div class="bts-notification ${type}">
+      <span class="bts-icon">${iconMarkup}</span>
+      <span class="bts-text" title="${ text }">${text}</span>
+      ${ scope ? `<span class="bts-scope" ${colorMarkup}>${scope.id}</span>` : '' }
+    </div>
+  `);
+
+  this.container.appendChild(notification);
+
+  // prevent more than 5 notifications at once
+  while (this.container.children.length > 5) {
+    this.container.children[0].remove();
+  }
+
+  setTimeout(function() {
+    notification.remove();
+  }, ttl);
+};
+
+Notifications.prototype.clear = function() {
+  while (this.container.children.length) {
+    this.container.children[0].remove();
+  }
+};
+
+Notifications.$inject = [
+  'eventBus',
+  'canvas',
+  'scopeFilter'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/notifications/index.js
+
+
+
+
+/* harmony default export */ const notifications = ({
+  __depends__: [
+    scope_filter
+  ],
+  notifications: [ 'type', Notifications ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/simulation-state/index.js
+
+
+
+
+
+/* harmony default export */ const simulation_state = ({
+  __depends__: [
+    element_notifications,
+    notifications
+  ],
+  __init__: [
+    'simulationState'
+  ],
+  simulationState: [ 'type', SimulationState ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/show-scopes/ShowScopes.js
+
+
+
+
+
+
+const FILL_COLOR = '--token-simulation-silver-base-97';
+const STROKE_COLOR = '--token-simulation-green-base-44';
+
+const ID = 'show-scopes';
+
+const VERY_HIGH_PRIORITY = 3000;
+
+
+function ShowScopes(
+    eventBus,
+    canvas,
+    scopeFilter,
+    elementColors,
+    simulationStyles) {
+
+  this._eventBus = eventBus;
+  this._canvas = canvas;
+  this._scopeFilter = scopeFilter;
+  this._elementColors = elementColors;
+  this._simulationStyles = simulationStyles;
+
+  this._highlight = null;
+
+  this._init();
+
+  eventBus.on(TOGGLE_MODE_EVENT, event => {
+    const active = event.active;
+
+    if (active) {
+      (0,min_dom_dist_index_esm/* classes */.Ly)(this._container).remove('hidden');
+    } else {
+      (0,min_dom_dist_index_esm/* classes */.Ly)(this._container).add('hidden');
+      (0,min_dom_dist_index_esm/* clear */.IU)(this._container);
+
+      this.unhighlightScope();
+    }
+  });
+
+  eventBus.on(SCOPE_FILTER_CHANGED_EVENT, event => {
+
+    const allElements = this.getScopeElements();
+
+    for (const element of allElements) {
+      const scopeId = element.dataset.scopeId;
+
+      (0,min_dom_dist_index_esm/* classes */.Ly)(element).toggle('inactive', !this._scopeFilter.isShown(scopeId));
+
+      (0,min_dom_dist_index_esm/* classes */.Ly)(element).toggle('focussed', this._scopeFilter.isFocused(scopeId));
+    }
+  });
+
+  eventBus.on(SCOPE_CREATE_EVENT, event => {
+    this.addScope(event.scope);
+  });
+
+  eventBus.on(SCOPE_DESTROYED_EVENT, event => {
+    this.removeScope(event.scope);
+  });
+
+  eventBus.on(SCOPE_CHANGED_EVENT, event => {
+    this.updateScope(event.scope);
+  });
+
+  eventBus.on(RESET_SIMULATION_EVENT, () => {
+    this.removeAllInstances();
+  });
+}
+
+ShowScopes.prototype._init = function() {
+  this._container = (0,min_dom_dist_index_esm/* domify */.zm)('<div class="bts-scopes hidden"></div>');
+
+  this._canvas.getContainer().appendChild(this._container);
+};
+
+ShowScopes.prototype.addScope = function(scope) {
+
+  const processElements = [
+    'bpmn:Process',
+    'bpmn:SubProcess',
+    'bpmn:Participant'
+  ];
+
+  const {
+    element: scopeElement
+  } = scope;
+
+  if (!(0,ModelUtil/* isAny */.f7)(scopeElement, processElements)) {
+    return;
+  }
+
+  const colors = scope.colors;
+
+  const colorMarkup = colors ? `style="color: ${colors.auxiliary}; background: ${colors.primary}; outline-color: ${colors.primary}"` : '';
+
+  const html = (0,min_dom_dist_index_esm/* domify */.zm)(`
+    <div data-scope-id="${scope.id}" class="bts-scope"
+         title="Focus process instance ${scope.id}" ${colorMarkup}>
+      ${scope.getTokens()}
+    </div>
+  `);
+
+  min_dom_dist_index_esm/* event */.f0.bind(html, 'click', () => {
+    this._scopeFilter.toggle(scope);
+  });
+
+  min_dom_dist_index_esm/* event */.f0.bind(html, 'mouseenter', () => {
+    this.highlightScope(scopeElement);
+  });
+
+  min_dom_dist_index_esm/* event */.f0.bind(html, 'mouseleave', () => {
+    this.unhighlightScope();
+  });
+
+  if (!this._scopeFilter.isShown(scope)) {
+    (0,min_dom_dist_index_esm/* classes */.Ly)(html).add('inactive');
+  }
+
+  (0,min_dom_dist_index_esm/* classes */.Ly)(html).toggle('focussed', this._scopeFilter.isFocused(scope));
+
+  this._container.appendChild(html);
+};
+
+ShowScopes.prototype.getScopeElements = function() {
+  return (0,min_dom_dist_index_esm/* queryAll */.YG)('[data-scope-id]', this._container);
+};
+
+ShowScopes.prototype.getScopeElement = function(scope) {
+  return (0,min_dom_dist_index_esm/* query */.P)(`[data-scope-id="${scope.id}"]`, this._container);
+};
+
+ShowScopes.prototype.updateScope = function(scope) {
+  const element = this.getScopeElement(scope);
+
+  if (element) {
+    element.textContent = scope.getTokens();
+  }
+};
+
+ShowScopes.prototype.removeScope = function(scope) {
+  const element = this.getScopeElement(scope);
+
+  if (element) {
+    element.remove();
+  }
+};
+
+ShowScopes.prototype.removeAllInstances = function() {
+  this._container.innerHTML = '';
+};
+
+ShowScopes.prototype.highlightScope = function(element) {
+
+  this.unhighlightScope();
+
+  this._highlight = element;
+
+  this._elementColors.add(element, ID, this._getHighlightColors(), VERY_HIGH_PRIORITY);
+
+  if (!element.parent) {
+    (0,min_dom_dist_index_esm/* classes */.Ly)(this._canvas.getContainer()).add('highlight');
+  }
+};
+
+ShowScopes.prototype.unhighlightScope = function() {
+
+  if (!this._highlight) {
+    return;
+  }
+
+  const element = this._highlight;
+
+  this._elementColors.remove(element, ID);
+
+  if (!element.parent) {
+    (0,min_dom_dist_index_esm/* classes */.Ly)(this._canvas.getContainer()).remove('highlight');
+  }
+
+  this._highlight = null;
+};
+
+ShowScopes.prototype._getHighlightColors = function() {
+  return {
+    fill: this._simulationStyles.get(FILL_COLOR),
+    stroke: this._simulationStyles.get(STROKE_COLOR)
+  };
+};
+
+ShowScopes.$inject = [
+  'eventBus',
+  'canvas',
+  'scopeFilter',
+  'elementColors',
+  'simulationStyles'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/simulation-styles/SimulationStyles.js
+function SimulationStyles() {
+  this._cache = {};
+}
+
+SimulationStyles.$inject = [];
+
+
+SimulationStyles.prototype.get = function(prop) {
+
+  const cachedValue = this._cache[prop];
+
+  if (cachedValue) {
+    return cachedValue;
+  }
+
+  if (!this._computedStyle) {
+    this._computedStyle = this._getComputedStyle();
+  }
+
+  return this._cache[prop] = this._computedStyle.getPropertyValue(prop).trim();
+};
+
+SimulationStyles.prototype._getComputedStyle = function() {
+
+  const get = typeof getComputedStyle === 'function'
+    ? getComputedStyle
+    : getComputedStyleMock;
+
+  const element = typeof document !== 'undefined'
+    ? document.documentElement
+    : {};
+
+  return get(element);
+};
+
+
+// helpers //////////////////
+
+function getComputedStyleMock() {
+  return {
+    getPropertyValue() {
+      return '';
+    }
+  };
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/features/simulation-styles/index.js
+
+
+/* harmony default export */ const simulation_styles = ({
+  simulationStyles: [ 'type', SimulationStyles ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/show-scopes/index.js
+
+
+
+
+
+/* harmony default export */ const show_scopes = ({
+  __depends__: [
+    scope_filter,
+    simulation_styles
+  ],
+  __init__: [
+    'showScopes'
+  ],
+  showScopes: [ 'type', ShowScopes ]
+});
+;// ./node_modules/diagram-js/lib/util/EscapeUtil.js
+/**
+ * @param {string} str
+ *
+ * @return {string}
+ */
+function escapeCSS(str) {
+  return CSS.escape(str);
+}
+
+var HTML_ESCAPE_MAP = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  '\'': '&#39;'
+};
+
+/**
+ * @param {string} str
+ *
+ * @return {string}
+ */
+function escapeHTML(str) {
+  str = '' + str;
+
+  return str && str.replace(/[&<>"']/g, function(match) {
+    return HTML_ESCAPE_MAP[match];
+  });
+}
+
+;// ./node_modules/bpmn-js-token-simulation/lib/features/log/Log.js
+
+
+
+
+
+
+
+
+
+
+
+const ICON_INFO = InfoIcon();
+
+function getElementName(element) {
+  const name = element && element.businessObject.name;
+
+  return name && escapeHTML(name);
+}
+
+function getIconForIntermediateEvent(element, throwOrCatch) {
+  const eventTypeString = getEventTypeString(element);
+  if (eventTypeString === 'none') {
+    return 'bpmn-icon-intermediate-event-none';
+  }
+  return `bpmn-icon-intermediate-event-${throwOrCatch}-${eventTypeString}`;
+}
+
+function getEventTypeString(element) {
+  const bo = (0,ModelUtil/* getBusinessObject */.Cf)(element);
+  if (bo.get('eventDefinitions').length === 0) {
+    return 'none';
+  }
+  const eventDefinition = bo.eventDefinitions[0];
+
+  if ((0,ModelUtil.is)(eventDefinition, 'bpmn:MessageEventDefinition')) {
+    return 'message';
+  }
+  if ((0,ModelUtil.is)(eventDefinition, 'bpmn:TimerEventDefinition')) {
+    return 'timer';
+  }
+  if ((0,ModelUtil.is)(eventDefinition, 'bpmn:SignalEventDefinition')) {
+    return 'signal';
+  }
+  if ((0,ModelUtil.is)(eventDefinition, 'bpmn:ErrorEventDefinition')) {
+    return 'error';
+  }
+  if ((0,ModelUtil.is)(eventDefinition, 'bpmn:EscalationEventDefinition')) {
+    return 'escalation';
+  }
+  if ((0,ModelUtil.is)(eventDefinition, 'bpmn:CompensateEventDefinition')) {
+    return 'compensation';
+  }
+  if ((0,ModelUtil.is)(eventDefinition, 'bpmn:ConditionalEventDefinition')) {
+    return 'condition';
+  }
+  if ((0,ModelUtil.is)(eventDefinition, 'bpmn:LinkEventDefinition')) {
+    return 'link';
+  }
+  if ((0,ModelUtil.is)(eventDefinition, 'bpmn:CancelEventDefinition')) {
+    return 'cancel';
+  }
+  if ((0,ModelUtil.is)(eventDefinition, 'bpmn:TerminateEventDefinition')) {
+    return 'terminate';
+  }
+  return 'none';
+}
+
+
+function Log(
+    eventBus, notifications,
+    tokenSimulationPalette, canvas,
+    scopeFilter, simulator) {
+
+  this._notifications = notifications;
+  this._tokenSimulationPalette = tokenSimulationPalette;
+  this._canvas = canvas;
+  this._scopeFilter = scopeFilter;
+
+  this._init();
+
+  eventBus.on(SCOPE_FILTER_CHANGED_EVENT, event => {
+    const allElements = (0,min_dom_dist_index_esm/* queryAll */.YG)('.bts-entry[data-scope-id]', this._container);
+
+    for (const element of allElements) {
+      const scopeId = element.dataset.scopeId;
+
+      (0,min_dom_dist_index_esm/* classes */.Ly)(element).toggle('inactive', !this._scopeFilter.isShown(scopeId));
+    }
+  });
+
+  eventBus.on(SCOPE_DESTROYED_EVENT, event => {
+    const {
+      scope
+    } = event;
+
+    const {
+      element: scopeElement
+    } = scope;
+
+    const completed = scope.completed;
+
+    const processScopes = [
+      'bpmn:Process',
+      'bpmn:Participant',
+      'bpmn:SubProcess'
+    ];
+
+    if (!(0,ModelUtil/* isAny */.f7)(scopeElement, processScopes)) {
+      return;
+    }
+
+    const isSubProcess = (0,ModelUtil.is)(scopeElement, 'bpmn:SubProcess');
+
+    const text = `${
+      isSubProcess ? (getElementName(scopeElement) || 'SubProcess') : 'Process'
+    } ${
+      completed ? 'finished' : 'canceled'
+    }`;
+
+    this.log({
+      text,
+      icon: completed ? CheckCircleIcon() : TimesCircleIcon(),
+      scope
+    });
+  });
+
+  eventBus.on(SCOPE_CREATE_EVENT, event => {
+    const {
+      scope
+    } = event;
+
+    const {
+      element: scopeElement
+    } = scope;
+
+    const processScopes = [
+      'bpmn:Process',
+      'bpmn:Participant',
+      'bpmn:SubProcess'
+    ];
+
+    if (!(0,ModelUtil/* isAny */.f7)(scopeElement, processScopes)) {
+      return;
+    }
+
+    const isSubProcess = (0,ModelUtil.is)(scopeElement, 'bpmn:SubProcess');
+
+    const text = `${
+      isSubProcess ? (getElementName(scopeElement) || 'SubProcess') : 'Process'
+    } started`;
+
+    this.log({
+      text,
+      icon: CheckCircleIcon(),
+      scope
+    });
+  });
+
+  eventBus.on(TRACE_EVENT, event => {
+
+    const {
+      action,
+      scope: elementScope,
+      element
+    } = event;
+
+    if (action !== 'exit') {
+      return;
+    }
+
+    const scope = elementScope.parent;
+
+    const elementName = getElementName(element);
+
+    // log tasks ////////////
+
+    if ((0,ModelUtil.is)(element, 'bpmn:ServiceTask')) {
+      return this.log({
+        text: elementName || 'Service Task',
+        icon: 'bpmn-icon-service',
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:UserTask')) {
+      return this.log({
+        text: elementName || 'User Task',
+        icon: 'bpmn-icon-user',
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:CallActivity')) {
+      return this.log({
+        text: elementName || 'Call Activity',
+        icon: 'bpmn-icon-call-activity',
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:ScriptTask')) {
+      return this.log({
+        text: elementName || 'Script Task',
+        icon: 'bpmn-icon-script',
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:BusinessRuleTask')) {
+      return this.log({
+        text: elementName || 'Business Rule Task',
+        icon: 'bpmn-icon-business-rule',
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:ManualTask')) {
+      return this.log({
+        text: elementName || 'Manual Task',
+        icon: 'bpmn-icon-manual-task',
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:ReceiveTask')) {
+      return this.log({
+        text: elementName || 'Receive Task',
+        icon: 'bpmn-icon-receive',
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:SendTask')) {
+      return this.log({
+        text: elementName || 'Send Task',
+        icon: 'bpmn-icon-send',
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:Task')) {
+      return this.log({
+        text: elementName || 'Task',
+        icon: 'bpmn-icon-task',
+        scope
+      });
+    }
+
+    // log gateways ////////////
+
+    if ((0,ModelUtil.is)(element, 'bpmn:ExclusiveGateway')) {
+      return this.log({
+        text: elementName || 'Exclusive Gateway',
+        icon: 'bpmn-icon-gateway-xor',
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:ParallelGateway')) {
+      return this.log({
+        text: elementName || 'Parallel Gateway',
+        icon: 'bpmn-icon-gateway-parallel',
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:InclusiveGateway')) {
+      return this.log({
+        text: elementName || 'Inclusive Gateway',
+        icon: 'bpmn-icon-gateway-or',
+        scope
+      });
+    }
+
+    // log events /////////////
+
+    if ((0,ModelUtil.is)(element, 'bpmn:StartEvent')) {
+      return this.log({
+        text: elementName || 'Start Event',
+        icon: `bpmn-icon-start-event-${getEventTypeString(element)}`,
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:IntermediateCatchEvent')) {
+      return this.log({
+        text: elementName || 'Intermediate Event',
+        icon: getIconForIntermediateEvent(element, 'catch'),
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:IntermediateThrowEvent')) {
+      return this.log({
+        text: elementName || 'Intermediate Event',
+        icon: getIconForIntermediateEvent(element, 'throw'),
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:BoundaryEvent')) {
+      return this.log({
+        text: elementName || 'Boundary Event',
+        icon: getIconForIntermediateEvent(element, 'catch'),
+        scope
+      });
+    }
+
+    if ((0,ModelUtil.is)(element, 'bpmn:EndEvent')) {
+
+      // TODO: No trace event for terminate end events is emitted
+      return this.log({
+        text: elementName || 'End Event',
+        icon: `bpmn-icon-end-event-${getEventTypeString(element)}`,
+        scope
+      });
+    }
+  });
+
+
+  eventBus.on([
+    TOGGLE_MODE_EVENT,
+    RESET_SIMULATION_EVENT
+  ], event => {
+    this.clear();
+    this.toggle(false);
+  });
+}
+
+Log.prototype._init = function() {
+  this._container = (0,min_dom_dist_index_esm/* domify */.zm)(`
+    <div class="bts-log hidden djs-scrollable">
+      <div class="bts-header">
+        ${ LogIcon('bts-log-icon') }
+        Simulation Log
+        <button class="bts-close" aria-label="Close">
+          ${ TimesIcon() }
+        </button>
+      </div>
+      <div class="bts-content">
+        <p class="bts-entry placeholder">No Entries</p>
+      </div>
+    </div>
+  `);
+
+  this._placeholder = (0,min_dom_dist_index_esm/* query */.P)('.bts-placeholder', this._container);
+
+  this._content = (0,min_dom_dist_index_esm/* query */.P)('.bts-content', this._container);
+
+  min_dom_dist_index_esm/* event */.f0.bind(this._content, 'mousedown', event => {
+    event.stopPropagation();
+  });
+
+  this._close = (0,min_dom_dist_index_esm/* query */.P)('.bts-close', this._container);
+
+  min_dom_dist_index_esm/* event */.f0.bind(this._close, 'click', () => {
+    this.toggle(false);
+  });
+
+  this._icon = (0,min_dom_dist_index_esm/* query */.P)('.bts-log-icon', this._container);
+
+  min_dom_dist_index_esm/* event */.f0.bind(this._icon, 'click', () => {
+    this.toggle();
+  });
+
+  this._canvas.getContainer().appendChild(this._container);
+
+  this.paletteEntry = (0,min_dom_dist_index_esm/* domify */.zm)(`
+    <div class="bts-entry" title="Toggle Simulation Log">
+      ${ LogIcon() }
+    </div>
+  `);
+
+  min_dom_dist_index_esm/* event */.f0.bind(this.paletteEntry, 'click', () => {
+    this.toggle();
+  });
+
+  this._tokenSimulationPalette.addEntry(this.paletteEntry, 3);
+};
+
+Log.prototype.isShown = function() {
+  const container = this._container;
+
+  return !(0,min_dom_dist_index_esm/* classes */.Ly)(container).has('hidden');
+};
+
+Log.prototype.toggle = function(shown = !this.isShown()) {
+  const container = this._container;
+
+  if (shown) {
+    (0,min_dom_dist_index_esm/* classes */.Ly)(container).remove('hidden');
+  } else {
+    (0,min_dom_dist_index_esm/* classes */.Ly)(container).add('hidden');
+  }
+};
+
+Log.prototype.log = function(options) {
+
+  const {
+    text,
+    type = 'info',
+    icon = ICON_INFO,
+    scope
+  } = options;
+
+  const content = this._content;
+
+  (0,min_dom_dist_index_esm/* classes */.Ly)(this._placeholder).add('hidden');
+
+  if (!this.isShown()) {
+    this._notifications.showNotification(options);
+  }
+
+  const iconMarkup = icon.startsWith('<') ? icon : `<i class="${icon}"></i>`;
+
+  const colors = scope && scope.colors;
+
+  const colorMarkup = colors ? `style="background: ${colors.primary}; color: ${colors.auxiliary}"` : '';
+
+  const logEntry = (0,min_dom_dist_index_esm/* domify */.zm)(`
+    <p class="bts-entry ${ type } ${
+      scope && this._scopeFilter.isShown(scope) ? '' : 'inactive'
+    }" ${
+      scope ? `data-scope-id="${scope.id}"` : ''
+    }>
+      <span class="bts-icon">${iconMarkup}</span>
+      <span class="bts-text" title="${ text }">${text}</span>
+      ${
+        scope
+          ? `<span class="bts-scope" data-scope-id="${scope.id}" ${colorMarkup}>${scope.id}</span>`
+          : ''
+      }
+    </p>
+  `);
+
+  min_dom_dist_index_esm/* delegate */.Mm.bind(logEntry, '.bts-scope[data-scope-id]', 'click', event => {
+    this._scopeFilter.toggle(scope);
+  });
+
+  // determine if the container should scroll,
+  // because it is currently scrolled to the very bottom
+  const shouldScroll = Math.abs(content.clientHeight + content.scrollTop - content.scrollHeight) < 2;
+
+  content.appendChild(logEntry);
+
+  if (shouldScroll) {
+    content.scrollTop = content.scrollHeight;
+  }
+};
+
+Log.prototype.clear = function() {
+  while (this._content.firstChild) {
+    this._content.removeChild(this._content.firstChild);
+  }
+
+  this._placeholder = (0,min_dom_dist_index_esm/* domify */.zm)('<p class="bts-entry placeholder">No Entries</p>');
+
+  this._content.appendChild(this._placeholder);
+};
+
+Log.$inject = [
+  'eventBus',
+  'notifications',
+  'tokenSimulationPalette',
+  'canvas',
+  'scopeFilter',
+  'simulator'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/log/index.js
+
+
+
+
+
+/* harmony default export */ const log = ({
+  __depends__: [
+    notifications,
+    scope_filter
+  ],
+  __init__: [
+    'log'
+  ],
+  log: [ 'type', Log ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/element-support/ElementSupport.js
+
+
+
+
+
+
+
+
+
+const UNSUPPORTED_ELEMENTS = [
+  'bpmn:ComplexGateway'
+];
+
+function ElementSupport_isLabel(element) {
+  return element.labelTarget;
+}
+
+
+function ElementSupport(
+    eventBus, elementRegistry, canvas,
+    notifications, elementNotifications) {
+
+  this._eventBus = eventBus;
+  this._elementRegistry = elementRegistry;
+  this._elementNotifications = elementNotifications;
+  this._notifications = notifications;
+
+  this._canvasParent = canvas.getContainer().parentNode;
+
+  eventBus.on(TOGGLE_MODE_EVENT, event => {
+
+    if (event.active) {
+      this.enable();
+    } else {
+      this.clear();
+    }
+  });
+}
+
+ElementSupport.prototype.getUnsupportedElements = function() {
+  return this._unsupportedElements;
+};
+
+ElementSupport.prototype.enable = function() {
+
+  const unsupportedElements = [];
+
+  this._elementRegistry.forEach(element => {
+
+    if (ElementSupport_isLabel(element)) {
+      return;
+    }
+
+    if (!(0,ModelUtil/* isAny */.f7)(element, UNSUPPORTED_ELEMENTS)) {
+      return;
+    }
+
+    this.showWarning(element);
+
+    unsupportedElements.push(element);
+  });
+
+  if (unsupportedElements.length) {
+
+    this._notifications.showNotification({
+      text: 'Found unsupported elements',
+      icon: ExclamationTriangleIcon(),
+      type: 'warning',
+      ttl: 5000
+    });
+  }
+
+  this._unsupportedElements = unsupportedElements;
+};
+
+ElementSupport.prototype.clear = function() {
+  (0,min_dom_dist_index_esm/* classes */.Ly)(this._canvasParent).remove('warning');
+};
+
+ElementSupport.prototype.showWarning = function(element) {
+  this._elementNotifications.addElementNotification(element, {
+    type: 'warning',
+    icon: ExclamationTriangleIcon(),
+    text: 'Not supported'
+  });
+};
+
+ElementSupport.$inject = [
+  'eventBus',
+  'elementRegistry',
+  'canvas',
+  'notifications',
+  'elementNotifications'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/element-support/index.js
+
+
+
+
+/* harmony default export */ const element_support = ({
+  __depends__: [
+    element_notifications,
+    notifications
+  ],
+  __init__: [ 'elementSupport' ],
+  elementSupport: [ 'type', ElementSupport ]
+});
+
+;// ./node_modules/bpmn-js-token-simulation/lib/features/pause-simulation/PauseSimulation.js
+
+
+
+
+
+
+
+const PLAY_MARKUP = PlayIcon();
+const PAUSE_MARKUP = PauseIcon();
+
+const PauseSimulation_HIGH_PRIORITY = 1500;
+
+
+function PauseSimulation(
+    eventBus, tokenSimulationPalette,
+    notifications, canvas) {
+
+  this._eventBus = eventBus;
+  this._tokenSimulationPalette = tokenSimulationPalette;
+  this._notifications = notifications;
+
+  this.canvasParent = canvas.getContainer().parentNode;
+
+  this.isActive = false;
+  this.isPaused = true;
+
+  this._init();
+
+  // unpause on simulation start
+  eventBus.on(SCOPE_CREATE_EVENT, PauseSimulation_HIGH_PRIORITY, event => {
+    this.activate();
+    this.unpause();
+  });
+
+  eventBus.on([
+    RESET_SIMULATION_EVENT,
+    TOGGLE_MODE_EVENT
+  ], () => {
+    this.deactivate();
+    this.pause();
+  });
+
+  eventBus.on(TRACE_EVENT, PauseSimulation_HIGH_PRIORITY, event => {
+    this.unpause();
+  });
+}
+
+PauseSimulation.prototype._init = function() {
+  this.paletteEntry = (0,min_dom_dist_index_esm/* domify */.zm)(`
+    <div class="bts-entry disabled" title="Play/Pause Simulation">
+      ${ PLAY_MARKUP }
+    </div>
+  `);
+
+  min_dom_dist_index_esm/* event */.f0.bind(this.paletteEntry, 'click', this.toggle.bind(this));
+
+  this._tokenSimulationPalette.addEntry(this.paletteEntry, 1);
+};
+
+PauseSimulation.prototype.toggle = function() {
+  if (this.isPaused) {
+    this.unpause();
+  } else {
+    this.pause();
+  }
+};
+
+PauseSimulation.prototype.pause = function() {
+  if (!this.isActive) {
+    return;
+  }
+
+  (0,min_dom_dist_index_esm/* classes */.Ly)(this.paletteEntry).remove('active');
+  (0,min_dom_dist_index_esm/* classes */.Ly)(this.canvasParent).add('paused');
+
+  this.paletteEntry.innerHTML = PLAY_MARKUP;
+
+  this._eventBus.fire(PAUSE_SIMULATION_EVENT);
+
+  this._notifications.showNotification({
+    text: 'Pause Simulation'
+  });
+
+  this.isPaused = true;
+};
+
+PauseSimulation.prototype.unpause = function() {
+
+  if (!this.isActive || !this.isPaused) {
+    return;
+  }
+
+  (0,min_dom_dist_index_esm/* classes */.Ly)(this.paletteEntry).add('active');
+  (0,min_dom_dist_index_esm/* classes */.Ly)(this.canvasParent).remove('paused');
+
+  this.paletteEntry.innerHTML = PAUSE_MARKUP;
+
+  this._eventBus.fire(PLAY_SIMULATION_EVENT);
+
+  this._notifications.showNotification({
+    text: 'Play Simulation'
+  });
+
+  this.isPaused = false;
+};
+
+PauseSimulation.prototype.activate = function() {
+  this.isActive = true;
+
+  (0,min_dom_dist_index_esm/* classes */.Ly)(this.paletteEntry).remove('disabled');
+};
+
+PauseSimulation.prototype.deactivate = function() {
+  this.isActive = false;
+
+  (0,min_dom_dist_index_esm/* classes */.Ly)(this.paletteEntry).remove('active');
+  (0,min_dom_dist_index_esm/* classes */.Ly)(this.paletteEntry).add('disabled');
+};
+
+PauseSimulation.$inject = [
+  'eventBus',
+  'tokenSimulationPalette',
+  'notifications',
+  'canvas'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/pause-simulation/index.js
+
+
+
+
+/* harmony default export */ const pause_simulation = ({
+  __depends__: [
+    notifications
+  ],
+  __init__: [
+    'pauseSimulation'
+  ],
+  pauseSimulation: [ 'type', PauseSimulation ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/reset-simulation/ResetSimulation.js
+
+
+
+
+
+
+
+function ResetSimulation(eventBus, tokenSimulationPalette, notifications) {
+  this._eventBus = eventBus;
+  this._tokenSimulationPalette = tokenSimulationPalette;
+  this._notifications = notifications;
+
+  this._init();
+
+  eventBus.on(SCOPE_CREATE_EVENT, () => {
+    (0,min_dom_dist_index_esm/* classes */.Ly)(this._paletteEntry).remove('disabled');
+  });
+
+  eventBus.on(TOGGLE_MODE_EVENT, (event) => {
+    const active = this._active = event.active;
+
+    if (!active) {
+      this.resetSimulation();
+    }
+  });
+}
+
+ResetSimulation.prototype._init = function() {
+  this._paletteEntry = (0,min_dom_dist_index_esm/* domify */.zm)(`
+    <div class="bts-entry disabled" title="Reset Simulation">
+      ${ ResetIcon() }
+    </div>
+  `);
+
+  min_dom_dist_index_esm/* event */.f0.bind(this._paletteEntry, 'click', () => {
+    this.resetSimulation();
+
+    this._notifications.showNotification({
+      text: 'Reset Simulation',
+      type: 'info'
+    });
+  });
+
+  this._tokenSimulationPalette.addEntry(this._paletteEntry, 2);
+};
+
+ResetSimulation.prototype.resetSimulation = function() {
+  (0,min_dom_dist_index_esm/* classes */.Ly)(this._paletteEntry).add('disabled');
+
+  this._eventBus.fire(RESET_SIMULATION_EVENT);
+};
+
+ResetSimulation.$inject = [
+  'eventBus',
+  'tokenSimulationPalette',
+  'notifications'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/reset-simulation/index.js
+
+
+
+
+/* harmony default export */ const reset_simulation = ({
+  __depends__: [
+    notifications
+  ],
+  __init__: [
+    'resetSimulation'
+  ],
+  resetSimulation: [ 'type', ResetSimulation ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/token-count/TokenCount.js
+
+
+
+
+
+
+
+const OFFSET_BOTTOM = 10;
+const TokenCount_OFFSET_LEFT = -15;
+
+const TokenCount_LOW_PRIORITY = 500;
+
+const TokenCount_DEFAULT_PRIMARY_COLOR = '--token-simulation-green-base-44';
+const TokenCount_DEFAULT_AUXILIARY_COLOR = '--token-simulation-white';
+
+
+function TokenCount(
+    eventBus, overlays,
+    simulator, scopeFilter,
+    simulationStyles) {
+
+  this._overlays = overlays;
+  this._scopeFilter = scopeFilter;
+  this._simulator = simulator;
+  this._simulationStyles = simulationStyles;
+
+  this.overlayIds = {};
+
+  eventBus.on(ELEMENT_CHANGED_EVENT, TokenCount_LOW_PRIORITY, event => {
+
+    const {
+      element
+    } = event;
+
+    this.removeTokenCounts(element);
+    this.addTokenCounts(element);
+  });
+
+  eventBus.on(SCOPE_FILTER_CHANGED_EVENT, event => {
+
+    const allElements = (0,min_dom_dist_index_esm/* queryAll */.YG)('.bts-token-count[data-scope-id]', overlays._overlayRoot);
+
+    for (const element of allElements) {
+      const scopeId = element.dataset.scopeId;
+
+      (0,min_dom_dist_index_esm/* classes */.Ly)(element).toggle('inactive', !this._scopeFilter.isShown(scopeId));
+    }
+  });
+}
+
+TokenCount.prototype.addTokenCounts = function(element) {
+
+  if ((0,ModelUtil.is)(element, 'bpmn:MessageFlow') || (0,ModelUtil.is)(element, 'bpmn:SequenceFlow')) {
+    return;
+  }
+
+  const scopes = this._simulator.findScopes(scope => {
+    return (
+      !scope.destroyed &&
+      scope.children.some(c => !c.destroyed && c.element === element)
+    );
+  });
+
+  this.addTokenCount(element, scopes);
+};
+
+TokenCount.prototype.addTokenCount = function(element, scopes) {
+  if (!scopes.length) {
+    return;
+  }
+
+  const tokenMarkup = scopes.map(scope => {
+    return this._getTokenHTML(element, scope);
+  }).join('');
+
+  const html = (0,min_dom_dist_index_esm/* domify */.zm)(`
+    <div class="bts-token-count-parent">
+      ${tokenMarkup}
+    </div>
+  `);
+
+  const position = { bottom: OFFSET_BOTTOM, left: TokenCount_OFFSET_LEFT };
+
+  const overlayId = this._overlays.add(element, 'bts-token-count', {
+    position: position,
+    html: html,
+    show: {
+      minZoom: 0.5
+    }
+  });
+
+  this.overlayIds[element.id] = overlayId;
+};
+
+TokenCount.prototype.removeTokenCounts = function(element) {
+  this.removeTokenCount(element);
+};
+
+TokenCount.prototype.removeTokenCount = function(element) {
+  const overlayId = this.overlayIds[element.id];
+
+  if (!overlayId) {
+    return;
+  }
+
+  this._overlays.remove(overlayId);
+
+  delete this.overlayIds[element.id];
+};
+
+TokenCount.prototype._getTokenHTML = function(element, scope) {
+
+  const colors = scope.colors || this._getDefaultColors();
+
+  return `
+    <div data-scope-id="${scope.id}" class="bts-token-count waiting ${this._scopeFilter.isShown(scope) ? '' : 'inactive' }"
+         style="color: ${colors.auxiliary}; background: ${ colors.primary }">
+      ${scope.getTokensByElement(element)}
+    </div>
+  `;
+};
+
+TokenCount.prototype._getDefaultColors = function() {
+  return {
+    primary: this._simulationStyles.get(TokenCount_DEFAULT_PRIMARY_COLOR),
+    auxiliary: this._simuationStyles.get(TokenCount_DEFAULT_AUXILIARY_COLOR)
+  };
+};
+
+TokenCount.$inject = [
+  'eventBus',
+  'overlays',
+  'simulator',
+  'scopeFilter',
+  'simulationStyles'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/token-count/index.js
+
+
+
+
+
+/* harmony default export */ const token_count = ({
+  __depends__: [
+    scope_filter,
+    simulation_styles
+  ],
+  __init__: [
+    'tokenCount'
+  ],
+  tokenCount: [ 'type', TokenCount ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/set-animation-speed/SetAnimationSpeed.js
+
+
+
+
+const SPEEDS = [
+  [ 'Slow', 0.5 ],
+  [ 'Normal', 1 ],
+  [ 'Fast', 2 ]
+];
+
+
+
+
+function SetAnimationSpeed(canvas, animation, eventBus) {
+  this._canvas = canvas;
+  this._animation = animation;
+  this._eventBus = eventBus;
+
+  this._init(animation.getAnimationSpeed());
+
+  eventBus.on(TOGGLE_MODE_EVENT, event => {
+    const active = event.active;
+
+    if (!active) {
+      (0,min_dom_dist_index_esm/* classes */.Ly)(this._container).add('hidden');
+    } else {
+      (0,min_dom_dist_index_esm/* classes */.Ly)(this._container).remove('hidden');
+    }
+  });
+
+  eventBus.on(ANIMATION_SPEED_CHANGED_EVENT, event => {
+    this.setActive(event.speed);
+  });
+}
+
+SetAnimationSpeed.prototype.getToggleSpeed = function(element) {
+  return parseFloat(element.dataset.speed);
+};
+
+SetAnimationSpeed.prototype._init = function(animationSpeed) {
+  this._container = (0,min_dom_dist_index_esm/* domify */.zm)(`
+    <div class="bts-set-animation-speed hidden">
+      ${ TachometerIcon() }
+      <div class="bts-animation-speed-buttons">
+        ${
+          SPEEDS.map(([ label, speed ], idx) => `
+            <button title="Set animation speed = ${ label }" data-speed="${ speed }" class="bts-animation-speed-button ${speed === animationSpeed ? 'active' : ''}">
+              ${
+                Array.from({ length: idx + 1 }).map(
+                  () => AngleRightIcon()
+                ).join('')
+              }
+            </button>
+          `).join('')
+        }
+      </div>
+    </div>
+  `);
+
+  min_dom_dist_index_esm/* delegate */.Mm.bind(this._container, '[data-speed]', 'click', event => {
+
+    const toggle = event.delegateTarget;
+
+    const speed = this.getToggleSpeed(toggle);
+
+    this._animation.setAnimationSpeed(speed);
+  });
+
+  this._canvas.getContainer().appendChild(this._container);
+};
+
+SetAnimationSpeed.prototype.setActive = function(speed) {
+  (0,min_dom_dist_index_esm/* queryAll */.YG)('[data-speed]', this._container).forEach(toggle => {
+
+    const active = this.getToggleSpeed(toggle) === speed;
+
+    (0,min_dom_dist_index_esm/* classes */.Ly)(toggle)[active ? 'add' : 'remove']('active');
+  });
+};
+
+SetAnimationSpeed.$inject = [
+  'canvas',
+  'animation',
+  'eventBus'
+];
+
+;// ./node_modules/bpmn-js-token-simulation/lib/features/set-animation-speed/index.js
+
+
+/* harmony default export */ const set_animation_speed = ({
+  __init__: [
+    'setAnimationSpeed'
+  ],
+  setAnimationSpeed: [ 'type', SetAnimationSpeed ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/exclusive-gateway-settings/ExclusiveGatewaySettings.js
+
+
+
+
+
+const SELECTED_COLOR = '--token-simulation-grey-darken-30';
+const NOT_SELECTED_COLOR = '--token-simulation-grey-lighten-56';
+
+function getNext(gateway, sequenceFlow) {
+  var outgoing = gateway.outgoing.filter(ExclusiveGatewaySettings_isSequenceFlow);
+
+  var index = outgoing.indexOf(sequenceFlow || gateway.sequenceFlow);
+
+  if (outgoing[index + 1]) {
+    return outgoing[index + 1];
+  } else {
+    return outgoing[0];
+  }
+}
+
+function ExclusiveGatewaySettings_isSequenceFlow(connection) {
+  return (0,ModelUtil.is)(connection, 'bpmn:SequenceFlow');
+}
+
+const ExclusiveGatewaySettings_ID = 'exclusive-gateway-settings';
+
+const ExclusiveGatewaySettings_HIGH_PRIORITY = 2000;
+
+
+function ExclusiveGatewaySettings(
+    eventBus, elementRegistry,
+    elementColors, simulator, simulationStyles) {
+
+  this._elementRegistry = elementRegistry;
+  this._elementColors = elementColors;
+  this._simulator = simulator;
+  this._simulationStyles = simulationStyles;
+
+  eventBus.on(TOGGLE_MODE_EVENT, event => {
+    if (event.active) {
+      this.setSequenceFlowsDefault();
+    } else {
+      this.resetSequenceFlows();
+    }
+  });
+}
+
+ExclusiveGatewaySettings.prototype.setSequenceFlowsDefault = function() {
+  const exclusiveGateways = this._elementRegistry.filter(element => {
+    return (0,ModelUtil.is)(element, 'bpmn:ExclusiveGateway');
+  });
+
+  for (const gateway of exclusiveGateways) {
+    this.setSequenceFlow(gateway);
+  }
+};
+
+ExclusiveGatewaySettings.prototype.resetSequenceFlows = function() {
+
+  const exclusiveGateways = this._elementRegistry.filter(element => {
+    return (0,ModelUtil.is)(element, 'bpmn:ExclusiveGateway');
+  });
+
+  exclusiveGateways.forEach(exclusiveGateway => {
+    if (exclusiveGateway.outgoing.filter(ExclusiveGatewaySettings_isSequenceFlow).length) {
+      this.resetSequenceFlow(exclusiveGateway);
+    }
+  });
+};
+
+ExclusiveGatewaySettings.prototype.resetSequenceFlow = function(gateway) {
+  this._simulator.setConfig(gateway, { activeOutgoing: undefined });
+};
+
+ExclusiveGatewaySettings.prototype.setSequenceFlow = function(gateway) {
+
+  const outgoing = gateway.outgoing.filter(ExclusiveGatewaySettings_isSequenceFlow);
+
+  // not forking
+  if (outgoing.length < 2) {
+    return;
+  }
+
+  const {
+    activeOutgoing
+  } = this._simulator.getConfig(gateway);
+
+  let newActiveOutgoing;
+
+  if (activeOutgoing) {
+
+    // set next sequence flow
+    newActiveOutgoing = getNext(gateway, activeOutgoing);
+  } else {
+
+    // set first sequence flow
+    newActiveOutgoing = outgoing[ 0 ];
+  }
+
+  this._simulator.setConfig(gateway, { activeOutgoing: newActiveOutgoing });
+
+  // set colors
+  gateway.outgoing.forEach(outgoing => {
+
+    const style = outgoing === newActiveOutgoing ? SELECTED_COLOR : NOT_SELECTED_COLOR;
+    const stroke = this._simulationStyles.get(style);
+
+    this._elementColors.add(outgoing, ExclusiveGatewaySettings_ID, {
+      stroke
+    }, ExclusiveGatewaySettings_HIGH_PRIORITY);
+  });
+};
+
+ExclusiveGatewaySettings.$inject = [
+  'eventBus',
+  'elementRegistry',
+  'elementColors',
+  'simulator',
+  'simulationStyles'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/element-colors/ElementColors.js
+
+
+
+
+const ElementColors_VERY_HIGH_PRIORITY = 50000;
+
+/**
+ * @typedef Colors
+ * @prop {string} fill
+ * @prop {string} stroke
+ */
+
+/**
+ * @typedef CustomColors
+ * @prop {string} fill
+ * @prop {string} stroke
+ * @prop {number} priority
+ */
+
+function ElementColors(elementRegistry, eventBus, graphicsFactory) {
+  this._elementRegistry = elementRegistry;
+  this._eventBus = eventBus;
+  this._graphicsFactory = graphicsFactory;
+
+  this._originalColors = {};
+  this._customColors = {};
+
+  eventBus.on(TOGGLE_MODE_EVENT, ElementColors_VERY_HIGH_PRIORITY, event => {
+    const active = event.active;
+
+    if (active) {
+      this._saveOriginalColors();
+    } else {
+      this._applyOriginalColors();
+
+      this._originalColors = {};
+      this._customColors = {};
+    }
+  });
+
+  eventBus.on('saveXML.start', ElementColors_VERY_HIGH_PRIORITY, () => {
+    this._applyOriginalColors();
+
+    eventBus.once('saveXML.done', () => this._applyCustomColors());
+  });
+}
+
+ElementColors.$inject = [
+  'elementRegistry',
+  'eventBus',
+  'graphicsFactory'
+];
+
+/**
+ * Add colors to an element. Element will be redrawn with highest priority
+ * colors.
+ *
+ * @param {Object} element
+ * @param {string} id
+ * @param {Colors} colors
+ * @param {number} [priority=1000]
+ */
+ElementColors.prototype.add = function(element, id, colors, priority = 1000) {
+  let elementColors = this._customColors[ element.id ];
+
+  if (!elementColors) {
+    elementColors = this._customColors[ element.id ] = {};
+  }
+
+  elementColors[ id ] = {
+    ...colors,
+    priority
+  };
+
+  this._applyHighestPriorityColor(element);
+};
+
+
+/**
+ * Remove colors from an element. Element will be redrawn with highest priority
+ * colors.
+ *
+ * @param {Object} element
+ * @param {string} id
+ */
+ElementColors.prototype.remove = function(element, id) {
+  const elementColors = this._customColors[ element.id ];
+
+  if (elementColors) {
+    delete elementColors[ id ];
+
+    if (!Object.keys(elementColors)) {
+      delete this._customColors[ element.id ];
+    }
+  }
+
+  this._applyHighestPriorityColor(element);
+};
+
+ElementColors.prototype._get = function(element) {
+  const di = (0,ModelUtil/* getDi */.S2)(element);
+
+  if (!di) {
+    return undefined;
+  }
+
+  // reading in accordance with bpmn-js@8.7+,
+  // BPMN-in-Color specification
+  if (ElementColors_isLabel(element)) {
+    return {
+      stroke: di.label && di.label.get('color')
+    };
+  } else if ((0,ModelUtil/* isAny */.f7)(di, [ 'bpmndi:BPMNEdge', 'bpmndi:BPMNShape' ])) {
+    return {
+      fill: di.get('background-color'),
+      stroke: di.get('border-color')
+    };
+  }
+};
+
+ElementColors.prototype._set = function(element, colors = {}) {
+  const {
+    fill,
+    stroke
+  } = colors;
+
+  const di = (0,ModelUtil/* getDi */.S2)(element);
+
+  if (!di) {
+    return;
+  }
+
+  // writing in accordance with bpmn-js@8.7+,
+  // BPMN-in-Color specification
+  if (ElementColors_isLabel(element)) {
+    di.label && di.label.set('color', stroke);
+  } else if ((0,ModelUtil/* isAny */.f7)(di, [ 'bpmndi:BPMNEdge', 'bpmndi:BPMNShape' ])) {
+    di.set('background-color', fill);
+    di.set('border-color', stroke);
+  }
+
+  this._forceRedraw(element);
+};
+
+ElementColors.prototype._saveOriginalColors = function() {
+  this._originalColors = {};
+
+  this._elementRegistry.forEach(element => {
+    this._originalColors[ element.id ] = this._get(element);
+  });
+};
+
+ElementColors.prototype._applyOriginalColors = function() {
+  this._elementRegistry.forEach(element => {
+    const colors = this._originalColors[ element.id ];
+
+    if (colors) {
+      this._set(element, colors);
+    }
+  });
+};
+
+ElementColors.prototype._applyCustomColors = function() {
+  this._elementRegistry.forEach(element => {
+    const elementColors = this._customColors[ element.id ];
+
+    if (elementColors) {
+      this._set(element, getColorsWithHighestPriority(elementColors));
+    }
+  });
+};
+
+ElementColors.prototype._applyHighestPriorityColor = function(element) {
+  const elementColors = this._customColors[ element.id ];
+
+  if (!elementColors) {
+    this._set(element, this._originalColors[ element.id ]);
+
+    return;
+  }
+
+  this._set(element, getColorsWithHighestPriority(elementColors));
+};
+
+ElementColors.prototype._forceRedraw = function(element) {
+  const gfx = this._elementRegistry.getGraphics(element);
+
+  const type = element.waypoints ? 'connection' : 'shape';
+
+  this._graphicsFactory.update(type, element, gfx);
+};
+
+
+// helpers /////////////////
+
+function ElementColors_isLabel(element) {
+  return 'labelTarget' in element;
+}
+
+/**
+ * Get colors with highest priority.
+ *
+ * @param {Map<string, CustomColors>|undefined} colors
+ *
+ * @returns {Colors|undefined}
+ */
+function getColorsWithHighestPriority(colors = {}) {
+  const colorsWithHighestPriority = Object.values(colors).reduce((colorsWithHighestPriority, colors) => {
+    const { priority = 1000 } = colors;
+
+    if (!colorsWithHighestPriority || priority > colorsWithHighestPriority.priority) {
+      return colors;
+    }
+
+    return colorsWithHighestPriority;
+  }, undefined);
+
+  if (colorsWithHighestPriority) {
+    const { priority, ...fillAndStroke } = colorsWithHighestPriority;
+
+    return fillAndStroke;
+  }
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/features/element-colors/index.js
+
+
+/* harmony default export */ const element_colors = ({
+  elementColors: [ 'type', ElementColors ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/exclusive-gateway-settings/index.js
+
+
+
+
+/* harmony default export */ const exclusive_gateway_settings = ({
+  __depends__: [
+    element_colors,
+    simulation_styles
+  ],
+  exclusiveGatewaySettings: [ 'type', ExclusiveGatewaySettings ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/neutral-element-colors/NeutralElementColors.js
+
+
+const NeutralElementColors_ID = 'neutral-element-colors';
+
+function NeutralElementColors(
+    eventBus, elementRegistry, elementColors) {
+
+  this._elementRegistry = elementRegistry;
+  this._elementColors = elementColors;
+
+  eventBus.on(TOGGLE_MODE_EVENT, event => {
+    const { active } = event;
+
+    if (active) {
+      this._setNeutralColors();
+    }
+  });
+}
+
+NeutralElementColors.prototype._setNeutralColors = function() {
+  this._elementRegistry.forEach(element => {
+    this._elementColors.add(element, NeutralElementColors_ID, {
+      stroke: '#212121',
+      fill: '#fff'
+    });
+  });
+};
+
+NeutralElementColors.$inject = [
+  'eventBus',
+  'elementRegistry',
+  'elementColors'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/neutral-element-colors/index.js
+
+
+
+/* harmony default export */ const neutral_element_colors = ({
+  __depends__: [ element_colors ],
+  __init__: [
+    'neutralElementColors'
+  ],
+  neutralElementColors: [ 'type', NeutralElementColors ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/inclusive-gateway-settings/InclusiveGatewaySettings.js
+
+
+
+const InclusiveGatewaySettings_SELECTED_COLOR = '--token-simulation-grey-darken-30';
+const InclusiveGatewaySettings_NOT_SELECTED_COLOR = '--token-simulation-grey-lighten-56';
+
+
+
+const COLOR_ID = 'inclusive-gateway-settings';
+
+
+function InclusiveGatewaySettings(
+    eventBus, elementRegistry,
+    elementColors, simulator, simulationStyles) {
+
+  this._elementRegistry = elementRegistry;
+  this._elementColors = elementColors;
+  this._simulator = simulator;
+  this._simulationStyles = simulationStyles;
+
+  eventBus.on(TOGGLE_MODE_EVENT, event => {
+    if (event.active) {
+      this.setDefaults();
+    } else {
+      this.reset();
+    }
+  });
+}
+
+InclusiveGatewaySettings.prototype.setDefaults = function() {
+  const inclusiveGateways = this._elementRegistry.filter(element => {
+    return (0,ModelUtil.is)(element, 'bpmn:InclusiveGateway');
+  });
+
+  inclusiveGateways.forEach(inclusiveGateway => {
+    if (inclusiveGateway.outgoing.filter(isSequenceFlow).length > 1) {
+      this._setGatewayDefaults(inclusiveGateway);
+    }
+  });
+};
+
+InclusiveGatewaySettings.prototype.reset = function() {
+  const inclusiveGateways = this._elementRegistry.filter(element => {
+    return (0,ModelUtil.is)(element, 'bpmn:InclusiveGateway');
+  });
+
+  inclusiveGateways.forEach(inclusiveGateway => {
+    if (inclusiveGateway.outgoing.filter(isSequenceFlow).length > 1) {
+      this._resetGateway(inclusiveGateway);
+    }
+  });
+};
+
+InclusiveGatewaySettings.prototype.toggleSequenceFlow = function(gateway, sequenceFlow) {
+  const activeOutgoing = this._getActiveOutgoing(gateway),
+        defaultFlow = getDefaultFlow(gateway),
+        nonDefaultFlows = getNonDefaultFlows(gateway);
+
+  let newActiveOutgoing;
+  if (activeOutgoing.includes(sequenceFlow)) {
+    newActiveOutgoing = without(activeOutgoing, sequenceFlow);
+  } else {
+    newActiveOutgoing = without(activeOutgoing, defaultFlow).concat(sequenceFlow);
+  }
+
+  // make sure at least one flow is active
+  if (!newActiveOutgoing.length) {
+
+    // default flow if available
+    if (defaultFlow) {
+      newActiveOutgoing = [ defaultFlow ];
+    } else {
+
+      // or another flow which is not the one toggled
+      newActiveOutgoing = [ nonDefaultFlows.find(flow => flow !== sequenceFlow) ];
+    }
+  }
+
+  this._setActiveOutgoing(gateway, newActiveOutgoing);
+};
+
+InclusiveGatewaySettings.prototype._getActiveOutgoing = function(gateway) {
+  const {
+    activeOutgoing
+  } = this._simulator.getConfig(gateway);
+
+  return activeOutgoing;
+};
+
+InclusiveGatewaySettings.prototype._setActiveOutgoing = function(gateway, activeOutgoing) {
+  this._simulator.setConfig(gateway, { activeOutgoing });
+
+  const sequenceFlows = gateway.outgoing.filter(isSequenceFlow);
+
+  // set colors
+  sequenceFlows.forEach(outgoing => {
+
+    const style = (!activeOutgoing || activeOutgoing.includes(outgoing)) ?
+      InclusiveGatewaySettings_SELECTED_COLOR : InclusiveGatewaySettings_NOT_SELECTED_COLOR;
+    const stroke = this._simulationStyles.get(style);
+
+    this._elementColors.add(outgoing, COLOR_ID, {
+      stroke
+    });
+  });
+};
+
+InclusiveGatewaySettings.prototype._setGatewayDefaults = function(gateway) {
+  const sequenceFlows = gateway.outgoing.filter(isSequenceFlow);
+
+  const defaultFlow = getDefaultFlow(gateway);
+  const nonDefaultFlows = without(sequenceFlows, defaultFlow);
+
+  this._setActiveOutgoing(gateway, nonDefaultFlows);
+};
+
+InclusiveGatewaySettings.prototype._resetGateway = function(gateway) {
+  this._simulator.setConfig(gateway, { activeOutgoing: undefined });
+};
+
+InclusiveGatewaySettings.$inject = [
+  'eventBus',
+  'elementRegistry',
+  'elementColors',
+  'simulator',
+  'simulationStyles'
+];
+
+function getDefaultFlow(gateway) {
+  const defaultFlow = (0,ModelUtil/* getBusinessObject */.Cf)(gateway).default;
+
+  if (!defaultFlow) {
+    return;
+  }
+
+  return gateway.outgoing.find(flow => {
+    const flowBo = (0,ModelUtil/* getBusinessObject */.Cf)(flow);
+
+    return flowBo === defaultFlow;
+  });
+}
+
+function getNonDefaultFlows(gateway) {
+  const defaultFlow = getDefaultFlow(gateway);
+
+  return gateway.outgoing.filter(flow => {
+    const flowBo = (0,ModelUtil/* getBusinessObject */.Cf)(flow);
+
+    return flowBo !== defaultFlow;
+  });
+}
+
+function without(array, element) {
+  return array.filter(arrayElement => arrayElement !== element);
+}
+
+;// ./node_modules/bpmn-js-token-simulation/lib/features/inclusive-gateway-settings/index.js
+
+
+
+
+/* harmony default export */ const inclusive_gateway_settings = ({
+  __depends__: [
+    element_colors,
+    simulation_styles
+  ],
+  inclusiveGatewaySettings: [ 'type', InclusiveGatewaySettings ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/palette/Palette.js
+
+
+
+
+
+function Palette(eventBus, canvas) {
+  var self = this;
+
+  this._canvas = canvas;
+
+  this.entries = [];
+
+  this._init();
+
+  eventBus.on(TOGGLE_MODE_EVENT, function(context) {
+    var active = context.active;
+
+    if (active) {
+      (0,min_dom_dist_index_esm/* classes */.Ly)(self.container).remove('hidden');
+    } else {
+      (0,min_dom_dist_index_esm/* classes */.Ly)(self.container).add('hidden');
+    }
+  });
+}
+
+Palette.prototype._init = function() {
+  this.container = (0,min_dom_dist_index_esm/* domify */.zm)('<div class="bts-palette hidden"></div>');
+
+  this._canvas.getContainer().appendChild(this.container);
+};
+
+Palette.prototype.addEntry = function(entry, index) {
+  var childIndex = 0;
+
+  this.entries.forEach(function(entry) {
+    if (index >= entry.index) {
+      childIndex++;
+    }
+  });
+
+  this.container.insertBefore(entry, this.container.childNodes[childIndex]);
+
+  this.entries.push({
+    entry: entry,
+    index: index
+  });
+};
+
+Palette.$inject = [ 'eventBus', 'canvas' ];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/palette/index.js
+
+
+/* harmony default export */ const palette = ({
+  __init__: [
+    'tokenSimulationPalette'
+  ],
+  tokenSimulationPalette: [ 'type', Palette ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/base.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* harmony default export */ const base = ({
+  __depends__: [
+    simulator,
+    animation,
+    colored_scopes,
+    context_pads,
+    simulation_state,
+    show_scopes,
+    log,
+    element_support,
+    pause_simulation,
+    reset_simulation,
+    token_count,
+    set_animation_speed,
+    exclusive_gateway_settings,
+    neutral_element_colors,
+    inclusive_gateway_settings,
+    palette
+  ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/disable-modeling/DisableModeling.js
+
+
+const DisableModeling_HIGH_PRIORITY = 10001;
+
+
+function DisableModeling(
+    eventBus,
+    contextPad,
+    dragging,
+    directEditing,
+    editorActions,
+    modeling,
+    palette) {
+
+  let modelingDisabled = false;
+
+  eventBus.on(TOGGLE_MODE_EVENT, DisableModeling_HIGH_PRIORITY, event => {
+
+    modelingDisabled = event.active;
+
+    if (modelingDisabled) {
+      directEditing.cancel();
+      dragging.cancel();
+    }
+
+    palette._update();
+  });
+
+  function intercept(obj, fnName, cb) {
+    const fn = obj[fnName];
+    obj[fnName] = function() {
+      return cb.call(this, fn, arguments);
+    };
+  }
+
+  function ignoreIfModelingDisabled(obj, fnName) {
+    intercept(obj, fnName, function(fn, args) {
+      if (modelingDisabled) {
+        return;
+      }
+
+      return fn.apply(this, args);
+    });
+  }
+
+  function throwIfModelingDisabled(obj, fnName) {
+    intercept(obj, fnName, function(fn, args) {
+      if (modelingDisabled) {
+        throw new Error('model is read-only');
+      }
+
+      return fn.apply(this, args);
+    });
+  }
+
+  ignoreIfModelingDisabled(dragging, 'init');
+
+  ignoreIfModelingDisabled(directEditing, 'activate');
+
+  ignoreIfModelingDisabled(dragging, 'init');
+
+  ignoreIfModelingDisabled(directEditing, 'activate');
+
+  throwIfModelingDisabled(modeling, 'moveShape');
+  throwIfModelingDisabled(modeling, 'updateAttachment');
+  throwIfModelingDisabled(modeling, 'moveElements');
+  throwIfModelingDisabled(modeling, 'moveConnection');
+  throwIfModelingDisabled(modeling, 'layoutConnection');
+  throwIfModelingDisabled(modeling, 'createConnection');
+  throwIfModelingDisabled(modeling, 'createShape');
+  throwIfModelingDisabled(modeling, 'createLabel');
+  throwIfModelingDisabled(modeling, 'appendShape');
+  throwIfModelingDisabled(modeling, 'removeElements');
+  throwIfModelingDisabled(modeling, 'distributeElements');
+  throwIfModelingDisabled(modeling, 'removeShape');
+  throwIfModelingDisabled(modeling, 'removeConnection');
+  throwIfModelingDisabled(modeling, 'replaceShape');
+  throwIfModelingDisabled(modeling, 'pasteElements');
+  throwIfModelingDisabled(modeling, 'alignElements');
+  throwIfModelingDisabled(modeling, 'resizeShape');
+  throwIfModelingDisabled(modeling, 'createSpace');
+  throwIfModelingDisabled(modeling, 'updateWaypoints');
+  throwIfModelingDisabled(modeling, 'reconnectStart');
+  throwIfModelingDisabled(modeling, 'reconnectEnd');
+
+  intercept(editorActions, 'trigger', function(fn, args) {
+    const action = args[0];
+
+    // allow list actions permitted,
+    // everything else is likely incompatible with
+    // token simulation mode
+    if (modelingDisabled && !isAnyAction([
+      'toggleTokenSimulation',
+      'toggleTokenSimulationLog',
+      'togglePauseTokenSimulation',
+      'resetTokenSimulation',
+      'stepZoom',
+      'zoom'
+    ], action)) {
+      return;
+    }
+
+    return fn.apply(this, args);
+  });
+}
+
+DisableModeling.$inject = [
+  'eventBus',
+  'contextPad',
+  'dragging',
+  'directEditing',
+  'editorActions',
+  'modeling',
+  'palette'
+];
+
+
+// helpers //////////
+
+function isAnyAction(actions, action) {
+  return actions.indexOf(action) > -1;
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/features/disable-modeling/index.js
+
+
+/* harmony default export */ const disable_modeling = ({
+  __init__: [
+    'disableModeling'
+  ],
+  disableModeling: [ 'type', DisableModeling ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/toggle-mode/modeler/ToggleMode.js
+
+
+
+
+
+
+
+function ToggleMode(
+    eventBus, canvas, selection,
+    contextPad) {
+
+  this._eventBus = eventBus;
+  this._canvas = canvas;
+  this._selection = selection;
+  this._contextPad = contextPad;
+
+  this._active = false;
+
+  eventBus.on('import.parse.start', () => {
+
+    if (this._active) {
+      this.toggleMode(false);
+
+      eventBus.once('import.done', () => {
+        this.toggleMode(true);
+      });
+    }
+  });
+
+  eventBus.on('diagram.init', () => {
+    this._canvasParent = this._canvas.getContainer().parentNode;
+    this._palette = (0,min_dom_dist_index_esm/* query */.P)('.djs-palette', this._canvas.getContainer());
+
+    this._init();
+  });
+}
+
+ToggleMode.prototype._init = function() {
+  this._container = (0,min_dom_dist_index_esm/* domify */.zm)(`
+    <div class="bts-toggle-mode">
+      Token Simulation <span class="bts-toggle">${ ToggleOffIcon() }</span>
+    </div>
+  `);
+
+  min_dom_dist_index_esm/* event */.f0.bind(this._container, 'click', () => this.toggleMode());
+
+  this._canvas.getContainer().appendChild(this._container);
+};
+
+ToggleMode.prototype.toggleMode = function(active = !this._active) {
+
+  if (active === this._active) {
+    return;
+  }
+
+  if (active) {
+    this._container.innerHTML = `Token Simulation <span class="bts-toggle">${ ToggleOnIcon() }</span>`;
+
+    (0,min_dom_dist_index_esm/* classes */.Ly)(this._canvasParent).add('simulation');
+    (0,min_dom_dist_index_esm/* classes */.Ly)(this._palette).add('hidden');
+  } else {
+    this._container.innerHTML = `Token Simulation <span class="bts-toggle">${ ToggleOffIcon() }</span>`;
+
+    (0,min_dom_dist_index_esm/* classes */.Ly)(this._canvasParent).remove('simulation');
+    (0,min_dom_dist_index_esm/* classes */.Ly)(this._palette).remove('hidden');
+
+    const elements = this._selection.get();
+
+    if (elements.length === 1) {
+      this._contextPad.open(elements[0]);
+    }
+  }
+
+  this._eventBus.fire(TOGGLE_MODE_EVENT, {
+    active
+  });
+
+  this._active = active;
+};
+
+ToggleMode.$inject = [
+  'eventBus',
+  'canvas',
+  'selection',
+  'contextPad'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/toggle-mode/modeler/index.js
+
+
+/* harmony default export */ const modeler = ({
+  __init__: [
+    'toggleMode'
+  ],
+  toggleMode: [ 'type', ToggleMode ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/editor-actions/EditorActions.js
+
+
+function EditorActions(
+    eventBus,
+    toggleMode,
+    pauseSimulation,
+    resetSimulation,
+    editorActions,
+    injector
+) {
+  var active = false;
+
+  editorActions.register({
+    toggleTokenSimulation: function() {
+      toggleMode.toggleMode();
+    }
+  });
+
+  editorActions.register({
+    togglePauseTokenSimulation: function() {
+      active && pauseSimulation.toggle();
+    }
+  });
+
+  editorActions.register({
+    resetTokenSimulation: function() {
+      active && resetSimulation.resetSimulation();
+    }
+  });
+
+  const log = injector.get('log', false);
+
+  log && editorActions.register({
+    toggleTokenSimulationLog: function() {
+      log.toggle();
+    }
+  });
+
+  eventBus.on(TOGGLE_MODE_EVENT, (event) => {
+    active = event.active;
+  });
+}
+
+EditorActions.$inject = [
+  'eventBus',
+  'toggleMode',
+  'pauseSimulation',
+  'resetSimulation',
+  'editorActions',
+  'injector'
+];
+;// ./node_modules/bpmn-js-token-simulation/lib/features/editor-actions/index.js
+
+
+/* harmony default export */ const editor_actions = ({
+  __init__: [
+    'tokenSimulationEditorActions'
+  ],
+  tokenSimulationEditorActions: [ 'type', EditorActions ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/features/keyboard-bindings/KeyboardBindings.js
+
+
+const KeyboardBindings_VERY_HIGH_PRIORITY = 10000;
+
+
+function KeyboardBindings(eventBus, injector) {
+
+  var editorActions = injector.get('editorActions', false),
+      keyboard = injector.get('keyboard', false);
+
+  if (!keyboard || !editorActions) {
+    return;
+  }
+
+
+  var isActive = false;
+
+
+  function handleKeyEvent(keyEvent) {
+    if (isKey([ 't', 'T' ], keyEvent)) {
+      editorActions.trigger('toggleTokenSimulation');
+
+      return true;
+    }
+
+    if (!isActive) {
+      return;
+    }
+
+    if (isKey([ 'l', 'L' ], keyEvent)) {
+      editorActions.trigger('toggleTokenSimulationLog');
+
+      return true;
+    }
+
+    // see https://developer.mozilla.org/de/docs/Web/API/KeyboardEvent/key/Key_Values#Whitespace_keys
+    if (isKey([ ' ', 'Spacebar' ], keyEvent)) {
+      editorActions.trigger('togglePauseTokenSimulation');
+
+      return true;
+    }
+
+    if (isKey([ 'r', 'R' ], keyEvent)) {
+      editorActions.trigger('resetTokenSimulation');
+
+      return true;
+    }
+  }
+
+
+  eventBus.on('keyboard.init', function() {
+
+    keyboard.addListener(KeyboardBindings_VERY_HIGH_PRIORITY, function(event) {
+      var keyEvent = event.keyEvent;
+
+      return handleKeyEvent(keyEvent);
+    });
+
+  });
+
+  eventBus.on(TOGGLE_MODE_EVENT, function(context) {
+    var active = context.active;
+
+    if (active) {
+      isActive = true;
+    } else {
+      isActive = false;
+    }
+  });
+
+}
+
+KeyboardBindings.$inject = [ 'eventBus', 'injector' ];
+
+
+// helpers //////////
+
+function isKey(keys, event) {
+  return keys.indexOf(event.key) > -1;
+}
+;// ./node_modules/bpmn-js-token-simulation/lib/features/keyboard-bindings/index.js
+
+
+/* harmony default export */ const keyboard_bindings = ({
+  __init__: [
+    'tokenSimulationKeyboardBindings'
+  ],
+  tokenSimulationKeyboardBindings: [ 'type', KeyboardBindings ]
+});
+;// ./node_modules/bpmn-js-token-simulation/lib/modeler.js
+
+
+
+
+
+
+
+/* harmony default export */ const lib_modeler = ({
+  __depends__: [
+    base,
+    disable_modeling,
+    modeler,
+    editor_actions,
+    keyboard_bindings
+  ]
+});
+
+/***/ }),
+
+/***/ 555:
+/***/ (function(module, exports, __webpack_require__) {
+
+/* module decorator */ module = __webpack_require__.nmd(module);
+// randomColor by David Merfield under the CC0 license
+// https://github.com/davidmerfield/randomColor/
+
+;(function(root, factory) {
+
+  // Support CommonJS
+  if (true) {
+    var randomColor = factory();
+
+    // Support NodeJS & Component, which allow module.exports to be a function
+    if ( true && module && module.exports) {
+      exports = module.exports = randomColor;
+    }
+
+    // Support CommonJS 1.1.1 spec
+    exports.randomColor = randomColor;
+
+  // Support AMD
+  } else {}
+
+}(this, function() {
+
+  // Seed to get repeatable colors
+  var seed = null;
+
+  // Shared color dictionary
+  var colorDictionary = {};
+
+  // Populate the color dictionary
+  loadColorBounds();
+
+  // check if a range is taken
+  var colorRanges = [];
+
+  var randomColor = function (options) {
+
+    options = options || {};
+
+    // Check if there is a seed and ensure it's an
+    // integer. Otherwise, reset the seed value.
+    if (options.seed !== undefined && options.seed !== null && options.seed === parseInt(options.seed, 10)) {
+      seed = options.seed;
+
+    // A string was passed as a seed
+    } else if (typeof options.seed === 'string') {
+      seed = stringToInteger(options.seed);
+
+    // Something was passed as a seed but it wasn't an integer or string
+    } else if (options.seed !== undefined && options.seed !== null) {
+      throw new TypeError('The seed value must be an integer or string');
+
+    // No seed, reset the value outside.
+    } else {
+      seed = null;
+    }
+
+    var H,S,B;
+
+    // Check if we need to generate multiple colors
+    if (options.count !== null && options.count !== undefined) {
+
+      var totalColors = options.count,
+          colors = [];
+      // Value false at index i means the range i is not taken yet.
+      for (var i = 0; i < options.count; i++) {
+        colorRanges.push(false)
+        }
+      options.count = null;
+
+      while (totalColors > colors.length) {
+
+        var color = randomColor(options);
+
+        if (seed !== null) {
+          options.seed = seed;
+        }
+
+        colors.push(color);
+      }
+
+      options.count = totalColors;
+
+      return colors;
+    }
+
+    // First we pick a hue (H)
+    H = pickHue(options);
+
+    // Then use H to determine saturation (S)
+    S = pickSaturation(H, options);
+
+    // Then use S and H to determine brightness (B).
+    B = pickBrightness(H, S, options);
+
+    // Then we return the HSB color in the desired format
+    return setFormat([H,S,B], options);
+  };
+
+  function pickHue(options) {
+    if (colorRanges.length > 0) {
+      var hueRange = getRealHueRange(options.hue)
+
+      var hue = randomWithin(hueRange)
+
+      //Each of colorRanges.length ranges has a length equal approximatelly one step
+      var step = (hueRange[1] - hueRange[0]) / colorRanges.length
+
+      var j = parseInt((hue - hueRange[0]) / step)
+
+      //Check if the range j is taken
+      if (colorRanges[j] === true) {
+        j = (j + 2) % colorRanges.length
+      }
+      else {
+        colorRanges[j] = true
+           }
+
+      var min = (hueRange[0] + j * step) % 359,
+          max = (hueRange[0] + (j + 1) * step) % 359;
+
+      hueRange = [min, max]
+
+      hue = randomWithin(hueRange)
+
+      if (hue < 0) {hue = 360 + hue;}
+      return hue
+    }
+    else {
+      var hueRange = getHueRange(options.hue)
+
+      hue = randomWithin(hueRange);
+      // Instead of storing red as two seperate ranges,
+      // we group them, using negative numbers
+      if (hue < 0) {
+        hue = 360 + hue;
+      }
+
+      return hue;
+    }
+  }
+
+  function pickSaturation (hue, options) {
+
+    if (options.hue === 'monochrome') {
+      return 0;
+    }
+
+    if (options.luminosity === 'random') {
+      return randomWithin([0,100]);
+    }
+
+    var saturationRange = getSaturationRange(hue);
+
+    var sMin = saturationRange[0],
+        sMax = saturationRange[1];
+
+    switch (options.luminosity) {
+
+      case 'bright':
+        sMin = 55;
+        break;
+
+      case 'dark':
+        sMin = sMax - 10;
+        break;
+
+      case 'light':
+        sMax = 55;
+        break;
+   }
+
+    return randomWithin([sMin, sMax]);
+
+  }
+
+  function pickBrightness (H, S, options) {
+
+    var bMin = getMinimumBrightness(H, S),
+        bMax = 100;
+
+    switch (options.luminosity) {
+
+      case 'dark':
+        bMax = bMin + 20;
+        break;
+
+      case 'light':
+        bMin = (bMax + bMin)/2;
+        break;
+
+      case 'random':
+        bMin = 0;
+        bMax = 100;
+        break;
+    }
+
+    return randomWithin([bMin, bMax]);
+  }
+
+  function setFormat (hsv, options) {
+
+    switch (options.format) {
+
+      case 'hsvArray':
+        return hsv;
+
+      case 'hslArray':
+        return HSVtoHSL(hsv);
+
+      case 'hsl':
+        var hsl = HSVtoHSL(hsv);
+        return 'hsl('+hsl[0]+', '+hsl[1]+'%, '+hsl[2]+'%)';
+
+      case 'hsla':
+        var hslColor = HSVtoHSL(hsv);
+        var alpha = options.alpha || Math.random();
+        return 'hsla('+hslColor[0]+', '+hslColor[1]+'%, '+hslColor[2]+'%, ' + alpha + ')';
+
+      case 'rgbArray':
+        return HSVtoRGB(hsv);
+
+      case 'rgb':
+        var rgb = HSVtoRGB(hsv);
+        return 'rgb(' + rgb.join(', ') + ')';
+
+      case 'rgba':
+        var rgbColor = HSVtoRGB(hsv);
+        var alpha = options.alpha || Math.random();
+        return 'rgba(' + rgbColor.join(', ') + ', ' + alpha + ')';
+
+      default:
+        return HSVtoHex(hsv);
+    }
+
+  }
+
+  function getMinimumBrightness(H, S) {
+
+    var lowerBounds = getColorInfo(H).lowerBounds;
+
+    for (var i = 0; i < lowerBounds.length - 1; i++) {
+
+      var s1 = lowerBounds[i][0],
+          v1 = lowerBounds[i][1];
+
+      var s2 = lowerBounds[i+1][0],
+          v2 = lowerBounds[i+1][1];
+
+      if (S >= s1 && S <= s2) {
+
+         var m = (v2 - v1)/(s2 - s1),
+             b = v1 - m*s1;
+
+         return m*S + b;
+      }
+
+    }
+
+    return 0;
+  }
+
+  function getHueRange (colorInput) {
+
+    if (typeof parseInt(colorInput) === 'number') {
+
+      var number = parseInt(colorInput);
+
+      if (number < 360 && number > 0) {
+        return [number, number];
+      }
+
+    }
+
+    if (typeof colorInput === 'string') {
+
+      if (colorDictionary[colorInput]) {
+        var color = colorDictionary[colorInput];
+        if (color.hueRange) {return color.hueRange;}
+      } else if (colorInput.match(/^#?([0-9A-F]{3}|[0-9A-F]{6})$/i)) {
+        var hue = HexToHSB(colorInput)[0];
+        return [ hue, hue ];
+      }
+    }
+
+    return [0,360];
+
+  }
+
+  function getSaturationRange (hue) {
+    return getColorInfo(hue).saturationRange;
+  }
+
+  function getColorInfo (hue) {
+
+    // Maps red colors to make picking hue easier
+    if (hue >= 334 && hue <= 360) {
+      hue-= 360;
+    }
+
+    for (var colorName in colorDictionary) {
+       var color = colorDictionary[colorName];
+       if (color.hueRange &&
+           hue >= color.hueRange[0] &&
+           hue <= color.hueRange[1]) {
+          return colorDictionary[colorName];
+       }
+    } return 'Color not found';
+  }
+
+  function randomWithin (range) {
+    if (seed === null) {
+      //generate random evenly destinct number from : https://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
+      var golden_ratio = 0.618033988749895
+      var r=Math.random()
+      r += golden_ratio
+      r %= 1
+      return Math.floor(range[0] + r*(range[1] + 1 - range[0]));
+    } else {
+      //Seeded random algorithm from http://indiegamr.com/generate-repeatable-random-numbers-in-js/
+      var max = range[1] || 1;
+      var min = range[0] || 0;
+      seed = (seed * 9301 + 49297) % 233280;
+      var rnd = seed / 233280.0;
+      return Math.floor(min + rnd * (max - min));
+}
+  }
+
+  function HSVtoHex (hsv){
+
+    var rgb = HSVtoRGB(hsv);
+
+    function componentToHex(c) {
+        var hex = c.toString(16);
+        return hex.length == 1 ? '0' + hex : hex;
+    }
+
+    var hex = '#' + componentToHex(rgb[0]) + componentToHex(rgb[1]) + componentToHex(rgb[2]);
+
+    return hex;
+
+  }
+
+  function defineColor (name, hueRange, lowerBounds) {
+
+    var sMin = lowerBounds[0][0],
+        sMax = lowerBounds[lowerBounds.length - 1][0],
+
+        bMin = lowerBounds[lowerBounds.length - 1][1],
+        bMax = lowerBounds[0][1];
+
+    colorDictionary[name] = {
+      hueRange: hueRange,
+      lowerBounds: lowerBounds,
+      saturationRange: [sMin, sMax],
+      brightnessRange: [bMin, bMax]
+    };
+
+  }
+
+  function loadColorBounds () {
+
+    defineColor(
+      'monochrome',
+      null,
+      [[0,0],[100,0]]
+    );
+
+    defineColor(
+      'red',
+      [-26,18],
+      [[20,100],[30,92],[40,89],[50,85],[60,78],[70,70],[80,60],[90,55],[100,50]]
+    );
+
+    defineColor(
+      'orange',
+      [18,46],
+      [[20,100],[30,93],[40,88],[50,86],[60,85],[70,70],[100,70]]
+    );
+
+    defineColor(
+      'yellow',
+      [46,62],
+      [[25,100],[40,94],[50,89],[60,86],[70,84],[80,82],[90,80],[100,75]]
+    );
+
+    defineColor(
+      'green',
+      [62,178],
+      [[30,100],[40,90],[50,85],[60,81],[70,74],[80,64],[90,50],[100,40]]
+    );
+
+    defineColor(
+      'blue',
+      [178, 257],
+      [[20,100],[30,86],[40,80],[50,74],[60,60],[70,52],[80,44],[90,39],[100,35]]
+    );
+
+    defineColor(
+      'purple',
+      [257, 282],
+      [[20,100],[30,87],[40,79],[50,70],[60,65],[70,59],[80,52],[90,45],[100,42]]
+    );
+
+    defineColor(
+      'pink',
+      [282, 334],
+      [[20,100],[30,90],[40,86],[60,84],[80,80],[90,75],[100,73]]
+    );
+
+  }
+
+  function HSVtoRGB (hsv) {
+
+    // this doesn't work for the values of 0 and 360
+    // here's the hacky fix
+    var h = hsv[0];
+    if (h === 0) {h = 1;}
+    if (h === 360) {h = 359;}
+
+    // Rebase the h,s,v values
+    h = h/360;
+    var s = hsv[1]/100,
+        v = hsv[2]/100;
+
+    var h_i = Math.floor(h*6),
+      f = h * 6 - h_i,
+      p = v * (1 - s),
+      q = v * (1 - f*s),
+      t = v * (1 - (1 - f)*s),
+      r = 256,
+      g = 256,
+      b = 256;
+
+    switch(h_i) {
+      case 0: r = v; g = t; b = p;  break;
+      case 1: r = q; g = v; b = p;  break;
+      case 2: r = p; g = v; b = t;  break;
+      case 3: r = p; g = q; b = v;  break;
+      case 4: r = t; g = p; b = v;  break;
+      case 5: r = v; g = p; b = q;  break;
+    }
+
+    var result = [Math.floor(r*255), Math.floor(g*255), Math.floor(b*255)];
+    return result;
+  }
+
+  function HexToHSB (hex) {
+    hex = hex.replace(/^#/, '');
+    hex = hex.length === 3 ? hex.replace(/(.)/g, '$1$1') : hex;
+
+    var red = parseInt(hex.substr(0, 2), 16) / 255,
+          green = parseInt(hex.substr(2, 2), 16) / 255,
+          blue = parseInt(hex.substr(4, 2), 16) / 255;
+
+    var cMax = Math.max(red, green, blue),
+          delta = cMax - Math.min(red, green, blue),
+          saturation = cMax ? (delta / cMax) : 0;
+
+    switch (cMax) {
+      case red: return [ 60 * (((green - blue) / delta) % 6) || 0, saturation, cMax ];
+      case green: return [ 60 * (((blue - red) / delta) + 2) || 0, saturation, cMax ];
+      case blue: return [ 60 * (((red - green) / delta) + 4) || 0, saturation, cMax ];
+    }
+  }
+
+  function HSVtoHSL (hsv) {
+    var h = hsv[0],
+      s = hsv[1]/100,
+      v = hsv[2]/100,
+      k = (2-s)*v;
+
+    return [
+      h,
+      Math.round(s*v / (k<1 ? k : 2-k) * 10000) / 100,
+      k/2 * 100
+    ];
+  }
+
+  function stringToInteger (string) {
+    var total = 0
+    for (var i = 0; i !== string.length; i++) {
+      if (total >= Number.MAX_SAFE_INTEGER) break;
+      total += string.charCodeAt(i)
+    }
+    return total
+  }
+
+  // get The range of given hue when options.count!=0
+  function getRealHueRange(colorHue)
+  { if (!isNaN(colorHue)) {
+    var number = parseInt(colorHue);
+
+    if (number < 360 && number > 0) {
+      return getColorInfo(colorHue).hueRange
+    }
+  }
+    else if (typeof colorHue === 'string') {
+
+      if (colorDictionary[colorHue]) {
+        var color = colorDictionary[colorHue];
+
+        if (color.hueRange) {
+          return color.hueRange
+       }
+    } else if (colorHue.match(/^#?([0-9A-F]{3}|[0-9A-F]{6})$/i)) {
+        var hue = HexToHSB(colorHue)[0]
+        return getColorInfo(hue).hueRange
+    }
+  }
+
+    return [0,360]
+}
+  return randomColor;
+}));
+
+
+/***/ })
+
+}]);
