@@ -10,7 +10,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'docs', 'dist'),
     filename: '[name].bundle.js',
-    publicPath: '/dist/',
+    publicPath: 'auto',
     clean: true
   },
 
